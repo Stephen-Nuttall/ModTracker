@@ -439,5 +439,157 @@
             ],
             "tablePosition": 22
         }
+    ],
+    "priorityList": [
+        {
+            "name": "High Priority",
+            "r": 255,
+            "g": 85,
+            "b": 0
+        },
+        {
+            "name": "Low Priority",
+            "r": 255,
+            "g": 255,
+            "b": 0
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        {
+            "name": "New Priority",
+            "r": 255,
+            "g": 255,
+            "b": 255
+        }
     ]
 }

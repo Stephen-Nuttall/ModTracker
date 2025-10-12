@@ -12,7 +12,7 @@ function CreatePriorityPopup({ isOpen = false, setIsOpen, onSubmit }) {
     };
 
     return (
-        <div lassName='popupContainer'>
+        <div className='popupContainer'>
             {isOpen && (
                 <div className='popupOverlay'>
                     <div className='popupContent'>

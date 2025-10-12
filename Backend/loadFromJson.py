@@ -37,7 +37,7 @@ def _dictToModProfile(data, requireValidModURL=True):
     return mod.Profile(modList = newModList, name=data["name"], selectedVersion=data["version"])
 
 # Open a json file, read the data, and create a list of mod profiles from it
-def createProfileList(filename="mods.json"):
+def createProfileList(filename="mods.json", rawJson = None):
     appdata = os.getenv('APPDATA')
     directory = os.path.join(appdata, 'ModTracker')
     os.makedirs(directory, exist_ok=True)
@@ -55,7 +55,11 @@ def createProfileList(filename="mods.json"):
     return newProfileList
 
 # Open a json file, read the data, and create a single mod profile from it
-def createProfile(filename="mods.json", requireValidModURL=True):
+def createProfile(filename="mods.json", rawJson = None, requireValidModURL=True):
+    if rawJson:
+        profile = _dictToModProfile(rawJson, requireValidModURL=requireValidModURL)
+        return profile
+
     appdata = os.getenv('APPDATA')
     directory = os.path.join(appdata, 'ModTracker')
     os.makedirs(directory, exist_ok=True)

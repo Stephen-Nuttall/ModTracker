@@ -11,7 +11,7 @@ class TestData(object):
     # Some tests check that the latest version is correct, comparing against this.
     # This variable needs to be periodically updated.
     # It should probably be replaced with a better system at some point.
-    latestGameVersion = "1.21.9"
+    latestGameVersion = "1.21.10"
 
     selectedVersion = "1.21.5"
     highPriority = mod.Priority("High Priority", 255, 85, 0)

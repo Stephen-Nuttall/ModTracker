@@ -395,7 +395,9 @@ class PriorityDropdownManager():
             backgroundColor = QtGui.QColor(0, 255, 0)
             self._dropdownWidget.setCustomButtonText("Ready")
         else:
-            backgroundColor = self._mod.priority.color
+            priority = self._mod.priority
+            priorityColor = QtGui.QColor(priority.r, priority.g, priority.b)
+            backgroundColor = priorityColor
         
         self._dropdownWidget.setStyleSheet(backgroundColor.name())
 
@@ -417,5 +419,5 @@ class PriorityDropdownManager():
         if not modName:
             modName = "New Priority Level"
 
-        self._priorityList.append(mod.Priority(modName, color=color))
+        self._priorityList.append(mod.Priority(modName,color.red(), color.green(), color.blue()))
         self._changeModPriority(len(self._priorityList) - 1, True)  # select new priority level

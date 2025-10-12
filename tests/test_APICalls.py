@@ -40,7 +40,7 @@ class TestAPICalls(testData.TestCase):
 
         modObj1 = mod.Mod(url ="https://modrinth.com/mod/sodium")
         modObj2 = mod.Mod(url = "https://modrinth.com/mod/fabric-api")
-        modObj3 = mod.Mod(url = "https://modrinth.com/mod/cloth-config")
+        modObj3 = mod.Mod(url = "https://modrinth.com/mod/dynamic-fps")
         modObj4 = mod.Mod(url = "https://www.curseforge.com/minecraft/mc-mods/sodium") # on both sites
         modObj5 = mod.Mod(url = "https://www.curseforge.com/minecraft/mc-mods/ice-cream-mini-sword-and-new-trades") # only on curseforge
 

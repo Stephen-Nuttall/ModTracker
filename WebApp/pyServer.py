@@ -12,10 +12,10 @@ profileManager:mod.ProfileManager
 
 async def lifespan(app: FastAPI):
     global profileManager
-    profileManager = mod.ProfileManager([mod.Profile([
-        mod.Mod(url="https://modrinth.com/mod/sodium"),
-        mod.Mod(url="https://modrinth.com/mod/lithium")])], [
-        mod.Priority("High Priority"), mod.Priority("Medium Priority"), mod.Priority("Low Priority")
+    profileManager = mod.ProfileManager(priorityList=[
+        mod.Priority("High Priority"),
+        mod.Priority("Medium Priority"),
+        mod.Priority("Low Priority")
     ])
 
     yield
@@ -32,17 +32,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def genericExceptionCatch(exception):
+def genericExceptionCatch(exception, debugInfo = None):
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    return { "errorMessage" : f"{str(exception)}.\nException Details: {exc_type} {fname} {exc_tb.tb_lineno}"}
+    output = { "errorMessage" : f"{str(exception)}.\nException Details: {exc_type} {fname} {exc_tb.tb_lineno}"}
+
+    if debugInfo:
+        output["debugInfo"] = debugInfo
+
+    return output
 
 @app.post("/get-data")
 async def getData():
     global profileManager
     try:
         if profileManager:
-            return profileManager.createDict()
+            return {
+                "profileManager" : profileManager.createDict(),
+                "errorMessage" : "None"
+            }
         else:
             return {"errorMessage" : "ERROR: profileManager does not exist!"}
     except Exception as e:
@@ -89,34 +97,91 @@ async def getProfile(request: Request):
     except Exception as e:
         return genericExceptionCatch(e)
     
-@app.post("/load-profiles")
-async def loadProfiles():
+@app.post("/add-profile")
+async def addProfile(request: Request):
+    def createDebugInfo():
+        return {
+            "profileData" : profileData,
+            "profile" : str(profile),
+            "profileManager" : profileManager.createDict()
+        }
+
     global profileManager
     try:
-        profileList = loadFromJson.createProfileList()
-        for profile in profileList:
-            profileManager.addProfile(profile)   
+        data = await request.json()
+        profileData = data.get("profileData", None)
 
-        return profileManager.createDict()     
+        profile = mod.Profile()
+        if profileData:
+            profile = loadFromJson.createProfile(rawJson=profileData)
+        
+        profileManager.addProfile(profile, saveToFile=False)
+
+        return {
+            "profile": profile.createDict(),
+            "modListLength" : len(profile.modList),
+            "priorityListLength" : len(profile.priorityList),
+            "debugInfo" : createDebugInfo(),
+            "errorMessage" : "None"
+        }
+        
     except Exception as e:
-        return genericExceptionCatch(e)
+        return genericExceptionCatch(e, createDebugInfo())
+    
+# @app.post("/load-profiles")
+# async def loadProfiles():
+#     global profileManager
+#     try:
+#         profileList = loadFromJson.createProfileList()
+#         for profile in profileList:
+#             profileManager.addProfile(profile)   
+
+#         return profileManager.createDict()     
+#     except Exception as e:
+#         return genericExceptionCatch(e)
 
 @app.post("/add-mod")
 async def addMod(request: Request):
+    def createDebugInfo():
+        return {
+            "url" : url,
+            "profileIndex" : profileIndex,
+            "profile" : str(profile),
+            "profileManager" : profileManager.createDict()
+        }
+    
     global profileManager
     try:
         data = await request.json()
         profileIndex = data.get("profileIndex", -1)
-        url = data.get("url", "Something went wrong")
+        url = data.get("url", None)
 
         profile:mod.Profile = profileManager.getProfile(profileIndex)
-        
-        if profile.addMod(url):
-            return {"errorMessage" : "None"}
+
+        if not profile:
+            return {
+                "errorMessage" : f"Could not find a profile at index {profileIndex}.",
+                "debugInfo" : createDebugInfo()
+            }
+        if not url:
+            return {
+                "errorMessage" : "URL provided was invalid.",
+                "debugInfo" : createDebugInfo()
+            }
         else:
-            return {"errorMessage" : "Unable to add this mod. Check the URL you provided and verify it's correct."}
+            if profile.addMod(url):
+                return {
+                    "errorMessage" : "None",
+                    "debugInfo" : createDebugInfo()
+                }
+            else:
+                return {
+                    "errorMessage" : "Unable to add this mod. Check the URL you provided and verify it's correct.",
+                    "debugInfo" : createDebugInfo()
+                }
+            
     except Exception as e:
-        return genericExceptionCatch(e)
+        return genericExceptionCatch(e, createDebugInfo())
 
 @app.post("/remove-mod")
 async def removeMod(request: Request):
@@ -181,7 +246,8 @@ async def addPriority(request: Request):
 
         if profileIndex > -1 and modIndex > -1:
             profile:mod.Profile = profileManager.getProfile(profileIndex)
-            profile.priorityList.append(newPriority)
+            if newPriority not in profile.priorityList:
+                profile.priorityList.append(newPriority)
             
             modObj:mod.Mod = profile.getMod(modIndex)
             modObj.priority = newPriority

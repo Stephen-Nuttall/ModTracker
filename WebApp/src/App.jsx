@@ -6,6 +6,8 @@ import TextInputBox from './textInputBox';
 import CreatePriorityPopup from './createPriorityPopup';
 
 function App() {
+    let startupInitiated = false
+
     const blankProfileData = {
         profile: {
             "name": "No Data",
@@ -25,6 +27,19 @@ function App() {
     const [output, setOutput] = useState('');
     const [modToAddPriorityTo, setModToAddPriorityTo] = useState(-1)
 
+    useEffect(() => {
+        console.log("Beginning Startup")
+
+        if (startupInitiated == false) {
+            startupInitiated = true
+            restoreProfileData()
+        }
+
+        return () => {
+            startupInitiated = true
+        };
+    }, [])
+
     const modList = useMemo(() => {
         if (!profileData?.profile?.modlist) return [];
         return profileData.profile.modlist.map((modData, i) => ({
@@ -39,7 +54,17 @@ function App() {
 
     const priorityList = useMemo(() => {
         if (!profileData?.profile?.priorityList) return [];
-        return profileData.profile.priorityList.map(priorityData => ({
+
+        const uniqueNames = new Set();
+        return profileData.profile.priorityList.filter(priorityData => {
+            if (uniqueNames.has(priorityData.name)) {
+                console.warn("Duplicate priority name found! '" + priorityData.name + "' will not be displayed.")
+                return false; // Skip if the name is already in the set
+            } else {
+                uniqueNames.add(priorityData.name);
+                return true; // Include if the name is unique
+            }
+        }).map(priorityData => ({
             name: priorityData.name,
             r: priorityData.r,
             g: priorityData.g,
@@ -47,7 +72,6 @@ function App() {
         }));
     }, [profileData]);
 
-    useEffect(() => { updateProfileData() }, [])
 
     const genericCall = async (callName, params) => {
         try {
@@ -56,10 +80,43 @@ function App() {
             const response = await axios.post(url, params);
             return response.data
         } catch (error) {
-            console.error('Error calling API:\n', error);
-            setOutput('Error calling API:\n' + error);
+            console.error('Error calling API: ', error);
+            setOutput('Error calling API: ' + error);
             return { errorMessage: error.message }
         }
+    }
+
+    const restoreProfileData = async () => {
+        setIsLoading(true)
+        let callParams = {}
+
+        if (localStorage.getItem('profileData') !== null) {
+            const storedData = localStorage.getItem('profileData');
+            const parsedData = JSON.parse(storedData);
+            callParams = { "profileData": parsedData.profile }
+        } else {
+            console.log("No profile data was found in localstorage. Continuing without restoring any data.")
+        }
+
+        try {
+            const data = await genericCall("add-profile", callParams)
+
+            if (data.errorMessage != "None") {
+                console.error("Error restoring data: " + data.errorMessage + "\nDebug info: " + data.debugInfo)
+                setOutput("Error restoring data: " + data.errorMessage)
+            } else {
+                console.log("Restored profile data: " + data.profile
+                    + "\nProfile list length: " + data.debugInfo.profileManager.profileList.length)
+                setProfileData(data)
+                localStorage.setItem('profileData', JSON.stringify(data))
+            }
+        } catch (error) {
+            console.error("Error restoring data: " + error)
+        } finally {
+            setIsLoading(false);
+        }
+
+        updateProfileData()
     }
 
     const updateProfileData = async () => {
@@ -67,10 +124,11 @@ function App() {
         const data = await genericCall("get-profile", { profileIndex: 0 })
 
         if (data.errorMessage != "None") {
-            console.error("Error fetching data:\n" + profileData.errorMessage + "\nChanges not applied.")
-            setOutput("ERROR:\n" + profileData.errorMessage + "\nChanges not applied.")
+            console.error("Error fetching data: " + data.errorMessage + "\nNo changes could applied, and no new data could be loaded.")
+            setOutput("Error fetching data: " + data.errorMessage + "\nNo changes could applied, and no new data could be loaded.")
         } else {
             setProfileData(data)
+            localStorage.setItem('profileData', JSON.stringify(data))
         }
         setIsLoading(false)
     }
@@ -94,8 +152,8 @@ function App() {
             })
 
             if (data.errorMessage != "None") {
-                console.error("ERROR:\n" + data.errorMessage)
-                setOutput("ERROR:\n" + data.errorMessage)
+                console.error("Failed to update priority level: " + data.errorMessage)
+                setOutput("Failed to update priority level: " + data.errorMessage)
             } else {
                 setOutput('Priority level successfully updated to ' + data.priority.name)
             }
@@ -137,8 +195,8 @@ function App() {
         setModToAddPriorityTo(-1)
 
         if (data.errorMessage != "None") {
-            console.error("ERROR:\n" + data.errorMessage)
-            setOutput("ERROR:\n" + data.errorMessage)
+            console.error("Failed to add new priority level: " + data.errorMessage)
+            setOutput("Failed to add priority level: " + data.errorMessage)
         }
 
         updateProfileData()
@@ -148,8 +206,8 @@ function App() {
         const data = await genericCall("remove-mod", { profileIndex: 0, modIndex: tableIndex })
 
         if (data.errorMessage != "None") {
-            console.error("ERROR:\n" + data.errorMessage)
-            setOutput("ERROR:\n" + data.errorMessage)
+            console.error("Failed to remove mod: " + data.errorMessage)
+            setOutput("Failed to remove mod: " + data.errorMessage)
         } else {
             setOutput('Mod successfully removed')
         }
@@ -160,8 +218,8 @@ function App() {
         const data = await genericCall("add-mod", { url: input, profileIndex: 0 })
 
         if (data.errorMessage != "None") {
-            console.error("ERROR:\n" + data.errorMessage)
-            setOutput("ERROR:\n" + data.errorMessage)
+            console.error("Failed to add mod: " + data.errorMessage)
+            setOutput("Failed to add mod: " + data.errorMessage)
         } else {
             setOutput('Mod successfully added')
         }

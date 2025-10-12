@@ -1,27 +1,18 @@
-from PyQt6 import QtGui
 import webbrowser, threading, json, os
 import Backend.callModrinth as callModrinth, Backend.callCurseForge as callCurseForge
 import Backend.loadFromJar as loadFromJar, Backend.loadFromJson as loadFromJson
 
 class Priority(object):
     name:str
-    color:QtGui.QColor
     r:int
     g:int
     b:int
 
-    def __init__(self, newName = "New Priority Level", red = 255, green = 255, blue = 255, color:QtGui.QColor = None):
+    def __init__(self, newName = "New Priority Level", red = 255, green = 255, blue = 255):
         self.name = newName
         self.r = red
         self.g = green
         self.b = blue
-        if color == None:
-            self.color = QtGui.QColor(red, green, blue)
-        else:
-            self.color = color
-            self.r = color.red()
-            self.g = color.green()
-            self.b = color.blue()
 
     def createDict(self):
         return {
@@ -30,7 +21,6 @@ class Priority(object):
             "g":self.g,
             "b":self.b
         }
-        
 
     def __str__(self):
         return f"{self.name}"
@@ -255,7 +245,13 @@ class Profile(object):
 
     # Adds a mod to the profile. Returns True if mod was successfully added. Otherwise, returns false.
     def addMod(self, inputString):
-        newMod = Mod(url = inputString, modPriority=self.priorityList[0], tablePosition=len(self.modList))
+        try:
+            newMod = Mod(url = inputString, modPriority=self.priorityList[0], tablePosition=len(self.modList))
+        except IndexError:
+            self.priorityList = [
+                Priority("High Priority", 255, 85, 0),
+                Priority("Low Priority", 255, 255, 0)]
+            newMod = Mod(url = inputString, modPriority=self.priorityList[0], tablePosition=len(self.modList))
         
         if newMod.isValid():
             self.modList.append(newMod)
@@ -373,15 +369,20 @@ class ProfileManager():
 
     def getProfile(self, index):
         if self._profileList:
-            return self._profileList[index]
+            try:
+                return self._profileList[index]
+            except IndexError:
+                return None
         else:
             return None
 
-    def addProfile(self, newProfile:Profile, profileName:str, saveToFile = True):
+    def addProfile(self, newProfile:Profile, profileName:str = None, saveToFile = True):
         if not newProfile:
             return
 
-        newProfile.name = profileName
+        if profileName:
+            newProfile.name = profileName
+
         self._profileList.append(newProfile)
         self.updatePriorityLists()
         self.sortModLists()

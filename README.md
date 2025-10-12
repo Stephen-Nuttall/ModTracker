@@ -33,7 +33,7 @@ Alternatively, you can install the executable directly from the latest action on
 If there are any issues with this version Mod Tracker, report it on our [issues page](https://github.com/Stephen-Nuttall/ModTracker/issues).
 
 ## Technical Details
-For those who want to download this repository on your own computer, here's some helpful information.
+For those who want to clone this repository, here's some helpful information.
 
 Required Python libraries:
 - requests
@@ -44,8 +44,8 @@ Required Python libraries:
 
 To run Mod Tracker Web in your IDE:
 - Install Python 3 and the required libraries listed above (You do not need to install ones used for the desktop app).
-- Unsure localhost ports 5173 and 8000 are available.
-- From the WebApp directory, run `./runServers.ps1`. (Note: this script accepts an optional -Path argument. Example use: `./WebApp/runServers.ps1 -Path "./WebApp"`)
+- Ensure localhost ports 5173 and 8000 are available.
+- In your python virtual environment and from the WebApp directory, run `./runServers.ps1`. (Note: this script accepts an optional -Path argument. Example use: `./WebApp/runServers.ps1 -Path "./WebApp"`)
 - Open http://localhost:5173/ in your web browser.
 
 To run Mod Tracker Desktop in your IDE:

@@ -199,8 +199,9 @@ class PieChart():
             if priority == self._readySlice:
                 slice.setExploded()
 
-            slice.setColor(priority.color)
-            slice.setBorderColor(priority.color)
+            priorityColor = QtGui.QColor(priority.r, priority.g, priority.b)
+            slice.setColor(priorityColor)
+            slice.setBorderColor(priorityColor)
 
             slice.setLabelVisible()
             slice.setLabelFont(label_font)
