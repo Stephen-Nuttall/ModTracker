@@ -1,6 +1,11 @@
 import './styles/modTable.css';
 
-const ModTable = ({ mods, onPriorityChange, onDelete }) => {
+const ModTable = ({ modList, priorityList, onPriorityChange, onDelete }) => {
+    let priorityNames = []
+    for (let i = 0; i < priorityList.length; i++) {
+        priorityNames.push(priorityList[i].name)
+    }
+
     return (
         <table className="mod-table">
             <thead>
@@ -12,20 +17,26 @@ const ModTable = ({ mods, onPriorityChange, onDelete }) => {
                 </tr>
             </thead>
             <tbody>
-                {mods.map((mod) => (
+                {modList.map((mod) => (
                     <tr key={mod.tablePos}>
                         <td>{mod.name}</td>
                         <td>{mod.versions.at(-1)}</td>
                         <td>
                             <select
-                                value={mod.priority.name}
+                                key={mod.priority.name}
+                                value={priorityNames.indexOf(mod.priority.name)}
                                 onChange={(e) => onPriorityChange(mod.tablePos, e.target.value)}
                                 className="priority-dropdown"
                             >
-                                <option value="Low Priority">Low Priority</option>
-                                <option value="Medium Priority">Medium Priority</option>
-                                <option value="High Priority">High Priority</option>
-                                <option value={mod.priority.name}>{mod.priority.name}</option>
+                                {priorityList.map((priority, index) => (
+                                    <option
+                                        key={priority.name}
+                                        value={index}
+                                    >
+                                        {priority.name}
+                                    </option>
+                                ))}
+                                <option key={"CREATE_NEW"} value={"CREATE_NEW"}>Create New Priority Level</option>
                             </select>
                         </td>
                         <td>

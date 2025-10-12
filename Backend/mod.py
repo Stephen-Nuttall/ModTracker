@@ -247,6 +247,8 @@ class Profile(object):
     
     def getModList(self): return self.modList
 
+    def getMod(self, index): return self.modList[index]
+
     def getPriorityList(self): return self.priorityList
 
     def getSelectedVersion(self): return self.selectedVersion
@@ -259,6 +261,19 @@ class Profile(object):
             self.modList.append(newMod)
             return True
         else:
+            return False
+    
+    # Removes a mod to the profile. Returns True if mod was successfully removed. Otherwise, returns false.
+    def removeMod(self, index):
+        try:
+            mod = self.modList[index]
+
+            if mod:
+                self.modList.remove(mod)
+                return True
+            else:
+                return False
+        except IndexError:
             return False
 
     # Refreshes the data for each mod by making fresh API calls
@@ -326,10 +341,16 @@ class Profile(object):
         modlist = []
         for mod in self.modList:
             modlist.append(mod.createDict())
+
+        prioritylist = []
+        for priority in self.priorityList:
+            prioritylist.append(priority.createDict())
+
         return {
             "name":self.name,
             "version":self.selectedVersion,
-            "modlist":modlist
+            "modlist":modlist,
+            "priorityList":prioritylist
         }
 
 # Manages all the user's profiles based on their interactions with the front end.
@@ -367,6 +388,9 @@ class ProfileManager():
 
         if saveToFile and self._allowWriteToFile:
             self.saveToJson()
+
+    def addPriority(self, newPriority:Priority):
+        self._priorityList.append(newPriority)
 
     # Write the details of each profile to a json file
     def saveToJson(self, filename="mods.json", updatedProfile:Profile = None, editedProfileIndex = -1):
