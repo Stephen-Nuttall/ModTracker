@@ -36,7 +36,10 @@
     color: #cc0000;
 }
 
-.add-mod-button {
+.generic-button {
+    margin-top: 10px;
     margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
     padding: 8px 16px;
 }

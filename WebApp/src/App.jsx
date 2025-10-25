@@ -23,7 +23,8 @@ function App() {
     const [profileData, setProfileData] = useState(blankProfileData)
     const [isLoading, setIsLoading] = useState(false);
     const [priorityPopupOpen, PriorityPopupVisible] = useState(false);
-    const [input, setInput] = useState('');
+    const [modInput, setModInput] = useState('');
+    const [versionInput, setVersionInput] = useState('');
     const [output, setOutput] = useState('');
     const [modToAddPriorityTo, setModToAddPriorityTo] = useState(-1)
 
@@ -73,11 +74,27 @@ function App() {
     }, [profileData]);
 
 
-    const genericCall = async (callName, params) => {
+    const genericRequest = async (callName, params, errorOutput = false, successOutput = false, updateData = true) => {
         try {
             const url = `http://localhost:8000/${callName}`
             console.log('Making post to ' + url + ' with data ' + JSON.stringify(params))
             const response = await axios.post(url, params);
+
+            if (response.data.errorMessage != "None") {
+                if (errorOutput != false) {
+                    console.error(errorOutput + response.data.errorMessage)
+                    setOutput(errorOutput + response.data.errorMessage)
+                } else {
+                    console.error("Error while performing backend operations: " + response.data.errorMessage)
+                }
+            } else if (successOutput != false) {
+                setOutput(successOutput)
+            }
+
+            if (updateData == true) {
+                updateProfileData()
+            }
+
             return response.data
         } catch (error) {
             console.error('Error calling API: ', error);
@@ -99,12 +116,9 @@ function App() {
         }
 
         try {
-            const data = await genericCall("add-profile", callParams)
+            const data = await genericRequest("add-profile", callParams, "Error restoring data: ")
 
-            if (data.errorMessage != "None") {
-                console.error("Error restoring data: " + data.errorMessage + "\nDebug info: " + data.debugInfo)
-                setOutput("Error restoring data: " + data.errorMessage)
-            } else {
+            if (data.errorMessage == "None") {
                 console.log("Restored profile data: " + data.profile
                     + "\nProfile list length: " + data.debugInfo.profileManager.profileList.length)
                 setProfileData(data)
@@ -115,18 +129,19 @@ function App() {
         } finally {
             setIsLoading(false);
         }
-
-        updateProfileData()
     }
 
     const updateProfileData = async () => {
         setIsLoading(true)
-        const data = await genericCall("get-profile", { profileIndex: 0 })
+        const data = await genericRequest(
+            "get-profile",
+            { profileIndex: 0 },
+            "Error fetching data. No changes could applied, and no new data could be loaded.\nError message: ",
+            false,
+            false
+        )
 
-        if (data.errorMessage != "None") {
-            console.error("Error fetching data: " + data.errorMessage + "\nNo changes could applied, and no new data could be loaded.")
-            setOutput("Error fetching data: " + data.errorMessage + "\nNo changes could applied, and no new data could be loaded.")
-        } else {
+        if (data.errorMessage == "None") {
             setProfileData(data)
             localStorage.setItem('profileData', JSON.stringify(data))
         }
@@ -142,23 +157,19 @@ function App() {
 
         if (priorityIndex < profileData.priorityListLength) {
             let newPriority = priorityList[priorityIndex]
-            const data = await genericCall("update-mod-priority", {
-                profileIndex: 0,
-                modIndex: tableIndex,
-                priorityName: newPriority.name,
-                red: newPriority.r,
-                green: newPriority.g,
-                blue: newPriority.b
-            })
-
-            if (data.errorMessage != "None") {
-                console.error("Failed to update priority level: " + data.errorMessage)
-                setOutput("Failed to update priority level: " + data.errorMessage)
-            } else {
-                setOutput('Priority level successfully updated to ' + data.priority.name)
-            }
-
-            updateProfileData()
+            const data = await genericRequest(
+                "update-mod-priority",
+                {
+                    profileIndex: 0,
+                    modIndex: tableIndex,
+                    priorityName: newPriority.name,
+                    red: newPriority.r,
+                    green: newPriority.g,
+                    blue: newPriority.b
+                },
+                "Failed to update priority level: ",
+                'Priority level successfully updated'
+            )
         } else {
             console.error("PriorityIndex of " + priorityIndex + " is out of range")
         }
@@ -184,69 +195,74 @@ function App() {
             }
         }
 
-        const data = await genericCall("add-priority", {
-            profileIndex: 0,
-            modIndex: modToAddPriorityTo,
-            priorityName: priorityName,
-            red: color.r,
-            green: color.g,
-            blue: color.b
-        })
+        const data = await genericRequest(
+            "add-priority",
+            {
+                profileIndex: 0,
+                modIndex: modToAddPriorityTo,
+                priorityName: priorityName,
+                red: color.r,
+                green: color.g,
+                blue: color.b
+            },
+            "Failed to add new priority level: "
+        )
         setModToAddPriorityTo(-1)
-
-        if (data.errorMessage != "None") {
-            console.error("Failed to add new priority level: " + data.errorMessage)
-            setOutput("Failed to add priority level: " + data.errorMessage)
-        }
-
-        updateProfileData()
     }
 
     const handleDelete = async (tableIndex) => {
-        const data = await genericCall("remove-mod", { profileIndex: 0, modIndex: tableIndex })
-
-        if (data.errorMessage != "None") {
-            console.error("Failed to remove mod: " + data.errorMessage)
-            setOutput("Failed to remove mod: " + data.errorMessage)
-        } else {
-            setOutput('Mod successfully removed')
-        }
-        updateProfileData()
+        const data = await genericRequest(
+            "remove-mod", { profileIndex: 0, modIndex: tableIndex },
+            "Failed to remove mod: ", "Mod successfully removed."
+        )
     };
 
     const addMod = async () => {
-        const data = await genericCall("add-mod", { url: input, profileIndex: 0 })
+        const data = await genericRequest(
+            "add-mod", { url: modInput, profileIndex: 0 },
+            "Failed to add mod: ", "Mod successfully added."
+        )
+    }
 
-        if (data.errorMessage != "None") {
-            console.error("Failed to add mod: " + data.errorMessage)
-            setOutput("Failed to add mod: " + data.errorMessage)
-        } else {
-            setOutput('Mod successfully added')
-        }
-
-        updateProfileData()
+    const reloadProfile = async () => {
+        const data = await genericRequest(
+            "update-profile", { profileIndex: 0, profileVersion: versionInput },
+            "Failed to update profile: ", "Profile successfully reloaded."
+        )
     }
 
     return (
         <>
-            <h2>{profileData.profile.name}</h2>
-            <pre>Selected Version: {profileData.profile.version}</pre>
-            <pre>{profileData.modListLength} mods</pre>
+            <div>
+                <h2>{profileData.profile.name}</h2>
+                Selected Version:
+                <TextInputBox
+                    onTextChange={(newInput) => { setVersionInput(newInput) }}
+                    placeholderText={profileData.profile.version}
+                    length={25}
+                />
+                <button onClick={reloadProfile} className="generic-button">⟳</button>
+            </div>
 
-            <ModTable
-                modList={modList}
-                priorityList={priorityList}
-                onPriorityChange={handlePriorityChange}
-                onDelete={handleDelete}
-            />
+            <div>
+                <ModTable
+                    modList={modList}
+                    priorityList={priorityList}
+                    onPriorityChange={handlePriorityChange}
+                    onDelete={handleDelete}
+                    selectedVersion={profileData.profile.version}
+                />
+            </div>
 
-            <TextInputBox
-                onTextChange={(newInput) => { setInput(newInput) }}
-                placeholderText='Enter Mod URL'
-                length={75}
-            />
-            <button onClick={addMod} className="add-mod-button">Add Mod</button>
-            <pre>{output}</pre>
+            <div>
+                <TextInputBox
+                    onTextChange={(newInput) => { setModInput(newInput) }}
+                    placeholderText='Enter Mod URL'
+                    length={75}
+                />
+                <button onClick={addMod} className="generic-button">Add Mod</button>
+                <pre>{output}</pre>
+            </div>
 
             <CreatePriorityPopup
                 isOpen={priorityPopupOpen}

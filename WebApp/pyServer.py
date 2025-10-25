@@ -13,9 +13,9 @@ profileManager:mod.ProfileManager
 async def lifespan(app: FastAPI):
     global profileManager
     profileManager = mod.ProfileManager(priorityList=[
-        mod.Priority("High Priority"),
-        mod.Priority("Medium Priority"),
-        mod.Priority("Low Priority")
+        mod.Priority("High Priority", red=255, green=85, blue=0),
+        mod.Priority("Medium Priority", red=255, green=170, blue=0),
+        mod.Priority("Low Priority", red=255, green=255, blue=0)
     ])
 
     yield
@@ -79,7 +79,7 @@ async def getProfile(request: Request):
     global profileManager
     try:
         data = await request.json()
-        profileIndex = data.get("profileIndex", -1)
+        profileIndex = data.get("profileIndex", None)
 
         profile = profileManager.getProfile(profileIndex)
         
@@ -128,17 +128,43 @@ async def addProfile(request: Request):
     except Exception as e:
         return genericExceptionCatch(e, createDebugInfo())
     
-# @app.post("/load-profiles")
-# async def loadProfiles():
-#     global profileManager
-#     try:
-#         profileList = loadFromJson.createProfileList()
-#         for profile in profileList:
-#             profileManager.addProfile(profile)   
 
-#         return profileManager.createDict()     
-#     except Exception as e:
-#         return genericExceptionCatch(e)
+@app.post("/update-profile")
+async def updateProfile(request: Request):
+    global profileManager
+    try:
+        data = await request.json()
+        profileIndex = data.get("profileIndex", None)
+        newVersion = data.get("profileVersion", None)
+        newName = data.get("profileName", None)
+
+        profile:mod.Profile = profileManager.getProfile(profileIndex)
+        
+        if profile:
+            if newVersion:
+                profile.selectedVersion = newVersion
+            
+            if newName:
+                profile.name = newName
+            
+            if newVersion or newName:
+                profileList = profileManager.getProfileList()
+                profileList[profileIndex] = profile
+
+            profile.refresh(newVersion)
+
+            return {
+                "profile": profile.createDict(),
+                "modListLength" : len(profile.modList),
+                "priorityListLength" : len(profile.priorityList),
+                "errorMessage" : "None"
+            }
+        else:
+            return {
+                "errorMessage" : f"Could not find a profile at index {profileIndex}." 
+            }
+    except Exception as e:
+        return genericExceptionCatch(e)
 
 @app.post("/add-mod")
 async def addMod(request: Request):
@@ -153,7 +179,7 @@ async def addMod(request: Request):
     global profileManager
     try:
         data = await request.json()
-        profileIndex = data.get("profileIndex", -1)
+        profileIndex = data.get("profileIndex", None)
         url = data.get("url", None)
 
         profile:mod.Profile = profileManager.getProfile(profileIndex)
@@ -188,7 +214,7 @@ async def removeMod(request: Request):
     global profileManager
     try:
         data = await request.json()
-        profileIndex = data.get("profileIndex", -1)
+        profileIndex = data.get("profileIndex", None)
         modIndex = data.get("modIndex", -1)
 
         profile:mod.Profile = profileManager.getProfile(profileIndex)
@@ -206,7 +232,7 @@ async def updateModPriority(request: Request):
     try:
         data = await request.json()
 
-        profileIndex = data.get("profileIndex", -1)
+        profileIndex = data.get("profileIndex", None)
         modIndex = data.get("modIndex", -1)
 
         priorityName = data.get("priorityName", "Something went wrong")
@@ -233,7 +259,7 @@ async def addPriority(request: Request):
     try:
         data = await request.json()
 
-        profileIndex = data.get("profileIndex", -1)
+        profileIndex = data.get("profileIndex", None)
         modIndex = data.get("modIndex", -1)
 
         priorityName = data.get("priorityName", "Something went wrong")
