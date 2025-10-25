@@ -12,16 +12,14 @@
 }
 
 .mod-table th {
-    /* background-color: #555555; */
-    /* Change this to your preferred color */
     color: white;
-    /* Optional: Change text color for better contrast */
 }
 
 .priority-dropdown {
     padding: 4px;
     border-radius: 4px;
-    border: 1px solid #ccc;
+    border: 1px solid #cccccc00;
+    background: #cccccc00;
 }
 
 .delete-button {

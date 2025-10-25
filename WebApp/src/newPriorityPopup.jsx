@@ -3,9 +3,47 @@ import { SketchPicker } from 'react-color';
 import TextInputBox from './textInputBox';
 import './styles/popup.css'
 
-function CreatePriorityPopup({ isOpen = false, setIsOpen, onSubmit }) {
+function NewPriorityPopup({ isOpen = false, setIsOpen, requestRef, priorityList, modToAddPriorityTo }) {
     const [textInput, setTextInput] = useState("")
     const [color, setColor] = useState({ r: 255, g: 255, b: 255, a: 1 });
+
+    const createNewPriority = async () => {
+        if (textInput === undefined || textInput == "") {
+            console.log("Failed to add priority level: PriorityName (" + textInput + ") is invalid.")
+            return
+        } else if (modToAddPriorityTo == -1) {
+            console.log("Failed to add priority level: modToAddPriorityTo (" + modToAddPriorityTo + ") is not set.")
+            return
+        } else {
+            let priorityNames = []
+            for (let i = 0; i < priorityList.length; i++) {
+                priorityNames.push(priorityList[i].name)
+            }
+
+            if (priorityNames.includes(textInput)) {
+                console.log("Failed to add priority level: There is already a priority named " + textInput + " in the priority list.")
+                setOutput("Can't create priority level. There is already a priority level named '" + textInput + "'!")
+                return
+            }
+        }
+
+        if (requestRef.current) {
+            const data = await requestRef.current?.genericRequest(
+                "add-priority",
+                {
+                    profileIndex: 0,
+                    modIndex: modToAddPriorityTo,
+                    priorityName: textInput,
+                    red: color.r,
+                    green: color.g,
+                    blue: color.b
+                },
+                "Failed to add new priority level: "
+            )
+        } else {
+            console.error("requestRef is not set!")
+        }
+    }
 
     const handleColorChange = (color) => {
         setColor(color.rgb);
@@ -35,7 +73,7 @@ function CreatePriorityPopup({ isOpen = false, setIsOpen, onSubmit }) {
                         <button
                             className='closeButton'
                             onClick={() => {
-                                onSubmit(textInput, color)
+                                createNewPriority()
                                 setIsOpen(false)
                             }}
                         >
@@ -56,4 +94,4 @@ function CreatePriorityPopup({ isOpen = false, setIsOpen, onSubmit }) {
     );
 }
 
-export default CreatePriorityPopup;
+export default NewPriorityPopup;

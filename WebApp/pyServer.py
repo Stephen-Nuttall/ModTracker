@@ -13,8 +13,8 @@ profileManager:mod.ProfileManager
 async def lifespan(app: FastAPI):
     global profileManager
     profileManager = mod.ProfileManager(priorityList=[
-        mod.Priority("High Priority", red=255, green=85, blue=0),
-        mod.Priority("Medium Priority", red=255, green=170, blue=0),
+        mod.Priority("High Priority", red=255, green=128, blue=0),
+        mod.Priority("Medium Priority", red=255, green=196, blue=0),
         mod.Priority("Low Priority", red=255, green=255, blue=0)
     ])
 

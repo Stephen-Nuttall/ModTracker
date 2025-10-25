@@ -46,14 +46,11 @@ const ModTable = ({ modList, priorityList, onPriorityChange, onDelete, selectedV
                                 onChange={(e) => onPriorityChange(mod.tablePos, e.target.value)}
                                 className="priority-dropdown"
                                 style={{
-                                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                                    // backgroundColor: `rgb(${mod.priority.r}, ${mod.priority.g}, ${mod.priority.b})`,
                                     color: mod.priority.r >= darkTextThreshold
                                         || mod.priority.g >= darkTextThreshold
                                         || mod.priority.b >= darkTextThreshold
                                         ? 'black'
-                                        : 'white',
-                                    borderColor: 'rgba(0, 0, 0, 0)'
+                                        : 'white'
                                 }}
                             >
                                 {priorityList.map((priority, index) => (
