@@ -16,6 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.post("/ping")
+async def ping(): return "Pong!"
+
 @app.post("/get-data")
 async def getData(request: Request): return await request.app.state.data.getData()
 

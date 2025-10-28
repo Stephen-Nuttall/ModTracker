@@ -36,14 +36,20 @@ class DataManager():
     async def getProfileList(self):
         try:
             profileData = self._profileManager.createDict()
-            return profileData["profileList"]
+            return {
+                "profileList" : profileData["profileList"],
+                "errorMessage" : "None"
+            }
         except Exception as e:
             return self._genericExceptionCatch(e)
 
     async def getPriorityList(self):
         try:
-            profileData = self._profileManager.createDict()
-            return profileData["priorityList"]
+            priorityData = self._profileManager.createDict()
+            return {
+                "priorityList" : priorityData["priorityList"],
+                "errorMessage" : "None"
+            }
         except Exception as e:
             return self._genericExceptionCatch(e)
 
@@ -52,11 +58,14 @@ class DataManager():
             data = await request.json()
             profileIndex = data.get("profileIndex", None)
 
+            if profileIndex == None:
+                return { "errorMessage" : "Profile index not provided (or it was falsy)" }
+
             profile = self._profileManager.getProfile(profileIndex)
             
             if profile:
                 return {
-                    "profile": profile.createDict(),
+                    "profile" : profile.createDict(),
                     "modListLength" : len(profile.modList),
                     "priorityListLength" : len(profile.priorityList),
                     "errorMessage" : "None"
@@ -83,6 +92,8 @@ class DataManager():
             profile = mod.Profile()
             if profileData:
                 profile = loadFromJson.createProfile(rawJson=profileData)
+            else:
+                return { "errorMessage" : "No profile data provided (or data was falsy)" }
             
             self._profileManager.addProfile(profile, saveToFile=False)
 
@@ -114,11 +125,9 @@ class DataManager():
                 if newName:
                     profile.name = newName
                 
-                if newVersion or newName:
-                    profileList = self._profileManager.getProfileList()
-                    profileList[profileIndex] = profile
-
                 profile.refresh(newVersion)
+                profileList = self._profileManager.getProfileList()
+                profileList[profileIndex] = profile
 
                 return {
                     "profile": profile.createDict(),
