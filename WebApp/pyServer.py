@@ -1,6 +1,11 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-import appData
+import sys
+
+if "test" in sys.argv[0]:
+    import WebApp.appData as appData
+else:
+    import appData
 
 async def lifespan(app: FastAPI):
     app.state.data = appData.DataManager()

@@ -1,35 +1,23 @@
-import sys, os, unittest, requests
+import sys, os, unittest, testData
+from fastapi.testclient import TestClient
 
 # Add the parent directory to the Python path
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
 
-import Backend.mod as mod
+import Backend.mod as mod, WebApp.appData as appData
+from WebApp.pyServer import app
 
-class TestPyServer(unittest.TestCase):
-    _skipTests = False
-        
-    def _genericCall(self, callName:str, requestParameters:dict = None):
-        requestTimeout = 2.0
-        url = f"http://localhost:8000/{callName}"
+class TestPyServer(testData.TestCase):
+    runSetup = False
+    runTeardown = False
 
-        try:
-            if requestParameters:
-                response = requests.post(url, json=requestParameters, timeout=(requestTimeout, requestTimeout))
-            else:
-                response = requests.post(url, timeout=(requestTimeout, requestTimeout))
-        
-            if response.status_code == 200:
-                return response.json()  
-            else:
-                print(f"Error reaching PyServer: {response.status_code}, {response.text}")
-                return False
-        except requests.exceptions.Timeout:
-            print(f"Request to PyServer timed out after {requestTimeout} seconds")
-            return False
-        except requests.exceptions.ConnectionError:
-            print(f"Failed to reach PyServer")
-            return False
+    @classmethod
+    def setUpClass(cls):
+        cls.client = TestClient(app)
+
+    def setUp(self):
+        app.state.data = appData.DataManager(useTestSetup=True)
         
     def _verifyModDict(self, modDict):
         name = modDict["name"]
@@ -73,149 +61,244 @@ class TestPyServer(unittest.TestCase):
             priority = priorityList[0]
             self._verifyPriorityDict(priority)
     
-    def test1_ping(self):
-        response = self._genericCall("ping")
-
-        if not response:
-            self.__class__._skipTests = True
-            self.skipTest("PyServer could not be pinged. Skipping PyServer tests.")
-        else:
-            self.__class__._skipTests = False
+    def testPing(self):
+        response = self.client.post("ping")
+        self.assertEqual(response.status_code, 200)
 
     def testGetData(self):
-        if self.__class__._skipTests:
-            self.skipTest("Failed to ping PyServer")
-            
-        response = self._genericCall("get-data")
-        self.assertNotEqual(response, False)
+        response = self.client.post("get-data")
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
         
         try:
-            errorMessage = response["errorMessage"]
+            errorMessage = json["errorMessage"]
             self.assertEqual(errorMessage, "None")
 
-            profileManager = response["profileManager"]
+            profileManager = json["profileManager"]
             self._verifyProfileManagerDict(profileManager)
-        except KeyError:
-            errorString = "The format of PyServer's response does not match expected format."
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
             self.fail(errorString)
 
     def testGetProfileList(self):
-        if self.__class__._skipTests:
-            self.skipTest("Failed to ping PyServer")
-            
-        response = self._genericCall("get-profile-list")
-        self.assertNotEqual(response, False)
+        response = self.client.post("get-profile-list")
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
         
         try:
-            errorMessage = response["errorMessage"]
+            errorMessage = json["errorMessage"]
             self.assertEqual(errorMessage, "None")
             
-            profileList = response["profileList"]
+            profileList = json["profileList"]
 
             if profileList:
                 self._verifyProfileDict(profileList[0])
-        except KeyError:
-            errorString = "The format of PyServer's response does not match expected format."
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
             self.fail(errorString)
 
     def testGetPriorityList(self):
-        if self.__class__._skipTests:
-            self.skipTest("Failed to ping PyServer")
-            
-        response = self._genericCall("get-priority-list")
-        self.assertNotEqual(response, False)
+        response = self.client.post("get-priority-list")
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
         
         try:
-            errorMessage = response["errorMessage"]
+            errorMessage = json["errorMessage"]
             self.assertEqual(errorMessage, "None")
             
-            priorityList = response["priorityList"]
+            priorityList = json["priorityList"]
 
             if priorityList:
                 self._verifyPriorityDict(priorityList[0])
-        except KeyError:
-            errorString = "The format of PyServer's response does not match expected format."
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
             self.fail(errorString)
 
     def testGetProfile(self):
-        if self.__class__._skipTests:
-            self.skipTest("Failed to ping PyServer")
-            
-        index = 0
-        response = self._genericCall("get-profile", {'profileIndex' : index})
-        self.assertNotEqual(response, False)
+        response = self.client.post("get-profile", json={'profileIndex' : 0})
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
         
         try:
-            errorMessage = response["errorMessage"]
+            errorMessage = json["errorMessage"]
 
             if errorMessage == "Could not find a profile at index 0.":
-                return
+                self.fail("This test cannot be conducted without any profiles in the profile manager.")
             
             self.assertEqual(errorMessage, "None")
             
-            profile = response["profile"]
+            profile = json["profile"]
             self._verifyProfileDict(profile)
 
-            modListLength = response["modListLength"]
-            priorityListLength = response["priorityListLength"]
-        except KeyError:
-            errorString = "The format of PyServer's response does not match expected format."
+            modListLength = json["modListLength"]
+            priorityListLength = json["priorityListLength"]
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
             self.fail(errorString)
 
     def testAddProfile(self):
-        if self.__class__._skipTests:
-            self.skipTest("Failed to ping PyServer")
-
         newProfile = mod.Profile()
-        
-        response = self._genericCall("add-profile", {'profileData' : newProfile.createDict()})
-        self.assertNotEqual(response, False)
+        response = self.client.post("add-profile", json={'profileData' : newProfile.createDict()})
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
         
         try:
-            errorMessage = response["errorMessage"]
+            errorMessage = json["errorMessage"]
             self.assertEqual(errorMessage, "None")
             
-            profile = response["profile"]
+            profile = json["profile"]
             self._verifyProfileDict(profile)
 
-            modListLength = response["modListLength"]
-            priorityListLength = response["priorityListLength"]
-        except KeyError:
-            errorString = "The format of PyServer's response does not match expected format."
+            modListLength = json["modListLength"]
+            priorityListLength = json["priorityListLength"]
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
             self.fail(errorString)
 
     def testUpdateProfile(self):
-        if self.__class__._skipTests:
-            self.skipTest("Failed to ping PyServer")
-        
-        index = 0
-        inputName = "Cool Name"
-        response = self._genericCall("update-profile", {'profileIndex' : index, 'profileName' : inputName})
-        self.assertNotEqual(response, False)
+        response = self.client.post("update-profile", json={'profileIndex' : 0, 'profileName' : "Cool Name", 'refresh' : False})
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
         
         try:
-            errorMessage = response["errorMessage"]
+            errorMessage = json["errorMessage"]
             
             if errorMessage == "Could not find a profile at index 0.":
-                return
+                self.fail("This test cannot be conducted without any profiles in the profile manager.")
             
             self.assertEqual(errorMessage, "None")
             
-            profile = response["profile"]
+            profile = json["profile"]
             self._verifyProfileDict(profile)
 
             self.assertEqual(profile["name"], "Cool Name")
 
-            modListLength = response["modListLength"]
-            priorityListLength = response["priorityListLength"]
-        except KeyError:
-            errorString = "The format of PyServer's response does not match expected format."
+            modListLength = json["modListLength"]
+            priorityListLength = json["priorityListLength"]
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
             self.fail(errorString)
 
-# "add-mod"
-# "remove-mod"
-# "update-mod-priority"
-# "add-priority"
+    def testAddMod(self):
+        response = self.client.post("add-mod", json={'profileIndex' : 0, 'url' : "https://modrinth.com/mod/sodium"})
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+        
+        try:
+            errorMessage = json["errorMessage"]
+
+            if errorMessage == "Could not find a profile at index 0.":
+                self.fail("This test cannot be conducted without any profiles in the profile manager.")
+
+            self.assertEqual(errorMessage, "None")
+            
+            debugInfo = json["debugInfo"]
+            profile = debugInfo["profile"]
+            modlist = profile["modlist"]
+
+            self.assertTrue(modlist)
+            self._verifyModDict(modlist[0])
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
+            self.fail(errorString)
+
+    def testRemoveMod(self):
+        profileManager:mod.ProfileManager = app.state.data._profileManager
+        profile:mod.Profile = profileManager.getProfile(0)
+        startLen = len(profile.getModList())
+
+        response = self.client.post("remove-mod", json={'profileIndex' : 0, "modIndex" : 0})
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+        
+        try:
+            errorMessage = json["errorMessage"]
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
+            self.fail(errorString)
+
+        if errorMessage == "Could not find a profile at index 0.":
+            self.fail("This test cannot be conducted without any profiles in the profile manager.")
+        self.assertEqual(errorMessage, "None")
+
+        endLen = len(profile.getModList())
+        self.assertEqual(endLen + 1, startLen)
+
+    def testUpdateModPriority(self):
+        priorityName = "Cool Priority"
+
+        profileManager:mod.ProfileManager = app.state.data._profileManager
+        profile:mod.Profile = profileManager.getProfile(0)
+        modObj:mod.Mod = profile.getMod(0)
+
+        self.assertNotEqual(modObj.priority.name, priorityName)
+        
+        response = self.client.post("update-mod-priority", json={
+            'profileIndex' : 0,
+            "modIndex" : 0,
+            "priorityName" : priorityName,
+            "red" : 0,
+            "green" : 0,
+            "blue" : 0
+        })
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+        
+        try:
+            errorMessage = json["errorMessage"]
+            
+            if errorMessage == "Could not find a profile at index 0.":
+                self.fail("This test cannot be conducted without any profiles in the profile manager.")
+            
+            self.assertEqual(errorMessage, "None")
+            
+            priority = json["priority"]
+            self._verifyPriorityDict(priority)
+            self.assertEqual(priority["name"], priorityName)
+
+            self.assertEqual(modObj.priority.name, priorityName)
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
+            self.fail(errorString)
+
+    def testAddPriority(self):
+        priorityName = "Cool Priority"
+
+        profileManager:mod.ProfileManager = app.state.data._profileManager
+        profile:mod.Profile = profileManager.getProfile(0)
+        modObj:mod.Mod = profile.getMod(-1)
+        startListLen = len(profileManager.getPriorityList())
+
+        self.assertNotEqual(modObj.priority.name, priorityName)
+        
+        response = self.client.post("add-priority", json={
+            'profileIndex' : 0,
+            "modIndex" : 0,
+            "priorityName" : priorityName,
+            "red" : 0,
+            "green" : 0,
+            "blue" : 0
+        })
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+        
+        try:
+            errorMessage = json["errorMessage"]
+            
+            if errorMessage == "Could not find a profile at index 0.":
+                self.fail("This test cannot be conducted without any profiles in the profile manager.")
+            
+            self.assertEqual(errorMessage, "None")
+            
+            priority = json["priority"]
+            self._verifyPriorityDict(priority)
+            self.assertEqual(priority["name"], priorityName)
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse Json:\n{json}"
+            self.fail(errorString)
+        
+        modObj:mod.Mod = profile.getMod(-1)
+        endListLen = len(profileManager.getPriorityList())
 
 if __name__ == "__main__":
     unittest.main(verbosity=2,failfast=True)

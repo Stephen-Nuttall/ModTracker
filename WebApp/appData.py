@@ -10,12 +10,19 @@ import Backend.mod as mod, Backend.loadFromJson as loadFromJson
 class DataManager():
     _profileManager:mod.ProfileManager
 
-    def __init__(self):
-        self._profileManager = mod.ProfileManager(priorityList=[
+    def __init__(self, useTestSetup = False):
+        priorityList = [
             mod.Priority("High Priority", red=255, green=128, blue=0),
             mod.Priority("Medium Priority", red=255, green=196, blue=0),
             mod.Priority("Low Priority", red=255, green=255, blue=0)
-        ])
+        ]
+        if useTestSetup:
+            self._profileManager = mod.ProfileManager([mod.Profile(
+                    [mod.Mod("Test Mod 1"), mod.Mod("Test Mod 2"), mod.Mod("Test Mod 3")], priorityList, name="Test Profile"
+                )], priorityList
+            )
+        else:
+            self._profileManager = mod.ProfileManager(priorityList=priorityList)
 
     def __del__(self):
         self._profileManager._profileList.clear()
@@ -115,6 +122,7 @@ class DataManager():
             profileIndex = data.get("profileIndex", None)
             newVersion = data.get("profileVersion", None)
             newName = data.get("profileName", None)
+            refresh = data.get("refresh", True)
 
             profile:mod.Profile = self._profileManager.getProfile(profileIndex)
             
@@ -125,7 +133,9 @@ class DataManager():
                 if newName:
                     profile.name = newName
                 
-                profile.refresh(newVersion)
+                if refresh:
+                    profile.refresh(newVersion)
+                    
                 profileList = self._profileManager.getProfileList()
                 profileList[profileIndex] = profile
 
@@ -144,10 +154,11 @@ class DataManager():
 
     async def addMod(self, request: Request):
         def createDebugInfo():
+            profileDict = profile.createDict() if profile else "None"
             return {
                 "url" : url,
                 "profileIndex" : profileIndex,
-                "profile" : str(profile),
+                "profile" : profile.createDict(),
                 "profileManager" : self._profileManager.createDict()
             }
         
@@ -236,6 +247,7 @@ class DataManager():
             b = data.get("blue", 0)
 
             newPriority = mod.Priority(priorityName, r, g, b)
+
             self._profileManager.addPriority(newPriority)
 
             if profileIndex > -1 and modIndex > -1:
@@ -245,11 +257,15 @@ class DataManager():
                 
                 modObj:mod.Mod = profile.getMod(modIndex)
                 modObj.priority = newPriority
-            
-            return {
-                "priority" : self._profileManager.getPriorityList()[-1].createDict(),
-                "errorMessage" : "None"
-            }
+                
+                return {
+                    "priority" : self._profileManager.getPriorityList()[-1].createDict(),
+                    "errorMessage" : "None"
+                }
+            else:
+                return {
+                    "errorMessage" : "None"
+                }
         except Exception as e:
             return self._genericExceptionCatch(e)
 

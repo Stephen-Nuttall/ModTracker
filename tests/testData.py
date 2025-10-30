@@ -95,6 +95,8 @@ class TestData(object):
 
 class TestCase(unittest.TestCase):
     # config options
+    runSetup = True
+    runTeardown = True
     createWindow = True
     createDetailsView = True
     createSelectView = False
@@ -102,12 +104,13 @@ class TestCase(unittest.TestCase):
     _testAPICalls = True
 
     def setUp(self):
-        self._data = TestData()
-        self._fileName = "tests\\testProfile.json" 
+        if self.runSetup:
+            self._data = TestData()
+            self._fileName = "tests\\testProfile.json" 
 
-        self._window = QtWidgets.QMainWindow() if self.createWindow else None
-        self._detailsView = windows.DetailsWindow() if self.createDetailsView else None
-        self._selectView = windows.ProfileSelectWindow(self._openDetailsView, mod.ProfileManager(allowWriteToFile=False)) if self.createSelectView else None
+            self._window = QtWidgets.QMainWindow() if self.createWindow else None
+            self._detailsView = windows.DetailsWindow() if self.createDetailsView else None
+            self._selectView = windows.ProfileSelectWindow(self._openDetailsView, mod.ProfileManager(allowWriteToFile=False)) if self.createSelectView else None
 
     def populateDetailsView(self):
         profile = mod.Profile(self._data.constructModList(), self._data.priorityList, self._data.selectedVersion)
@@ -120,14 +123,15 @@ class TestCase(unittest.TestCase):
         self._detailsView.deleteLater()
 
     def tearDown(self):
-        if self._window:
-            self._window.deleteLater()
+        if self.runTeardown:
+            if self._window:
+                self._window.deleteLater()
 
-        if self._detailsView:
-            self._detailsView.getModList().clear()
-            self._detailsView.getModTable().getTableWidget().clearDropdownList()
+            if self._detailsView:
+                self._detailsView.getModList().clear()
+                self._detailsView.getModTable().getTableWidget().clearDropdownList()
 
-        if self._selectView:
-            self._selectView._profileManager.getProfileList().clear()
-            self._selectView._profileManager.getPriorityList().clear()
-            self._selectView._layout._profileWidgets.clear()
+            if self._selectView:
+                self._selectView._profileManager.getProfileList().clear()
+                self._selectView._profileManager.getPriorityList().clear()
+                self._selectView._layout._profileWidgets.clear()
