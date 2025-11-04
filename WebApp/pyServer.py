@@ -42,6 +42,9 @@ async def addProfile(request: Request): return await request.app.state.data.addP
 @app.post("/update-profile")
 async def updateProfile(request: Request): return await request.app.state.data.updateProfile(request)
 
+@app.post("/download-mods")
+async def downloadMods(request: Request): return await request.app.state.data.downloadReadyMods(request)
+
 @app.post("/add-mod")
 async def addMod(request: Request): return await request.app.state.data.addMod(request)
 

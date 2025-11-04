@@ -100,7 +100,9 @@ def downloadMod(curseforgeJson, mod_id:int, loader:str, version:str):
         if file["gameVersion"] == version and "modLoader" in file and (file["modLoader"] == 0 or modLoader_IDtoText(file["modLoader"]) == loader):
             url = f"https://api.curseforge.com/v1/mods/{mod_id}/files/{file['fileId']}"
             downloadLink = _genericCurseforgeCall(url)["data"]["downloadUrl"]
-            return downloadLink
+
+            if downloadLink:
+                return downloadLink
 
     return False
 

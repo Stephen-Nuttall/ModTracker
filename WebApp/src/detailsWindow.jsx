@@ -49,6 +49,33 @@ function DetailsWindow() {
         }
     }
 
+    const downloadProfile = async () => {
+        let select = document.getElementById("loaderDropdown")
+        let loader = select.value
+
+        if (requestRef.current) {
+            const data = await requestRef.current?.genericRequest(
+                "download-mods", { profileIndex: 0, modLoader: loader },
+                "Failed to download mods: ", false, false
+            )
+
+            let numSuccess = 0
+            if (data.errorMessage == "None") {
+                for (let url of data.downloadLinks) {
+                    if (url != false) {
+                        window.open(url, '_blank')
+                        numSuccess++
+                    }
+                }
+            }
+
+            console.log("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profileData.profile.version)
+            setOutput("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profileData.profile.version)
+        } else {
+            console.error("requestRef is not set!")
+        }
+    }
+
     return (
         <>
             <ProfileFetcher updateData={setProfileData} setOutputText={setOutput} ref={requestRef} />
@@ -79,6 +106,16 @@ function DetailsWindow() {
                 />
                 <button onClick={addMod} className="generic-button">Add Mod</button>
                 <pre>{output}</pre>
+            </div>
+
+            <div>
+                <button onClick={downloadProfile} className="generic-button">Download Ready Mods</button>
+                <select id='loaderDropdown'>
+                    <option value="forge">Forge</option>
+                    <option value="fabric">Fabric</option>
+                    <option value="neoforge">NeoForge</option>
+                    <option value="quilt">Quilt</option>
+                </select>
             </div>
 
             <NewPriorityPopup

@@ -156,6 +156,7 @@ class Mod(object):
             self._curseforgeData = callCurseForge.modData(mod_slug)
 
     # Downloads the latest version of the mod. Returns True if a mod was downloaded and False if not.
+    # Returns False if unsuccessful or the download link if successful.
     def downloadMod(self, loader:str, version:str, preventDownload=False):
         mod_slug = self._url.rstrip("/").split("/")[-1]
         downloadLink = False
@@ -165,10 +166,10 @@ class Mod(object):
         elif self._curseforgeData:
             downloadLink = callCurseForge.downloadMod(self._curseforgeData, self._ID, loader, version)
 
-        if downloadLink != False:
+        if downloadLink:
             if preventDownload == False:
                 webbrowser.open(downloadLink)
-            return True
+            return downloadLink
         else:
             return False
 
@@ -285,19 +286,17 @@ class Profile(object):
         for thread in threadList:
             thread.join()
 
-    # Downloads every mod that is ready for the selected version
+    # Downloads every mod that is ready for the selected version.
+    # Returns an list with False for each failure and the download link for each success.
     def downloadReadyMods(self, selectedModLoader, preventDownload = False):
         successful_downloads = []
         
         for mod in self.modList:
             if self.selectedVersion in mod.getVersionList():
-                # downloadMod returns True if a mod was downloaded, and False if not. Remember these results by adding them to a list
                 successful_downloads.append(mod.downloadMod(selectedModLoader, self.selectedVersion, preventDownload=preventDownload))
             else:
-                # Remember that this mod was not successfully downloaded
                 successful_downloads.append(False)
 
-        # return list of results
         return successful_downloads
     
     # Exports the profile as a json file. Returns True if succcessful, False if not.

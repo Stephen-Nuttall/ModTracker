@@ -64,8 +64,8 @@ const ProfileFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bo
 
             return response.data
         } catch (error) {
-            console.error('Error calling API: ', error);
-            setOutput('Error calling API: ' + error);
+            console.error('Error calling backend: ' + error.message + "\n" + error);
+            setOutput('Error calling backend: ' + error.message);
             return { errorMessage: error.message }
         }
     }

@@ -151,6 +151,31 @@ class DataManager():
                 }
         except Exception as e:
             return self._genericExceptionCatch(e)
+        
+    async def downloadReadyMods(self, request: Request):
+        try:
+            data = await request.json()
+            profileIndex = data.get("profileIndex", None)
+            loader = data.get("modLoader", None)
+
+            if profileIndex == None:
+                return { "errorMessage" : "Profile index not provided (or it was falsy)" }
+
+            profile:mod.Profile = self._profileManager.getProfile(profileIndex)
+
+            links = profile.downloadReadyMods(loader, preventDownload=True)
+            
+            if profile:
+                return {
+                    "downloadLinks" : links,
+                    "errorMessage" : "None"
+                }
+            else:
+                return {
+                    "errorMessage" : f"Could not find a profile at index {profileIndex}." 
+                }
+        except Exception as e:
+            return self._genericExceptionCatch(e)
 
     async def addMod(self, request: Request):
         def createDebugInfo():
@@ -158,7 +183,7 @@ class DataManager():
             return {
                 "url" : url,
                 "profileIndex" : profileIndex,
-                "profile" : profile.createDict(),
+                "profile" : profileDict,
                 "profileManager" : self._profileManager.createDict()
             }
         
