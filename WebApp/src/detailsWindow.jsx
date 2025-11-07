@@ -3,6 +3,9 @@ import { useState } from 'react'
 import TableManager from './tableManager'
 import NewPriorityPopup from './newPriorityPopup'
 import TextInputBox from './textInputBox'
+import ChartManager from './chartManager'
+
+import './styles/detailsWindow.css'
 
 function DetailsWindow({ profileIndex, profile, requestRef }) {
     const [priorityPopupOpen, OpenPriorityPopup] = useState(false)
@@ -75,54 +78,66 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
 
     return (
         <>
-            <div>
-                <h2>{profile?.name}</h2>
-                Selected Version:
-                <TextInputBox
-                    onTextChange={(newInput) => { setVersionInput(newInput) }}
-                    placeholderText={profile?.version}
-                    length={25}
+            <div className="profile-layout">
+                <div className="left-column">
+                    <div className="controls">
+                        <h2>{profile?.name}</h2>
+                        <div>Selected Version: {profile?.version}</div>
+                    </div>
+
+                    <TableManager
+                        profile={profile}
+                        requestRef={requestRef}
+                        profileIndex={profileIndex}
+                        OpenPriorityPopup={OpenPriorityPopup}
+                        setModToAddPriorityTo={setModToAddPriorityTo}
+                    />
+
+                    <div className="add-mod">
+                        <TextInputBox
+                            onTextChange={(newInput) => { setModInput(newInput) }}
+                            placeholderText='Enter Mod URL'
+                            length={75}
+                        />
+                        <button onClick={addMod} className="generic-button">Add Mod</button>
+                    </div>
+
+                    <pre>{output}</pre>
+                </div>
+
+                <aside className="right-column">
+                    <div className="button-row">
+                        <TextInputBox
+                            onTextChange={(newInput) => { setVersionInput(newInput) }}
+                            placeholderText={"Enter version number here"}
+                            length={25}
+                        />
+                        <button onClick={reloadProfile} className="generic-button">⟳</button>
+                        <button onClick={exportProfile} className="generic-button">Export</button>
+                    </div>
+
+                    <ChartManager profile={profile} />
+
+                    <div className="download-row">
+                        <button onClick={downloadMods} className="generic-button">Download Available Mods</button>
+                        <select id='loaderDropdown'>
+                            <option value="forge">Forge</option>
+                            <option value="fabric">Fabric</option>
+                            <option value="neoforge">NeoForge</option>
+                            <option value="quilt">Quilt</option>
+                        </select>
+                    </div>
+                </aside>
+
+                <NewPriorityPopup
+                    isOpen={priorityPopupOpen}
+                    setIsOpen={OpenPriorityPopup}
+                    requestRef={requestRef}
+                    profileIndex={profileIndex}
+                    priorityList={profile?.priorityList}
+                    modToAddPriorityTo={modToAddPriorityTo}
                 />
-                <button onClick={reloadProfile} className="generic-button">⟳</button>
-                <button onClick={exportProfile} className="generic-button">Export</button>
             </div>
-
-            <TableManager
-                profile={profile}
-                requestRef={requestRef}
-                profileIndex={profileIndex}
-                OpenPriorityPopup={OpenPriorityPopup}
-                setModToAddPriorityTo={setModToAddPriorityTo}
-            />
-
-            <div>
-                <TextInputBox
-                    onTextChange={(newInput) => { setModInput(newInput) }}
-                    placeholderText='Enter Mod URL'
-                    length={75}
-                />
-                <button onClick={addMod} className="generic-button">Add Mod</button>
-                <pre>{output}</pre>
-            </div>
-
-            <div>
-                <button onClick={downloadMods} className="generic-button">Download Ready Mods</button>
-                <select id='loaderDropdown'>
-                    <option value="forge">Forge</option>
-                    <option value="fabric">Fabric</option>
-                    <option value="neoforge">NeoForge</option>
-                    <option value="quilt">Quilt</option>
-                </select>
-            </div>
-
-            <NewPriorityPopup
-                isOpen={priorityPopupOpen}
-                setIsOpen={OpenPriorityPopup}
-                requestRef={requestRef}
-                profileIndex={profileIndex}
-                priorityList={profile?.priorityList}
-                modToAddPriorityTo={modToAddPriorityTo}
-            />
         </>
     );
 }

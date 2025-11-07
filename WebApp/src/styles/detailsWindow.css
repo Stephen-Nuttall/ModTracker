@@ -1,0 +1,71 @@
+.profile-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+/* make room for the fixed right column */
+.left-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    /* ensure left column content doesn't go under the fixed right column */
+    margin-right: 400px;
+    /* right-column width (360) + desired gap (40) */
+}
+
+/* right column bound to the right side of the viewport */
+.right-column {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+/* small helpers */
+.controls .button-row {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.add-mod,
+.download-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* responsive: on small screens revert to stacked layout */
+@media (max-width: 900px) {
+    .profile-layout {
+        flex-direction: column;
+    }
+
+    .left-column {
+        margin-right: 0;
+    }
+
+    .right-column {
+        position: static;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        background: transparent;
+        padding: 0;
+    }
+}
