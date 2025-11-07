@@ -27,8 +27,14 @@ async def ping(): return "Pong!"
 @app.post("/get-data")
 async def getData(request: Request): return await request.app.state.data.getData()
 
+@app.post("/restore-data")
+async def restoreData(request: Request): return await request.app.state.data.restoreData(request)
+
 @app.post("/get-profile-list")
 async def getProfileList(request: Request): return await request.app.state.data.getProfileList()
+
+@app.post("/get-num-profiles")
+async def getNumProfiles(request: Request): return await request.app.state.data.getNumProfiles()
 
 @app.post("/get-priority-list")
 async def getPriorityList(request: Request): return await request.app.state.data.getPriorityList()
@@ -38,6 +44,9 @@ async def getProfile(request: Request): return await request.app.state.data.getP
     
 @app.post("/add-profile")
 async def addProfile(request: Request): return await request.app.state.data.addProfile(request)
+
+@app.post("/restore-profile")
+async def restoreProfile(request: Request): return await request.app.state.data.restoreProfile(request)
 
 @app.post("/update-profile")
 async def updateProfile(request: Request): return await request.app.state.data.updateProfile(request)

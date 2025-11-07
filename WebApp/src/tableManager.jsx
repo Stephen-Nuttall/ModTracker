@@ -3,10 +3,10 @@ import { useState, useMemo } from 'react'
 import ModTable from "./modTable";
 import './styles/modTable.css';
 
-const TableManager = ({ profileData, requestRef, OpenPriorityPopup, setModToAddPriorityTo }) => {
+const TableManager = ({ profile, requestRef, OpenPriorityPopup, setModToAddPriorityTo }) => {
     const modList = useMemo(() => {
-        if (!profileData?.profile?.modlist) return [];
-        return profileData.profile.modlist.map((modData, i) => ({
+        if (!profile?.modlist) return [];
+        return profile?.modlist.map((modData, i) => ({
             name: modData.name,
             id: modData.id,
             url: modData.url,
@@ -14,13 +14,13 @@ const TableManager = ({ profileData, requestRef, OpenPriorityPopup, setModToAddP
             priority: modData.priority,
             tablePos: i
         }));
-    }, [profileData]);
+    }, [profile]);
 
     const priorityList = useMemo(() => {
-        if (!profileData?.profile?.priorityList) return [];
+        if (!profile?.priorityList) return [];
 
         const uniqueNames = new Set();
-        return profileData.profile.priorityList.filter(priorityData => {
+        return profile?.priorityList.filter(priorityData => {
             if (uniqueNames.has(priorityData.name)) {
                 console.warn("Duplicate priority name found! '" + priorityData.name + "' will not be displayed.")
                 return false; // Skip if the name is already in the set
@@ -34,7 +34,7 @@ const TableManager = ({ profileData, requestRef, OpenPriorityPopup, setModToAddP
             g: priorityData.g,
             b: priorityData.b
         }));
-    }, [profileData]);
+    }, [profile]);
 
     const handlePriorityChange = async (tableIndex, priorityIndex) => {
         if (priorityIndex == "CREATE_NEW") {
@@ -43,7 +43,7 @@ const TableManager = ({ profileData, requestRef, OpenPriorityPopup, setModToAddP
             return
         }
 
-        if (priorityIndex < profileData.priorityListLength) {
+        if (priorityIndex < profile?.priorityList.length) {
             let newPriority = priorityList[priorityIndex]
 
             if (requestRef.current) {
@@ -86,7 +86,7 @@ const TableManager = ({ profileData, requestRef, OpenPriorityPopup, setModToAddP
                 priorityList={priorityList}
                 onPriorityChange={handlePriorityChange}
                 onDelete={handleDelete}
-                selectedVersion={profileData.profile?.version}
+                selectedVersion={profile?.version}
             />
         </>
     )

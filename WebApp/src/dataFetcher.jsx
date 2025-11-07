@@ -1,21 +1,14 @@
-import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useState, forwardRef, useImperativeHandle, version } from 'react';
 import axios from 'axios';
 
-const ProfileFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool) => { } }, requestRef) => {
+const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool) => { } }, requestRef) => {
     let startupInitiated = false
 
     useImperativeHandle(requestRef, () => ({ genericRequest: genericRequest }))
 
     const blankProfileData = {
-        profile: {
-            "name": "No Data",
-            "version": "No Data",
-            "modlist": [],
-            "priorityList": []
-        },
-        modListLength: 0,
-        priorityListLength: 0,
-        errorMessage: "None"
+        "profileList": [],
+        "priorityList": []
     }
 
     const [profileData, setProfileData] = useState(blankProfileData)
@@ -59,7 +52,7 @@ const ProfileFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bo
             }
 
             if (updateData == true) {
-                updateProfileData()
+                refreshData()
             }
 
             return response.data
@@ -73,49 +66,34 @@ const ProfileFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bo
     // Loads profile data from browser storage.
     const restoreProfileData = async () => {
         setIsLoading(true)
-        let callParams = {}
+        const storedData = localStorage.getItem('profiles');
+        const parsedData = JSON.parse(storedData);
 
-        if (localStorage.getItem('profileData') !== null) {
-            const storedData = localStorage.getItem('profileData');
-            const parsedData = JSON.parse(storedData);
-            callParams = { "profileData": parsedData.profile }
-        } else {
-            console.log("No profile data was found in localstorage. Continuing without restoring any data.")
-        }
+        const data = await genericRequest(
+            "restore-data",
+            { data: parsedData },
+            "Error restoring data: ", false
+        )
 
-        try {
-            const data = await genericRequest("add-profile", callParams, "Error restoring data: ")
-
-            if (data.errorMessage == "None") {
-                console.log("Restored profile data: " + data.profile
-                    + "\nProfile list length: " + data.debugInfo.profileManager.profileList.length)
-                setProfileData(data)
-                localStorage.setItem('profileData', JSON.stringify(data))
-            }
-        } catch (error) {
-            console.error("Error restoring data: " + error)
-        } finally {
-            setIsLoading(false);
-        }
+        setIsLoading(false);
     }
 
     // Retrieves profile data after a call and loads the new data into updateData() and browser storage.
-    const updateProfileData = async () => {
-        setIsLoading(true)
+    const refreshData = async () => {
         const data = await genericRequest(
-            "get-profile",
-            { profileIndex: 0 },
+            "get-data",
+            {},
+            -1,
             "Error fetching data. No changes could applied, and no new data could be loaded.\nError message: ",
             false,
             false
         )
 
         if (data.errorMessage == "None") {
-            setProfileData(data)
-            localStorage.setItem('profileData', JSON.stringify(data))
+            setProfileData(data.profileManager)
+            localStorage.setItem('profiles', JSON.stringify(data.profileManager))
         }
-        setIsLoading(false)
     }
 })
 
-export default ProfileFetcher
+export default DataFetcher

@@ -39,12 +39,58 @@ class DataManager():
                 return {"errorMessage" : "ERROR: profileManager does not exist!"}
         except Exception as e:
             return self._genericExceptionCatch(e)
+        
+    async def restoreData(self, request: Request):
+        try:
+            if not self._profileManager:
+                return {"errorMessage" : "ERROR: profileManager does not exist!"}
+        
+            data = await request.json()
+            newData = data.get("data", None)
+
+            profileIndex = 0
+            for profileIndex, profileData  in enumerate(newData["profileList"]):
+                profile = loadFromJson.createProfile(rawJson=profileData)
+                
+                profileList = self._profileManager.getProfileList()
+                if profileIndex >= len(profileList):
+                    self._profileManager.addProfile(profile, saveToFile=False)
+                else:
+                    profileList[profileIndex] = profile
+                    self._profileManager.updatePriorityLists()
+                    self._profileManager.sortModLists()
+            
+            if profileIndex == 0:
+                profile = mod.Profile()
+                self._profileManager.addProfile(profile, saveToFile=False)
+
+            for priorityData in newData["priorityList"]:
+                priority = mod.Priority(priorityData["name"], priorityData["r"], priorityData["g"], priorityData["b"])
+                if priority not in self._profileManager._priorityList:
+                    self._profileManager._priorityList.append(priority)
+
+            return {
+                "profileManager" : self._profileManager.createDict(),
+                "errorMessage" : "None"
+            }
+        except Exception as e:
+            return self._genericExceptionCatch(e)
 
     async def getProfileList(self):
         try:
             profileData = self._profileManager.createDict()
             return {
                 "profileList" : profileData["profileList"],
+                "errorMessage" : "None"
+            }
+        except Exception as e:
+            return self._genericExceptionCatch(e)
+        
+    async def getNumProfiles(self):
+        try:
+            numProfiles = self._profileManager.getNumProfiles()
+            return {
+                "numProfiles" : numProfiles,
                 "errorMessage" : "None"
             }
         except Exception as e:
@@ -96,13 +142,50 @@ class DataManager():
             data = await request.json()
             profileData = data.get("profileData", None)
 
+            if profileData:
+                profile = loadFromJson.createProfile(rawJson=profileData)
+            else:
+                profile = mod.Profile()
+            
+            self._profileManager.addProfile(profile, saveToFile=False)
+
+            return {
+                "profile": profile.createDict(),
+                "modListLength" : len(profile.modList),
+                "priorityListLength" : len(profile.priorityList),
+                "debugInfo" : createDebugInfo(),
+                "errorMessage" : "None"
+            }
+            
+        except Exception as e:
+            return self._genericExceptionCatch(e, createDebugInfo())
+        
+    async def restoreProfile(self, request: Request):
+        def createDebugInfo():
+            return {
+                "profileData" : profileData,
+                "profile" : str(profile),
+                "profileManager" : self._profileManager.createDict()
+            }
+
+        try:
+            data = await request.json()
+            profileData = data.get("profileData", None)
+            profileIndex = data.get("profileIndex", None)
+
             profile = mod.Profile()
             if profileData:
                 profile = loadFromJson.createProfile(rawJson=profileData)
             else:
                 return { "errorMessage" : "No profile data provided (or data was falsy)" }
             
-            self._profileManager.addProfile(profile, saveToFile=False)
+            profileList = self._profileManager.getProfileList()
+            if profileIndex >= len(profileList):
+                self._profileManager.addProfile(profile, saveToFile=False)
+            else:
+                profileList[profileIndex] = profile
+                self._profileManager.updatePriorityLists()
+                self._profileManager.sortModLists()
 
             return {
                 "profile": profile.createDict(),

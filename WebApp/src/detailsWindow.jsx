@@ -1,28 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 
-import ProfileFetcher from './profileFetcher'
 import TableManager from './tableManager'
 import NewPriorityPopup from './newPriorityPopup'
 import TextInputBox from './textInputBox'
 
-function DetailsWindow() {
-    const requestRef = useRef(null)
+function DetailsWindow({ profileIndex, profile, requestRef }) {
     const [priorityPopupOpen, OpenPriorityPopup] = useState(false)
     const [modToAddPriorityTo, setModToAddPriorityTo] = useState(-1)
-
-    const blankProfileData = {
-        profile: {
-            "name": "No Data",
-            "version": "No Data",
-            "modlist": [],
-            "priorityList": []
-        },
-        modListLength: 0,
-        priorityListLength: 0,
-        errorMessage: "None"
-    }
-
-    const [profileData, setProfileData] = useState(blankProfileData)
     const [modInput, setModInput] = useState('');
     const [versionInput, setVersionInput] = useState('');
     const [output, setOutput] = useState('');
@@ -30,7 +14,7 @@ function DetailsWindow() {
     const addMod = async () => {
         if (requestRef.current) {
             const data = await requestRef.current?.genericRequest(
-                "add-mod", { url: modInput, profileIndex: 0 },
+                "add-mod", { url: modInput, profileIndex: profileIndex },
                 "Failed to add mod: ", "Mod successfully added."
             )
         } else {
@@ -41,7 +25,7 @@ function DetailsWindow() {
     const reloadProfile = async () => {
         if (requestRef.current) {
             const data = await requestRef.current?.genericRequest(
-                "update-profile", { profileIndex: 0, profileVersion: versionInput },
+                "update-profile", { profileIndex: profileIndex, profileVersion: versionInput },
                 "Failed to update profile: ", "Profile successfully reloaded."
             )
         } else {
@@ -49,13 +33,13 @@ function DetailsWindow() {
         }
     }
 
-    const downloadProfile = async () => {
+    const downloadMods = async () => {
         let select = document.getElementById("loaderDropdown")
         let loader = select.value
 
         if (requestRef.current) {
             const data = await requestRef.current?.genericRequest(
-                "download-mods", { profileIndex: 0, modLoader: loader },
+                "download-mods", { profileIndex: profileIndex, modLoader: loader },
                 "Failed to download mods: ", false, false
             )
 
@@ -69,31 +53,44 @@ function DetailsWindow() {
                 }
             }
 
-            console.log("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profileData.profile.version)
-            setOutput("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profileData.profile.version)
+            console.log("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profile?.version)
+            setOutput("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profile?.version)
         } else {
             console.error("requestRef is not set!")
         }
     }
 
+    function exportProfile() {
+        const json = JSON.stringify(profile);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = profile?.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
     return (
         <>
-            <ProfileFetcher updateData={setProfileData} setOutputText={setOutput} ref={requestRef} />
-
             <div>
-                <h2>{profileData.profile.name}</h2>
+                <h2>{profile?.name}</h2>
                 Selected Version:
                 <TextInputBox
                     onTextChange={(newInput) => { setVersionInput(newInput) }}
-                    placeholderText={profileData.profile.version}
+                    placeholderText={profile?.version}
                     length={25}
                 />
                 <button onClick={reloadProfile} className="generic-button">⟳</button>
+                <button onClick={exportProfile} className="generic-button">Export</button>
             </div>
 
             <TableManager
-                profileData={profileData}
+                profile={profile}
                 requestRef={requestRef}
+                profileIndex={profileIndex}
                 OpenPriorityPopup={OpenPriorityPopup}
                 setModToAddPriorityTo={setModToAddPriorityTo}
             />
@@ -109,7 +106,7 @@ function DetailsWindow() {
             </div>
 
             <div>
-                <button onClick={downloadProfile} className="generic-button">Download Ready Mods</button>
+                <button onClick={downloadMods} className="generic-button">Download Ready Mods</button>
                 <select id='loaderDropdown'>
                     <option value="forge">Forge</option>
                     <option value="fabric">Fabric</option>
@@ -122,7 +119,8 @@ function DetailsWindow() {
                 isOpen={priorityPopupOpen}
                 setIsOpen={OpenPriorityPopup}
                 requestRef={requestRef}
-                priorityList={profileData.profile.priorityList}
+                profileIndex={profileIndex}
+                priorityList={profile?.priorityList}
                 modToAddPriorityTo={modToAddPriorityTo}
             />
         </>
