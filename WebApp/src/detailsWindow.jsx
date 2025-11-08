@@ -4,6 +4,7 @@ import TableManager from './tableManager'
 import NewPriorityPopup from './newPriorityPopup'
 import TextInputBox from './textInputBox'
 import ChartManager from './chartManager'
+import EditableText from './EditableText'
 
 import './styles/detailsWindow.css'
 
@@ -25,15 +26,22 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
         }
     }
 
-    const reloadProfile = async () => {
+    const reloadProfile = async (newProfileName = "") => {
+        let name = newProfileName.length > 0 ? newProfileName : profile?.name
+        let version = versionInput.length > 0 ? versionInput : profile?.version
+
         if (requestRef.current) {
             const data = await requestRef.current?.genericRequest(
-                "update-profile", { profileIndex: profileIndex, profileVersion: versionInput },
+                "update-profile", { profileIndex: profileIndex, profileVersion: version, profileName: name },
                 "Failed to update profile: ", "Profile successfully reloaded."
             )
         } else {
             console.error("requestRef is not set!")
         }
+    }
+
+    const renameProfile = async (profileName) => {
+        reloadProfile(profileName)
     }
 
     const downloadMods = async () => {
@@ -85,9 +93,12 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
     return (
         <>
             <div className="profile-layout">
+                {/* LEFT COLUMN */}
                 <div className="left-column">
                     <div className="controls">
-                        <h2>{profile?.name}</h2>
+                        <h2>
+                            <EditableText value={profile?.name} onChange={renameProfile} />
+                        </h2>
                         <label>Selected Version: {profile?.version}</label>
                     </div>
 
@@ -102,21 +113,25 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
                     <div className="add-mod">
                         <TextInputBox
                             onTextChange={(newInput) => { setModInput(newInput) }}
+                            onPressEnter={addMod}
                             placeholderText='Enter Mod URL'
-                            length={75}
+                            className={"add-mod-textbox"}
                         />
-                        <button onClick={addMod} className="generic-button">Add Mod</button>
+                        <button onClick={addMod} className="add-mod-button">Add Mod</button>
                     </div>
 
                     <pre>{output}</pre>
                 </div>
 
+                {/* RIGHT COLUMN */}
                 <aside className="right-column">
                     <div className="button-row">
                         <TextInputBox
                             onTextChange={(newInput) => { setVersionInput(newInput) }}
+                            onPressEnter={reloadProfile}
                             placeholderText={"Enter new version"}
                             length={15}
+                            className={"version-input"}
                         />
                         <button onClick={reloadProfile} className="generic-button">⟳</button>
                         <button onClick={exportProfile} className="generic-button">Export</button>
@@ -135,16 +150,16 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
                         </select>
                     </div>
                 </aside>
-
-                <NewPriorityPopup
-                    isOpen={priorityPopupOpen}
-                    setIsOpen={OpenPriorityPopup}
-                    requestRef={requestRef}
-                    profileIndex={profileIndex}
-                    priorityList={profile?.priorityList}
-                    modToAddPriorityTo={modToAddPriorityTo}
-                />
             </div>
+
+            <NewPriorityPopup
+                isOpen={priorityPopupOpen}
+                setIsOpen={OpenPriorityPopup}
+                requestRef={requestRef}
+                profileIndex={profileIndex}
+                priorityList={profile?.priorityList}
+                modToAddPriorityTo={modToAddPriorityTo}
+            />
         </>
     );
 }

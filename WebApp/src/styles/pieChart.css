@@ -1,22 +1,24 @@
-/* .chart {
-    width: 100%;
-    gap: 16;
+.chartContainer {
     display: flex;
-    justify-content: center;
+    gap: 16px;
     align-items: center;
-    margin-top: auto;
-    margin-bottom: auto;
+    width: 100%;
+    height: 100%;
+}
+
+.chartSVG {
+    width: 75%;
+    height: 75%;
 }
 
 .legend {
     display: flex;
     flex-direction: column;
-    gap: 6;
+    gap: 6px;
 }
 
 .legendItem {
-    text-align: left;
     display: flex;
     align-items: center;
-    gap: 8;
-} */
+    gap: 8px;
+}

@@ -1,6 +1,9 @@
+import { useState } from 'react'
+import NewProfilePopup from './newProfilePopup'
 import './styles/profileSelectWindow.css'
 
 function ProfileSelectWindow({ profileList, requestRef }) {
+    const [popupOpen, setPopupOpen] = useState(false)
     const profiles = profileList ?? []
 
     function onTileClick(tileNum) {
@@ -9,50 +12,74 @@ function ProfileSelectWindow({ profileList, requestRef }) {
         window.location.href = `${base}/profile=${tileNum}`
     }
 
-    const createNewProfile = async () => {
+    const removeProfile = async (index) => {
         if (requestRef.current) {
             const data = await requestRef.current?.genericRequest(
-                "add-profile", {},
-                "Failed to add profile: ", "Profile successfully added."
+                "remove-profile", { profileIndex: index },
+                "Failed to remove profile: ", "Profile successfully removed."
             )
         } else {
             console.error("requestRef is not set!")
         }
     }
 
+    const editProfile = async (profileIndex) => {
+        console.log("placeholder")
+    }
+
     return (
-        <section className="profile-grid">
-            {profiles.map((profile, i) => {
-                let readyCount = 0
-                for (const mod of profile.modlist) {
-                    if (mod.versions.includes(profile.version)) {
-                        readyCount++
+        <>
+            <section className="profile-grid">
+                {profiles.map((profile, i) => {
+                    let readyCount = 0
+                    for (const mod of profile.modlist) {
+                        if (mod.versions.includes(profile.version)) {
+                            readyCount++
+                        }
                     }
-                }
 
-                const modsCount = Number(profile.modlist.length || 0)
-                const percent = modsCount ? Math.round((readyCount / modsCount) * 100) : 0
+                    const modsCount = Number(profile.modlist.length || 0)
+                    const percent = modsCount ? Math.round((readyCount / modsCount) * 100) : 0
 
-                return (
-                    <button key={i} className="tile" onClick={() => onTileClick(i)}>
-                        <div className="tile-inner">
-                            <h2 className="profile-name">{profile.name}</h2>
-                            <div className="mods-count">{modsCount} mods</div>
-                            <div className="ready">{percent}% ready for {profile.version}</div>
+                    return (
+                        <div key={i} className="tile" role="button" onClick={() => onTileClick(i)}>
+                            <div className="tile-inner">
+                                <h2 className="profile-name">{profile.name}</h2>
+                                <div className="mods-count">{modsCount} mods</div>
+                                <div className="ready">{percent}% ready for {profile.version}</div>
+                            </div>
+
+                            {/* <button className="tile-edit" onClick={
+                            (e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                if (typeof editProfile === 'function')
+                                    editProfile(i)
+                            }
+                        }
+                        >✏️</button> */}
+                            <button className="tile-close" onClick={
+                                (e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    if (typeof removeProfile === 'function')
+                                        removeProfile(i)
+                                }
+                            }
+                            >X</button>
                         </div>
+                    )
+                })}
 
-                        <button className="tile-edit">✏️</button>
-                        <button className="tile-close">X</button>
-                    </button>
-                )
-            })}
-
-            <button className="tile" onClick={createNewProfile}>
-                <div className="tile-inner">
-                    <h1>+</h1>
+                <div className="tile" role="button" onClick={() => { setPopupOpen(true) }}>
+                    <div className="tile-inner">
+                        <h1>+</h1>
+                    </div>
                 </div>
-            </button>
-        </section>
+            </section>
+
+            <NewProfilePopup isOpen={popupOpen} setIsOpen={setPopupOpen} requestRef={requestRef} />
+        </>
     )
 }
 

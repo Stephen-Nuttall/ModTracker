@@ -45,6 +45,9 @@ async def getProfile(request: Request): return await request.app.state.data.getP
 @app.post("/add-profile")
 async def addProfile(request: Request): return await request.app.state.data.addProfile(request)
 
+@app.post("/remove-profile")
+async def removeProfile(request: Request): return await request.app.state.data.removeProfile(request)
+
 @app.post("/restore-profile")
 async def restoreProfile(request: Request): return await request.app.state.data.restoreProfile(request)
 

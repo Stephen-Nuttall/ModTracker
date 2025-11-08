@@ -54,39 +54,43 @@ function NewPriorityPopup({ isOpen = false, setIsOpen, requestRef, priorityList,
             {isOpen && (
                 <div className='popupOverlay'>
                     <div className='popupContent'>
-                        <h3>Create a New Priority Level</h3>
-                        Priority Name:
-                        <br />
-                        <TextInputBox
-                            onTextChange={(newInput) => { setTextInput(newInput) }}
-                            placeholderText='Enter Priority Name'
-                        />
-                        <br />
-                        <br />
-                        Priority Color:
-                        <br />
-                        <SketchPicker
-                            color={color}
-                            onChange={handleColorChange}
-                            className='colorPicker'
-                        />
-                        <button
-                            className='closeButton'
-                            onClick={() => {
-                                createNewPriority()
-                                setIsOpen(false)
-                            }}
-                        >
-                            Create New Priority
-                        </button>
-                        <button
-                            className='closeButton'
-                            onClick={() => {
-                                setIsOpen(false)
-                            }}
-                        >
-                            Cancel
-                        </button>
+                        <div className='popupTitle'>Create a New Priority Level</div>
+                        <div className='popupTextInputArea'>
+                            <div className='popupLabel'>Priority Name:</div>
+                            <TextInputBox
+                                onTextChange={(newInput) => { setTextInput(newInput) }}
+                                placeholderText='Enter Priority Name'
+                                length={25}
+                                className={"popupTextInput"}
+                            />
+                        </div>
+                        <div className='colorPickerArea'>
+                            <div className='popupLabel'>Priority Color:</div>
+                            <SketchPicker
+                                color={color}
+                                onChange={handleColorChange}
+                                className='colorPicker'
+                            />
+                        </div>
+                        <div className='popupButtonArea'>
+                            <button
+                                className='popupOptionButton'
+                                onClick={() => {
+                                    createNewPriority()
+                                    setIsOpen(false)
+                                }}
+                            >
+                                Create New Priority
+                            </button>
+                            <button
+                                className='popupOptionButton'
+                                onClick={() => {
+                                    setIsOpen(false)
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -1,7 +1,5 @@
 .profile-layout {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
+    min-height: 100vh;
     padding: 16px;
 }
 
@@ -9,9 +7,9 @@
     position: fixed;
     flex: 1;
     width: 49%;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    margin-right: 10px;
 }
 
 .right-column {
@@ -28,6 +26,28 @@
     align-items: flex-end;
 }
 
+.controls {
+    width: 100%;
+}
+
+.add-mod {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: auto;
+    align-self: flex-end;
+}
+
+.add-mod-textbox {
+    width: 85%;
+    height: 75%;
+}
+
+.add-mod-button {
+    width: 15%;
+}
+
 .button-row {
     width: 100%;
     display: flex;
@@ -36,6 +56,10 @@
     justify-content: flex-end;
     margin-top: 0;
     align-self: flex-end;
+}
+
+.version-input {
+    height: 75%;
 }
 
 .download-row {

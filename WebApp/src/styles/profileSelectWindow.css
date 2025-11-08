@@ -13,6 +13,7 @@
     width: 250px;
     aspect-ratio: 1 / 1;
     background: linear-gradient(180deg, #414141 0%, #474747 100%);
+    border: 1px solid transparent;
     border-radius: 12px;
     box-shadow: 0 6px 18px rgba(16, 24, 40, 0.08);
     display: flex;
@@ -34,6 +35,7 @@
 .tile:hover {
     transform: translateY(-6px);
     box-shadow: 0 10px 30px rgba(16, 24, 40, 0.12);
+    border-color: #646cff;
 }
 
 .tile-inner {

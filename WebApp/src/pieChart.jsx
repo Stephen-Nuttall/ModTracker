@@ -1,4 +1,5 @@
-// Thank you Mr. GPT for spitting out this helpful code
+// Thank you Mr. GPT for spitting out most of this helpful code
+import './styles/pieChart.css'
 
 function polarToCartesian(cx, cy, r, angleDeg) {
     const angleRad = (angleDeg - 90) * Math.PI / 180.0;
@@ -20,29 +21,39 @@ function describeArc(cx, cy, r, startAngle, endAngle) {
     ].join(" ");
 }
 
-function PieChart({ data = [], size = 200, innerRadius = 0 }) {
-    const total = data.reduce((s, d) => s + (d.value || 0), 0) || 1;
+function PieChart({ data: dataArray = [], size = 200, innerRadius = 0 }) {
+    const total = dataArray.reduce((s, d) => s + (d.value || 0), 0) || 1;
     const cx = size / 2;
     const cy = size / 2;
-    const r = size / 2;
+    const radius = size / 2;
     let angle = 0;
 
     return (
-        <div style={{ display: "flex", gap: 16, alignItems: "center", marginTop: "auto", marginBottom: "auto" }}>
-            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                {data.map((d, i) => {
+        <div className='chartContainer'>
+            <svg className='chartSVG' viewBox={`0 0 ${size} ${size}`}>
+                {dataArray.map((data, i) => {
                     const startAngle = angle;
-                    const sliceAngle = (d.value / total) * 360;
-                    const endAngle = angle + sliceAngle;
+                    const sliceAngle = (data.value / total) * 360;
+                    let endAngle = angle + sliceAngle;
                     angle = endAngle;
-                    // Outer slice path
-                    const path = describeArc(cx, cy, r, startAngle, endAngle);
+
+                    // prevents pie chart from not rendering if there's only one element to show
+                    if (sliceAngle == 360) {
+                        endAngle = endAngle - 0.0001
+                    }
+
+                    const slicePath = describeArc(cx, cy, radius, startAngle, endAngle);
+                    return (
+                        <path key={i} d={slicePath} fill={data.color || `hsl(${(i * 70) % 360} 70% 50%)`} />
+                    );
+
+                    /* OLD INNER RADIUS/DONUT CODE FROM MR. GPT
                     if (innerRadius <= 0) {
                         return (
-                            <path key={i} d={path} fill={d.color || `hsl(${(i * 70) % 360} 70% 50%)`} />
+                            <path key={i} d={path} fill={data.color || `hsl(${(i * 70) % 360} 70% 50%)`} />
                         );
                     }
-                    // For donut: draw outer arc then inner reversed arc to create donut ring using path+clip
+                    For donut: draw outer arc then inner reversed arc to create donut ring using path+clip
                     const innerStart = polarToCartesian(cx, cy, innerRadius, endAngle);
                     const innerEnd = polarToCartesian(cx, cy, innerRadius, startAngle);
                     const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
@@ -54,13 +65,14 @@ function PieChart({ data = [], size = 200, innerRadius = 0 }) {
                         "Z"
                     ].join(" ");
                     return (
-                        <path key={i} d={donutPath} fill={d.color || `hsl(${(i * 70) % 360} 70% 50%)`} />
+                        <path key={i} d={donutPath} fill={data.color || `hsl(${(i * 70) % 360} 70% 50%)`} />
                     );
+                    */
                 })}
             </svg>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {data.map((d, i) => (
+            <div className='legend'>
+                {dataArray.map((d, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{ width: 20, height: 20, background: d.color || `hsl(${(i * 70) % 360} 70% 50%)` }} />
                         <div>{d.label}: {d.value}</div>

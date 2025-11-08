@@ -5,67 +5,79 @@ import ProfileSelectWindow from './profileSelectWindow.jsx'
 import DetailsWindow from './DetailsWindow.jsx'
 
 function App() {
-    const requestRef = useRef(null)
+    try {
+        const requestRef = useRef(null)
 
-    const [profileData, setProfileData] = useState([])
-    const [profileIndex, setProfileIndex] = useState(-1)
-    const [selectedProfile, setSelectedProfile] = useState()
-    const [numProfiles, setNumProfiles] = useState(-1)
-    const [output, setOutput] = useState('');
+        const [profileData, setProfileData] = useState([])
+        const [profileIndex, setProfileIndex] = useState(-1)
+        const [selectedProfile, setSelectedProfile] = useState()
+        const [numProfiles, setNumProfiles] = useState(-1)
+        const [output, setOutput] = useState('');
 
-    const storedData = localStorage.getItem('profiles');
-    const parsedData = JSON.parse(storedData);
+        const storedData = localStorage.getItem('profiles');
+        const parsedData = JSON.parse(storedData);
 
-    useEffect(() => {
-        setProfileIndex(getProfileIndexFromURL())
-        setNumProfiles(getNumProfiles())
-    }, [])
+        useEffect(() => {
+            setProfileIndex(getProfileIndexFromURL())
+            setNumProfiles(getNumProfiles())
+        }, [])
 
-    useEffect(() => {
-        if (profileIndex >= 0) {
-            setSelectedProfile(profileData.profileList[profileIndex])
-        }
-    }, [profileData])
-
-    const getProfileIndexFromURL = () => {
-        let index = null
-
-        try {
-            const qp = new URLSearchParams(window.location.search).get('profile')
-            if (qp !== null) {
-                const n = parseInt(qp, 10)
-                if (!isNaN(n)) return n
+        useEffect(() => {
+            if (profileIndex >= 0) {
+                setSelectedProfile(profileData.profileList[profileIndex])
             }
-        } catch (exception) { }
+        }, [profileData])
 
-        const pathMatch = window.location.pathname && window.location.pathname.match(/profile=(\d+)/)
-        const hashMatch = window.location.hash && window.location.hash.match(/profile=(\d+)/)
+        const getProfileIndexFromURL = () => {
+            let index = null
 
-        if (pathMatch) {
-            index = parseInt(pathMatch[1], 10)
-        } else if (hashMatch) {
-            index = parseInt(hashMatch[1], 10)
+            try {
+                const qp = new URLSearchParams(window.location.search).get('profile')
+                if (qp !== null) {
+                    const n = parseInt(qp, 10)
+                    if (!isNaN(n)) return n
+                }
+            } catch (exception) { }
+
+            const pathMatch = window.location.pathname && window.location.pathname.match(/profile=(\d+)/)
+            const hashMatch = window.location.hash && window.location.hash.match(/profile=(\d+)/)
+
+            if (pathMatch) {
+                index = parseInt(pathMatch[1], 10)
+            } else if (hashMatch) {
+                index = parseInt(hashMatch[1], 10)
+            }
+
+            return index !== null ? index : -1
         }
 
-        return index !== null ? index : -1
-    }
-
-    function getNumProfiles() {
-        if (parsedData == null) {
-            return 0
-        } else {
-            return parsedData.profileList.length
+        function getNumProfiles() {
+            if (parsedData == null) {
+                return 0
+            } else {
+                return parsedData.profileList.length
+            }
         }
-    }
 
-    return (
-        <>
-            <DataFetcher updateData={setProfileData} setOutputText={setOutput} ref={requestRef} />
-            {profileIndex < 0 || profileIndex >= numProfiles ?
-                <ProfileSelectWindow profileList={parsedData.profileList} requestRef={requestRef} /> :
-                <DetailsWindow profileIndex={profileIndex} profile={selectedProfile} requestRef={requestRef} />}
-        </>
-    )
+        const displaySelectWindow = profileIndex < 0 || profileIndex >= numProfiles
+
+        return (
+            <>
+                <DataFetcher updateData={setProfileData} setOutputText={setOutput} ref={requestRef} />
+                {displaySelectWindow ?
+                    <ProfileSelectWindow profileList={parsedData?.profileList} requestRef={requestRef} /> :
+                    <DetailsWindow profileIndex={profileIndex} profile={selectedProfile} requestRef={requestRef} />}
+            </>
+        )
+    }
+    catch (exception) {
+        return (
+            <>
+                <h2>Sorry! A fatal error occured when trying to load the site.</h2>
+                <div>Exception caught: {exception.message}</div>
+            </>
+        )
+    }
 }
 
 export default App

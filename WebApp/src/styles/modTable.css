@@ -1,7 +1,6 @@
 .mod-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: Arial, sans-serif;
 }
 
 .mod-table th,
@@ -32,12 +31,4 @@
 
 .delete-button:hover {
     color: #cc0000;
-}
-
-.generic-button {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-    padding: 8px 16px;
 }

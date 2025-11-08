@@ -46,10 +46,10 @@ class DataManager():
                 return {"errorMessage" : "ERROR: profileManager does not exist!"}
         
             data = await request.json()
-            newData = data.get("data", None)
+            newData = data.get("data", [])
 
             profileIndex = 0
-            for profileIndex, profileData  in enumerate(newData["profileList"]):
+            for profileIndex, profileData in enumerate(newData["profileList"]):
                 profile = loadFromJson.createProfile(rawJson=profileData)
                 
                 profileList = self._profileManager.getProfileList()
@@ -141,11 +141,15 @@ class DataManager():
         try:
             data = await request.json()
             profileData = data.get("profileData", None)
+            profileName = data.get("profileName", None)
 
             if profileData:
                 profile = loadFromJson.createProfile(rawJson=profileData)
             else:
                 profile = mod.Profile()
+
+            if profileName and len(profileName) > 0:
+                profile.name = profileName
             
             self._profileManager.addProfile(profile, saveToFile=False)
 
@@ -153,6 +157,31 @@ class DataManager():
                 "profile": profile.createDict(),
                 "modListLength" : len(profile.modList),
                 "priorityListLength" : len(profile.priorityList),
+                "debugInfo" : createDebugInfo(),
+                "errorMessage" : "None"
+            }
+            
+        except Exception as e:
+            return self._genericExceptionCatch(e, createDebugInfo())
+        
+    async def removeProfile(self, request: Request):
+        def createDebugInfo():
+            return {
+                "profileIndex" : profileIndex,
+                "profileManager" : self._profileManager.createDict()
+            }
+
+        try:
+            data = await request.json()
+            profileIndex = data.get("profileIndex", None)
+
+            if profileIndex:
+                profileList = self._profileManager.getProfileList()
+                profileList.pop(profileIndex)
+            else:
+                return { "errorMessage" : "No profile index provided" }
+
+            return {
                 "debugInfo" : createDebugInfo(),
                 "errorMessage" : "None"
             }
@@ -198,7 +227,6 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e, createDebugInfo())
         
-
     async def updateProfile(self, request: Request):
         try:
             data = await request.json()
