@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react'
 import ModTable from "./modTable";
 import './styles/modTable.css';
 
-const TableManager = ({ profile, requestRef, OpenPriorityPopup, setModToAddPriorityTo }) => {
+const TableManager = ({ profile, requestRef, profileIndex, OpenPriorityPopup, setModToAddPriorityTo }) => {
     const modList = useMemo(() => {
         if (!profile?.modlist) return [];
         return profile?.modlist.map((modData, i) => ({
@@ -50,7 +50,7 @@ const TableManager = ({ profile, requestRef, OpenPriorityPopup, setModToAddPrior
                 const data = await requestRef.current?.genericRequest(
                     "update-mod-priority",
                     {
-                        profileIndex: 0,
+                        profileIndex: profileIndex,
                         modIndex: tableIndex,
                         priorityName: newPriority.name,
                         red: newPriority.r,
@@ -71,7 +71,7 @@ const TableManager = ({ profile, requestRef, OpenPriorityPopup, setModToAddPrior
     const handleDelete = async (tableIndex) => {
         if (requestRef.current) {
             const data = await requestRef.current?.genericRequest(
-                "remove-mod", { profileIndex: 0, modIndex: tableIndex },
+                "remove-mod", { profileIndex: profileIndex, modIndex: tableIndex },
                 "Failed to remove mod: ", "Mod successfully removed."
             )
         } else {

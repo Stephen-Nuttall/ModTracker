@@ -3,7 +3,7 @@ import { SketchPicker } from 'react-color';
 import TextInputBox from './textInputBox';
 import './styles/popup.css'
 
-function NewPriorityPopup({ isOpen = false, setIsOpen, requestRef, priorityList, modToAddPriorityTo }) {
+function NewPriorityPopup({ isOpen = false, setIsOpen, requestRef, priorityList, profileIndex, modToAddPriorityTo }) {
     const [textInput, setTextInput] = useState("")
     const [color, setColor] = useState({ r: 255, g: 255, b: 255, a: 1 });
 
@@ -31,7 +31,7 @@ function NewPriorityPopup({ isOpen = false, setIsOpen, requestRef, priorityList,
             const data = await requestRef.current?.genericRequest(
                 "add-priority",
                 {
-                    profileIndex: 0,
+                    profileIndex: profileIndex,
                     modIndex: modToAddPriorityTo,
                     priorityName: textInput,
                     red: color.r,

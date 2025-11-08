@@ -13,6 +13,9 @@ function App() {
     const [numProfiles, setNumProfiles] = useState(-1)
     const [output, setOutput] = useState('');
 
+    const storedData = localStorage.getItem('profiles');
+    const parsedData = JSON.parse(storedData);
+
     useEffect(() => {
         setProfileIndex(getProfileIndexFromURL())
         setNumProfiles(getNumProfiles())
@@ -48,9 +51,6 @@ function App() {
     }
 
     function getNumProfiles() {
-        const storedData = localStorage.getItem('profiles');
-        const parsedData = JSON.parse(storedData);
-
         if (parsedData == null) {
             return 0
         } else {
@@ -62,7 +62,7 @@ function App() {
         <>
             <DataFetcher updateData={setProfileData} setOutputText={setOutput} ref={requestRef} />
             {profileIndex < 0 || profileIndex >= numProfiles ?
-                <ProfileSelectWindow /> :
+                <ProfileSelectWindow profileList={parsedData.profileList} requestRef={requestRef} /> :
                 <DetailsWindow profileIndex={profileIndex} profile={selectedProfile} requestRef={requestRef} />}
         </>
     )

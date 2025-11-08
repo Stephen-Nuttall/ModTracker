@@ -1,0 +1,108 @@
+.profile-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 18px;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.tile {
+    position: relative;
+    flex: 0 1 250px;
+    width: 250px;
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(180deg, #414141 0%, #474747 100%);
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+@media (max-width: 480px) {
+    .tile {
+        flex-basis: 160px;
+        width: 160px;
+    }
+}
+
+.tile:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(16, 24, 40, 0.12);
+}
+
+.tile-inner {
+    text-align: center;
+    width: 100%;
+}
+
+.tile-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: rgb(50, 50, 50);
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 120ms ease, transform 120ms ease;
+}
+
+.tile-edit {
+    position: absolute;
+    top: 8px;
+    right: 44px;
+    /* 8px (gap) + 30px (button width) + 6px buffer */
+    z-index: 5;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: rgb(50, 50, 50);
+    color: #0f1724;
+    font-size: 16px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 120ms ease, transform 120ms ease;
+}
+
+.tile:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(16, 24, 40, 0.12);
+}
+
+.profile-name {
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mods-count {
+    font-size: 1.05rem;
+    color: #e7e7e7;
+    margin-bottom: 6px;
+}
+
+.ready {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #e7e7e7;
+}

@@ -3,69 +3,72 @@
     gap: 24px;
     align-items: flex-start;
     padding: 16px;
-    box-sizing: border-box;
 }
 
-/* make room for the fixed right column */
 .left-column {
+    position: fixed;
     flex: 1;
+    width: 49%;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-
-    /* ensure left column content doesn't go under the fixed right column */
-    margin-right: 400px;
-    /* right-column width (360) + desired gap (40) */
+    margin-right: 10px;
 }
 
-/* right column bound to the right side of the viewport */
 .right-column {
     position: fixed;
     right: 0;
     top: 0;
+    width: 49%;
     height: 100vh;
     padding: 16px;
     box-sizing: border-box;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-    justify-content: flex-start;
+    align-items: flex-end;
 }
 
-/* small helpers */
-.controls .button-row {
-    margin-top: 8px;
+.button-row {
+    width: 100%;
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: flex-end;
+    margin-top: 0;
+    align-self: flex-end;
 }
 
-.add-mod,
 .download-row {
+    width: 100%;
     display: flex;
     gap: 8px;
     align-items: center;
-    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-top: auto;
+    align-self: flex-end;
 }
 
-/* responsive: on small screens revert to stacked layout */
+/* responsive: on small screens revert to stacked layout and disable vertical pinning */
 @media (max-width: 900px) {
     .profile-layout {
         flex-direction: column;
+        gap: 0px;
+        padding: 16px;
     }
 
     .left-column {
-        margin-right: 0;
+        width: 100%;
+        position: static;
     }
 
     .right-column {
         position: static;
         width: 100%;
-        height: auto;
-        box-shadow: none;
-        background: transparent;
-        padding: 0;
+    }
+
+    .right-column .button-row,
+    .right-column .chart,
+    .right-column .download-row {
+        margin: 0;
     }
 }

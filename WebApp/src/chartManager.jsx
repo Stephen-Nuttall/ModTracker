@@ -27,7 +27,7 @@ function ChartManager({ profile }) {
     }
 
     return (
-        <PieChart data={priorityLevels} size={500} />
+        <PieChart data={priorityLevels} size={600} />
     )
 }
 

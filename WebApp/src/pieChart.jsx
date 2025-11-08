@@ -28,7 +28,7 @@ function PieChart({ data = [], size = 200, innerRadius = 0 }) {
     let angle = 0;
 
     return (
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 16, alignItems: "center", marginTop: "auto", marginBottom: "auto" }}>
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                 {data.map((d, i) => {
                     const startAngle = angle;
@@ -62,8 +62,8 @@ function PieChart({ data = [], size = 200, innerRadius = 0 }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {data.map((d, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div style={{ width: 12, height: 12, background: d.color || `hsl(${(i * 70) % 360} 70% 50%)` }} />
-                        <div style={{ fontSize: 13 }}>{d.label}: {d.value}</div>
+                        <div style={{ width: 20, height: 20, background: d.color || `hsl(${(i * 70) % 360} 70% 50%)` }} />
+                        <div>{d.label}: {d.value}</div>
                     </div>
                 ))}
             </div>

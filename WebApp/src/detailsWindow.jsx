@@ -76,13 +76,19 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
         URL.revokeObjectURL(url);
     }
 
+    function backToSelectView() {
+        console.log("Going to profile select window")
+        const base = window.location.origin.replace(/\/+$/, "");
+        window.location.href = base;
+    }
+
     return (
         <>
             <div className="profile-layout">
                 <div className="left-column">
                     <div className="controls">
                         <h2>{profile?.name}</h2>
-                        <div>Selected Version: {profile?.version}</div>
+                        <label>Selected Version: {profile?.version}</label>
                     </div>
 
                     <TableManager
@@ -109,14 +115,15 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
                     <div className="button-row">
                         <TextInputBox
                             onTextChange={(newInput) => { setVersionInput(newInput) }}
-                            placeholderText={"Enter version number here"}
-                            length={25}
+                            placeholderText={"Enter new version"}
+                            length={15}
                         />
                         <button onClick={reloadProfile} className="generic-button">⟳</button>
                         <button onClick={exportProfile} className="generic-button">Export</button>
+                        <button onClick={backToSelectView} className="generic-button">Back</button>
                     </div>
 
-                    <ChartManager profile={profile} />
+                    <ChartManager className="chart" profile={profile} />
 
                     <div className="download-row">
                         <button onClick={downloadMods} className="generic-button">Download Available Mods</button>
