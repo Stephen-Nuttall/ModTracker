@@ -1,5 +1,4 @@
 import sys, os
-from fastapi import Request
 
 # Add the parent directory to the Python path
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -10,25 +9,19 @@ import Backend.mod as mod, Backend.loadFromJson as loadFromJson
 class DataManager():
     _profileManager:mod.ProfileManager
 
-    def __init__(self, useTestSetup = False):
+    def __init__(self):
         priorityList = [
             mod.Priority("High Priority", red=255, green=128, blue=0),
             mod.Priority("Medium Priority", red=255, green=196, blue=0),
             mod.Priority("Low Priority", red=255, green=255, blue=0)
         ]
-        if useTestSetup:
-            self._profileManager = mod.ProfileManager([mod.Profile(
-                    [mod.Mod("Test Mod 1"), mod.Mod("Test Mod 2"), mod.Mod("Test Mod 3")], priorityList, name="Test Profile"
-                )], priorityList
-            )
-        else:
-            self._profileManager = mod.ProfileManager(priorityList=priorityList)
+        self._profileManager = mod.ProfileManager(priorityList=priorityList)
 
     def __del__(self):
         self._profileManager._profileList.clear()
         self._profileManager._priorityList.clear()
 
-    async def getData(self):
+    def getData(self, data = False):
         try:
             if self._profileManager:
                 return {
@@ -36,21 +29,20 @@ class DataManager():
                     "errorMessage" : "None"
                 }
             else:
-                return {"errorMessage" : "ERROR: profileManager does not exist!"}
+                return {"errorMessage" : "profileManager does not exist!"}
         except Exception as e:
             return self._genericExceptionCatch(e)
         
-    async def restoreData(self, request: Request):
+    def restoreData(self, newData):
         try:
             if not self._profileManager:
-                return {"errorMessage" : "ERROR: profileManager does not exist!"}
-        
-            data = await request.json()
-            newData = data.get("data", [])
+                return {"errorMessage" : "profileManager does not exist!"}
+            elif not newData:
+                return {"errorMessage" : f"new data provided to this call is none or falsy"}
 
             profileIndex = 0
             for profileIndex, profileData in enumerate(newData["profileList"]):
-                profile = loadFromJson.createProfile(rawJson=profileData)
+                profile = loadFromJson.createProfile(rawJson=profileData, requireValidModURL=False)
                 
                 profileList = self._profileManager.getProfileList()
                 if profileIndex >= len(profileList):
@@ -65,7 +57,12 @@ class DataManager():
                 self._profileManager.addProfile(profile, saveToFile=False)
 
             for priorityData in newData["priorityList"]:
-                priority = mod.Priority(priorityData["name"], priorityData["r"], priorityData["g"], priorityData["b"])
+                priority = mod.Priority(
+                    priorityData["name"],
+                    priorityData["r"],
+                    priorityData["g"],
+                    priorityData["b"]
+                )
                 if priority not in self._profileManager._priorityList:
                     self._profileManager._priorityList.append(priority)
 
@@ -76,7 +73,7 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
 
-    async def getProfileList(self):
+    def getProfileList(self, data):
         try:
             profileData = self._profileManager.createDict()
             return {
@@ -86,7 +83,7 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
         
-    async def getNumProfiles(self):
+    def getNumProfiles(self, data):
         try:
             numProfiles = self._profileManager.getNumProfiles()
             return {
@@ -96,7 +93,7 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
 
-    async def getPriorityList(self):
+    def getPriorityList(self, data):
         try:
             priorityData = self._profileManager.createDict()
             return {
@@ -106,9 +103,8 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
 
-    async def getProfile(self, request: Request):
+    def getProfile(self, data):
         try:
-            data = await request.json()
             profileIndex = data.get("profileIndex", None)
 
             if profileIndex == None:
@@ -130,7 +126,7 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
         
-    async def addProfile(self, request: Request):
+    def addProfile(self, data):
         def createDebugInfo():
             return {
                 "profileData" : profileData,
@@ -139,7 +135,6 @@ class DataManager():
             }
 
         try:
-            data = await request.json()
             profileData = data.get("profileData", None)
             profileName = data.get("profileName", None)
 
@@ -164,7 +159,7 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e, createDebugInfo())
         
-    async def removeProfile(self, request: Request):
+    def removeProfile(self, data):
         def createDebugInfo():
             return {
                 "profileIndex" : profileIndex,
@@ -172,7 +167,6 @@ class DataManager():
             }
 
         try:
-            data = await request.json()
             profileIndex = data.get("profileIndex", None)
 
             if profileIndex:
@@ -189,7 +183,7 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e, createDebugInfo())
         
-    async def restoreProfile(self, request: Request):
+    def restoreProfile(self, data):
         def createDebugInfo():
             return {
                 "profileData" : profileData,
@@ -198,7 +192,6 @@ class DataManager():
             }
 
         try:
-            data = await request.json()
             profileData = data.get("profileData", None)
             profileIndex = data.get("profileIndex", None)
 
@@ -206,7 +199,7 @@ class DataManager():
             if profileData:
                 profile = loadFromJson.createProfile(rawJson=profileData)
             else:
-                return { "errorMessage" : "No profile data provided (or data was falsy)" }
+                return { "errorMessage" : "No profile data provided (or it was falsy)" }
             
             profileList = self._profileManager.getProfileList()
             if profileIndex >= len(profileList):
@@ -227,9 +220,8 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e, createDebugInfo())
         
-    async def updateProfile(self, request: Request):
+    def updateProfile(self, data):
         try:
-            data = await request.json()
             profileIndex = data.get("profileIndex", None)
             newVersion = data.get("profileVersion", None)
             newName = data.get("profileName", None)
@@ -263,9 +255,8 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
         
-    async def downloadReadyMods(self, request: Request):
+    def downloadReadyMods(self, data):
         try:
-            data = await request.json()
             profileIndex = data.get("profileIndex", None)
             loader = data.get("modLoader", None)
 
@@ -288,7 +279,7 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
 
-    async def addMod(self, request: Request):
+    def addMod(self, data):
         def createDebugInfo():
             profileDict = profile.createDict() if profile else "None"
             return {
@@ -299,7 +290,6 @@ class DataManager():
             }
         
         try:
-            data = await request.json()
             profileIndex = data.get("profileIndex", None)
             url = data.get("url", None)
 
@@ -330,9 +320,8 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e, createDebugInfo())
 
-    async def removeMod(self, request: Request):
+    def removeMod(self, data):
         try:
-            data = await request.json()
             profileIndex = data.get("profileIndex", None)
             modIndex = data.get("modIndex", -1)
 
@@ -345,10 +334,8 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
         
-    async def updateModPriority(self, request: Request):
+    def updateModPriority(self, data):
         try:
-            data = await request.json()
-
             profileIndex = data.get("profileIndex", None)
             modIndex = data.get("modIndex", -1)
 
@@ -370,10 +357,8 @@ class DataManager():
         except Exception as e:
             return self._genericExceptionCatch(e)
         
-    async def addPriority(self, request: Request):
+    def addPriority(self, data):
         try:
-            data = await request.json()
-
             profileIndex = data.get("profileIndex", None)
             modIndex = data.get("modIndex", -1)
 

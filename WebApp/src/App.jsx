@@ -2,20 +2,25 @@ import { useState, useRef, useEffect } from 'react'
 
 import DataFetcher from './dataFetcher.jsx'
 import ProfileSelectWindow from './profileSelectWindow.jsx'
-import DetailsWindow from './DetailsWindow.jsx'
+import DetailsWindow from './detailsWindow.jsx'
 
 function App() {
     try {
         const requestRef = useRef(null)
 
+        const blankProfileData = {
+            "profileList": [],
+            "priorityList": []
+        }
+
         const [profileData, setProfileData] = useState([])
         const [profileIndex, setProfileIndex] = useState(-1)
         const [selectedProfile, setSelectedProfile] = useState()
         const [numProfiles, setNumProfiles] = useState(-1)
-        const [output, setOutput] = useState('');
+        const [output, setOutput] = useState('')
 
-        const storedData = localStorage.getItem('profiles');
-        const parsedData = JSON.parse(storedData);
+        const storedData = localStorage.getItem('profiles')
+        const parsedData = storedData !== (undefined || "undefined") ? JSON.parse(storedData) : blankProfileData
 
         useEffect(() => {
             setProfileIndex(getProfileIndexFromURL())
@@ -26,7 +31,7 @@ function App() {
             if (profileIndex >= 0) {
                 setSelectedProfile(profileData.profileList[profileIndex])
             }
-        }, [profileData])
+        }, [profileData, profileIndex])
 
         const getProfileIndexFromURL = () => {
             let index = null
@@ -64,9 +69,11 @@ function App() {
         return (
             <>
                 <DataFetcher updateData={setProfileData} setOutputText={setOutput} ref={requestRef} />
-                {displaySelectWindow ?
-                    <ProfileSelectWindow profileList={parsedData?.profileList} requestRef={requestRef} /> :
-                    <DetailsWindow profileIndex={profileIndex} profile={selectedProfile} requestRef={requestRef} />}
+                {
+                    displaySelectWindow ?
+                        <ProfileSelectWindow profileList={parsedData?.profileList} requestRef={requestRef} /> :
+                        <DetailsWindow profileIndex={profileIndex} profile={selectedProfile} requestRef={requestRef} />
+                }
             </>
         )
     }
@@ -75,6 +82,7 @@ function App() {
             <>
                 <h2>Sorry! A fatal error occured when trying to load the site.</h2>
                 <div>Exception caught: {exception.message}</div>
+                {console.error(exception)}
             </>
         )
     }

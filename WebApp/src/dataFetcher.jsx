@@ -1,5 +1,5 @@
-import { useEffect, useState, forwardRef, useImperativeHandle, version } from 'react';
-import axios from 'axios';
+import { useEffect, useState, forwardRef, useImperativeHandle, version } from 'react'
+import axios from 'axios'
 
 const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool) => { } }, requestRef) => {
     let startupInitiated = false
@@ -12,8 +12,8 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
     }
 
     const [profileData, setProfileData] = useState(blankProfileData)
-    const [isLoading, setIsLoading] = useState(false);
-    const [output, setOutput] = useState('');
+    const [isLoading, setIsLoading] = useState(false)
+    const [output, setOutput] = useState('')
 
     useEffect(() => {
         console.log("Beginning Startup")
@@ -25,7 +25,7 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
 
         return () => {
             startupInitiated = true
-        };
+        }
     }, [])
 
     useEffect(() => { updateData(profileData) }, [profileData])
@@ -35,10 +35,12 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
     // Generic method of making a request to the backend server, with parameters available for customization.
     // Available for parent components to reference.
     const genericRequest = async (callName, params, errorOutput = false, successOutput = false, updateData = true) => {
+        setIsLoading(true)
         try {
             const url = `http://localhost:8000/${callName}`
-            console.log('Making post to ' + url + ' with data ' + JSON.stringify(params))
-            const response = await axios.post(url, params);
+            const fullParams = { data: profileData, ...params }
+            console.log('Making post to ' + url + ' with current data + ' + JSON.stringify(params))
+            const response = await axios.post(url, fullParams)
 
             if (response.data.errorMessage != "None") {
                 if (errorOutput != false) {
@@ -51,23 +53,25 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
                 setOutput(successOutput)
             }
 
-            if (updateData == true) {
-                refreshData()
+            if (updateData) {
+                setProfileData(response.data.profileManager)
+                localStorage.setItem('profiles', JSON.stringify(response.data.profileManager))
             }
 
-            return response.data
+            return response.data.functionOutput
         } catch (error) {
-            console.error('Error calling backend: ' + error.message + "\n" + error);
-            setOutput('Error calling backend: ' + error.message);
+            console.error('Error calling backend: ' + error.message + "\n" + error)
+            setOutput('Error calling backend: ' + error.message)
             return { errorMessage: error.message }
+        } finally {
+            setIsLoading(false)
         }
     }
 
     // Loads profile data from browser storage.
     const restoreProfileData = async () => {
-        setIsLoading(true)
-        const storedData = localStorage.getItem('profiles');
-        const parsedData = JSON.parse(storedData);
+        const storedData = localStorage.getItem('profiles')
+        const parsedData = storedData !== (undefined || "undefined") ? JSON.parse(storedData) : blankProfileData
 
         const data = await genericRequest(
             "restore-data",
@@ -75,24 +79,6 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
             "Error restoring data: ", false
         )
 
-        setIsLoading(false);
-    }
-
-    // Retrieves profile data after a call and loads the new data into updateData() and browser storage.
-    const refreshData = async () => {
-        const data = await genericRequest(
-            "get-data",
-            {},
-            -1,
-            "Error fetching data. No changes could applied, and no new data could be loaded.\nError message: ",
-            false,
-            false
-        )
-
-        if (data.errorMessage == "None") {
-            setProfileData(data.profileManager)
-            localStorage.setItem('profiles', JSON.stringify(data.profileManager))
-        }
     }
 })
 
