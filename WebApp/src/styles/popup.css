@@ -66,3 +66,8 @@
     min-width: 90%;
     max-width: 300px;
 }
+
+.subComponentButton {
+    min-width: 100%;
+    max-width: 300px;
+}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import TextInputBox from './textInputBox';
+import FilePickerButton from './filePickerButton';
 import './styles/popup.css'
 
 function NewProfilePopup({ isOpen = false, setIsOpen, requestRef }) {
@@ -16,8 +17,23 @@ function NewProfilePopup({ isOpen = false, setIsOpen, requestRef }) {
         }
     }
 
-    const importProfile = async () => {
-        console.log("placeholder")
+    const importProfile = async (parsedData, errorMessage = null) => {
+        if (parsedData == null || parsedData === undefined) {
+            console.error("parsed JSON data is null or undefined")
+        }
+        else if (errorMessage != null) {
+            console.error("Error parsing JSON data: " + errorMessage)
+        }
+        else if (!requestRef.current) {
+            console.error("requestRef is not set!")
+        }
+        else {
+            const data = await requestRef.current?.genericRequest(
+                "add-profile", { profileName: nameInput, profileData: parsedData },
+                "Failed to import profile: ", "Profile " + nameInput + " successfully imported."
+            )
+            setIsOpen(false)
+        }
     }
 
     return (
@@ -44,15 +60,13 @@ function NewProfilePopup({ isOpen = false, setIsOpen, requestRef }) {
                             >
                                 Create blank profile
                             </button>
-                            <button
+
+                            <FilePickerButton
+                                onFileLoaded={importProfile}
                                 className='popupOptionButton'
-                                onClick={() => {
-                                    importProfile()
-                                    setIsOpen(false)
-                                }}
-                            >
-                                Import from JSON file
-                            </button>
+                                buttonClassName='subComponentButton'
+                            />
+
                             <button
                                 className='popupOptionButton'
                                 onClick={() => {

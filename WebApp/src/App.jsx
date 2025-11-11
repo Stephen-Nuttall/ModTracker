@@ -28,7 +28,7 @@ function App() {
         }, [])
 
         useEffect(() => {
-            if (profileIndex >= 0) {
+            if (profileIndex >= 0 && profileData.profileList !== undefined) {
                 setSelectedProfile(profileData.profileList[profileIndex])
             }
         }, [profileData, profileIndex])
@@ -72,7 +72,12 @@ function App() {
                 {
                     displaySelectWindow ?
                         <ProfileSelectWindow profileList={parsedData?.profileList} requestRef={requestRef} /> :
-                        <DetailsWindow profileIndex={profileIndex} profile={selectedProfile} requestRef={requestRef} />
+                        <DetailsWindow
+                            profileIndex={profileIndex}
+                            profile={selectedProfile}
+                            requestRef={requestRef}
+                            functionOutputText={output}
+                        />
                 }
             </>
         )

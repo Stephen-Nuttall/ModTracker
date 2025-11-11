@@ -13,7 +13,7 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
     const [modToAddPriorityTo, setModToAddPriorityTo] = useState(-1)
     const [modInput, setModInput] = useState('');
     const [versionInput, setVersionInput] = useState('');
-    const [output, setOutput] = useState('');
+    const [funcOutputText, setFuncOutput] = useState('');
 
     const addMod = async () => {
         if (requestRef.current) {
@@ -21,6 +21,12 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
                 "add-mod", { url: modInput, profileIndex: profileIndex },
                 "Failed to add mod: ", "Mod successfully added."
             )
+
+            if (data?.errorMessage != "None") {
+                setFuncOutput("Unable to add this mod. Check the URL you provided and try again.")
+            } else {
+                setFuncOutput("Mod successfully added.")
+            }
         } else {
             console.error("requestRef is not set!")
         }
@@ -33,8 +39,14 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
         if (requestRef.current) {
             const data = await requestRef.current?.genericRequest(
                 "update-profile", { profileIndex: profileIndex, profileVersion: version, profileName: name },
-                "Failed to update profile: ", "Profile successfully reloaded."
+                "Failed to update profile: ", "Profile successfully refreshed."
             )
+
+            if (data?.errorMessage != "None") {
+                setFuncOutput("Failed to update profile.")
+            } else {
+                setFuncOutput("Profile successfully refreshed.")
+            }
         } else {
             console.error("requestRef is not set!")
         }
@@ -65,7 +77,7 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
             }
 
             console.log("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profile?.version)
-            setOutput("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profile?.version)
+            setFuncOutput("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profile?.version)
         } else {
             console.error("requestRef is not set!")
         }
@@ -82,6 +94,8 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
+
+        setFuncOutput("Profile successfully exported.")
     }
 
     function backToSelectView() {
@@ -119,8 +133,6 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
                         />
                         <button onClick={addMod} className="add-mod-button">Add Mod</button>
                     </div>
-
-                    <pre>{output}</pre>
                 </div>
 
                 {/* RIGHT COLUMN */}
@@ -139,6 +151,7 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
                     </div>
 
                     <ChartManager className="chart" profile={profile} />
+                    <pre>{funcOutputText}</pre>
 
                     <div className="download-row">
                         <button onClick={downloadMods} className="generic-button">Download Available Mods</button>

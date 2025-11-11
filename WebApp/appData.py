@@ -169,7 +169,7 @@ class DataManager():
         try:
             profileIndex = data.get("profileIndex", None)
 
-            if profileIndex:
+            if profileIndex != None:
                 profileList = self._profileManager.getProfileList()
                 profileList.pop(profileIndex)
             else:

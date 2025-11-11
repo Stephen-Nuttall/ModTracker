@@ -43,6 +43,8 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
             const response = await axios.post(url, fullParams)
 
             if (response.data.errorMessage != "None") {
+                updateData = false
+
                 if (errorOutput != false) {
                     console.error(errorOutput + response.data.errorMessage)
                     setOutput(errorOutput + response.data.errorMessage)
@@ -53,7 +55,7 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
                 setOutput(successOutput)
             }
 
-            if (updateData) {
+            if (updateData && response.data.profileManager !== undefined) {
                 setProfileData(response.data.profileManager)
                 localStorage.setItem('profiles', JSON.stringify(response.data.profileManager))
             }
