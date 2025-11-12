@@ -3,7 +3,7 @@ import TextInputBox from './textInputBox';
 import FilePickerButton from './filePickerButton';
 import './styles/popup.css'
 
-function NewProfilePopup({ isOpen = false, setIsOpen, requestRef }) {
+function NewProfilePopup({ isOpen = false, setIsOpen, requestRef, setFuncOutput }) {
     const [nameInput, setNameInput] = useState("")
 
     const createBlankProfile = async () => {
@@ -12,6 +12,12 @@ function NewProfilePopup({ isOpen = false, setIsOpen, requestRef }) {
                 "add-profile", { profileName: nameInput },
                 "Failed to add profile: ", "Profile " + nameInput + " successfully added."
             )
+
+            if (data?.errorMessage != "None") {
+                setFuncOutput("Failed to create profile.")
+            } else {
+                setFuncOutput("Profile successfully created.")
+            }
         } else {
             console.error("requestRef is not set!")
         }
@@ -33,6 +39,12 @@ function NewProfilePopup({ isOpen = false, setIsOpen, requestRef }) {
                 "Failed to import profile: ", "Profile " + nameInput + " successfully imported."
             )
             setIsOpen(false)
+
+            if (data?.errorMessage != "None") {
+                setFuncOutput("Failed to import profile.")
+            } else {
+                setFuncOutput("Profile successfully imported.")
+            }
         }
     }
 

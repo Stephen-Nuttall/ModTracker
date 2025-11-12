@@ -12,30 +12,29 @@ const ModTable = ({ modList, priorityList, onPriorityChange, onDelete, selectedV
         <table className="mod-table">
             <thead>
                 <tr>
-                    <th>Mod Name</th>
-                    <th>Latest Version</th>
-                    <th>Priority</th>
-                    <th></th>
+                    <th className='name-column'>Mod Name</th>
+                    <th className='version-column'>Latest Version</th>
+                    <th className='priority-column'>Priority</th>
+                    <th className='delete-column'></th>
                 </tr>
             </thead>
             <tbody>
                 {modList.map((mod) => (
                     <tr key={mod.tablePos}>
-                        <td>{mod.name}</td>
+                        <td className='name-column'>{mod.name}</td>
                         <td
+                            className='version-column'
                             style={{
                                 backgroundColor: mod.versions.includes(selectedVersion)
                                     ? 'rgb(0, 125, 0)'
                                     : '',
-                                // color: mod.versions.includes(selectedVersion)
-                                //     ? 'rgb(0, 0, 0)'
-                                //     : ''
                             }}
                         >
                             {mod.versions.at(-1)}
                             {mod.versions.includes(selectedVersion) && <span> ✔</span>}
                         </td>
                         <td
+                            className='priority-column'
                             style={{
                                 backgroundColor: `rgb(${mod.priority.r}, ${mod.priority.g}, ${mod.priority.b})`
                             }}
@@ -71,9 +70,8 @@ const ModTable = ({ modList, priorityList, onPriorityChange, onDelete, selectedV
                                 ))}
                                 <option key={"CREATE_NEW"} value={"CREATE_NEW"}>Create New Priority Level</option>
                             </select>
-                            {/* {mod.versions.includes(selectedVersion) && <span style={{ color: 'black' }}> ✔</span>} */}
                         </td>
-                        <td>
+                        <td className='delete-column'>
                             <button
                                 onClick={() => onDelete(mod.tablePos)}
                                 className="delete-button"

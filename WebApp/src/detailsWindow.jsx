@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import TableManager from './tableManager'
 import NewPriorityPopup from './newPriorityPopup'
@@ -8,12 +8,20 @@ import EditableText from './EditableText'
 
 import './styles/detailsWindow.css'
 
-function DetailsWindow({ profileIndex, profile, requestRef }) {
+function DetailsWindow({ profileIndex, profile, requestRef, isLoading }) {
     const [priorityPopupOpen, OpenPriorityPopup] = useState(false)
     const [modToAddPriorityTo, setModToAddPriorityTo] = useState(-1)
     const [modInput, setModInput] = useState('');
     const [versionInput, setVersionInput] = useState('');
     const [funcOutputText, setFuncOutput] = useState('');
+
+    useEffect(() => {
+        if (isLoading == true) {
+            setFuncOutput("Loading...")
+        } else if (funcOutputText == "Loading...") {
+            setFuncOutput("")
+        }
+    }, [isLoading])
 
     const addMod = async () => {
         if (requestRef.current) {
@@ -109,7 +117,7 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
             <div className="profile-layout">
                 {/* LEFT COLUMN */}
                 <div className="left-column">
-                    <div className="controls">
+                    <div className="info-row">
                         <h2>
                             <EditableText value={profile?.name} onChange={renameProfile} />
                         </h2>
@@ -136,7 +144,7 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
                 </div>
 
                 {/* RIGHT COLUMN */}
-                <aside className="right-column">
+                <div className="right-column">
                     <div className="button-row">
                         <TextInputBox
                             onTextChange={(newInput) => { setVersionInput(newInput) }}
@@ -145,24 +153,24 @@ function DetailsWindow({ profileIndex, profile, requestRef }) {
                             length={15}
                             className={"version-input"}
                         />
-                        <button onClick={reloadProfile} className="generic-button">⟳</button>
-                        <button onClick={exportProfile} className="generic-button">Export</button>
-                        <button onClick={backToSelectView} className="generic-button">Back</button>
+                        <button onClick={reloadProfile} className="menu-button">⟳</button>
+                        <button onClick={exportProfile} className="menu-button">Export</button>
+                        <button onClick={backToSelectView} className="menu-button">Back</button>
                     </div>
 
+                    <div className='function-output-detailsWindow'>{funcOutputText}</div>
                     <ChartManager className="chart" profile={profile} />
-                    <pre>{funcOutputText}</pre>
 
                     <div className="download-row">
-                        <button onClick={downloadMods} className="generic-button">Download Available Mods</button>
-                        <select id='loaderDropdown'>
+                        <button onClick={downloadMods} className="menu-button">Download Available Mods</button>
+                        <select id='loaderDropdown' className="menu-button">
                             <option value="forge">Forge</option>
                             <option value="fabric">Fabric</option>
                             <option value="neoforge">NeoForge</option>
                             <option value="quilt">Quilt</option>
                         </select>
                     </div>
-                </aside>
+                </div>
             </div>
 
             <NewPriorityPopup

@@ -80,7 +80,7 @@ const TableManager = ({ profile, requestRef, profileIndex, OpenPriorityPopup, se
     };
 
     return (
-        <>
+        <div className='table-manager'>
             <ModTable
                 modList={modList}
                 priorityList={priorityList}
@@ -88,7 +88,7 @@ const TableManager = ({ profile, requestRef, profileIndex, OpenPriorityPopup, se
                 onDelete={handleDelete}
                 selectedVersion={profile?.version}
             />
-        </>
+        </div>
     )
 }
 

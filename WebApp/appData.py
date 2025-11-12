@@ -34,37 +34,45 @@ class DataManager():
             return self._genericExceptionCatch(e)
         
     def restoreData(self, newData):
+        defaultPriorityList = [
+            mod.Priority("High Priority", red=255, green=128, blue=0),
+            mod.Priority("Medium Priority", red=255, green=196, blue=0),
+            mod.Priority("Low Priority", red=255, green=255, blue=0)
+        ]
+
         try:
             if not self._profileManager:
                 return {"errorMessage" : "profileManager does not exist!"}
             elif not newData:
-                return {"errorMessage" : f"new data provided to this call is none or falsy"}
-
-            profileIndex = 0
-            for profileIndex, profileData in enumerate(newData["profileList"]):
-                profile = loadFromJson.createProfile(rawJson=profileData, requireValidModURL=False)
-                
-                profileList = self._profileManager.getProfileList()
-                if profileIndex >= len(profileList):
-                    self._profileManager.addProfile(profile, saveToFile=False)
-                else:
-                    profileList[profileIndex] = profile
-                    self._profileManager.updatePriorityLists()
-                    self._profileManager.sortModLists()
+                return {"errorMessage" : f"Data to be restored is none or falsy"}
             
-            if profileIndex == 0:
-                profile = mod.Profile()
+            if len(newData["profileList"]) == 0:
+                profile = mod.Profile(priorityList=defaultPriorityList)
                 self._profileManager.addProfile(profile, saveToFile=False)
+            else:
+                for profileIndex, profileData in enumerate(newData["profileList"]):
+                    profile = loadFromJson.createProfile(rawJson=profileData, requireValidModURL=False)
+                    
+                    profileList = self._profileManager.getProfileList()
+                    if profileIndex >= len(profileList):
+                        self._profileManager.addProfile(profile, saveToFile=False)
+                    else:
+                        profileList[profileIndex] = profile
+                        self._profileManager.updatePriorityLists()
+                        self._profileManager.sortModLists()
 
-            for priorityData in newData["priorityList"]:
-                priority = mod.Priority(
-                    priorityData["name"],
-                    priorityData["r"],
-                    priorityData["g"],
-                    priorityData["b"]
-                )
-                if priority not in self._profileManager._priorityList:
-                    self._profileManager._priorityList.append(priority)
+            if len(newData["priorityList"]) == 0:
+                self._profileManager._priorityList = defaultPriorityList
+            else:
+                for priorityData in newData["priorityList"]:
+                    priority = mod.Priority(
+                        priorityData["name"],
+                        priorityData["r"],
+                        priorityData["g"],
+                        priorityData["b"]
+                    )
+                    if priority not in self._profileManager._priorityList:
+                        self._profileManager._priorityList.append(priority)
 
             return {
                 "profileManager" : self._profileManager.createDict(),

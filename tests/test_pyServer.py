@@ -17,21 +17,22 @@ class TestPyServer(testData.TestCase):
         cls.client = TestClient(app)
 
     def setUp(self):
-        examplePriorityList = [
+        self._examplePriorityList = [
                 mod.Priority("High Priority", red=255, green=128, blue=0),
                 mod.Priority("Medium Priority", red=255, green=196, blue=0),
-                mod.Priority("Low Priority", red=255, green=255, blue=0)
+                mod.Priority("Low Priority", red=255, green=255, blue=0),
+                mod.Priority()
             ]
         self._exampleDataSource = mod.ProfileManager([
             mod.Profile([
-                    mod.Mod("Test Mod 1"),
-                    mod.Mod("Test Mod 2"),
-                    mod.Mod("Test Mod 3")
+                    mod.Mod("Test Mod 1", modPriority=self._examplePriorityList[0]),
+                    mod.Mod("Test Mod 2", modPriority=self._examplePriorityList[1]),
+                    mod.Mod("Test Mod 3", modPriority=self._examplePriorityList[2])
                 ],
-                examplePriorityList,
+                self._examplePriorityList,
                 name="Test Profile"
             )],
-            examplePriorityList
+            self._examplePriorityList
         )
         self._exampleData = self._exampleDataSource.createDict()
 
@@ -102,7 +103,7 @@ class TestPyServer(testData.TestCase):
             errorString = f"The format of PyServer's response does not match expected format. Reponse JSON:\n{json}"
             self.fail(errorString)
 
-    def testRestoreData(self):
+    def testRestoreData_oneProfile(self):
         response = self.client.post("restore-data", json={"data" : self._exampleData})
         self.assertEqual(response.status_code, 200)
         json = response.json()
@@ -113,6 +114,67 @@ class TestPyServer(testData.TestCase):
 
             profileManager = json["profileManager"]
             self._verifyProfileManagerDict(profileManager)
+            self.assertEqual(profileManager, self._exampleData)
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse JSON:\n{json}"
+            self.fail(errorString)
+
+    def testRestoreData_twoProfiles(self):
+        dataSource_twoProfiles = mod.ProfileManager(
+            [
+                mod.Profile([
+                        mod.Mod("Test Mod 1", modPriority=self._examplePriorityList[0]),
+                        mod.Mod("Test Mod 2", modPriority=self._examplePriorityList[1]),
+                        mod.Mod("Test Mod 3", modPriority=self._examplePriorityList[2])
+                    ],
+                    self._examplePriorityList,
+                    name="Test Profile"
+                ),
+                mod.Profile([
+                        mod.Mod("Test Mod 4", modPriority=self._examplePriorityList[2]),
+                        mod.Mod("Test Mod 5", modPriority=self._examplePriorityList[0]),
+                        mod.Mod("Test Mod 6", modPriority=self._examplePriorityList[1])
+                    ],
+                    self._examplePriorityList,
+                    name="Test Profile 2"
+                )
+            ],
+            self._examplePriorityList
+        )
+        data_twoProfiles = dataSource_twoProfiles.createDict()
+
+        response = self.client.post("restore-data", json={"data" : data_twoProfiles})
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        try:
+            errorMessage = json["errorMessage"]
+            self.assertEqual(errorMessage, "None")
+
+            profileManager = json["profileManager"]
+            self._verifyProfileManagerDict(profileManager)
+            self.assertEqual(profileManager, data_twoProfiles)
+        except (KeyError, TypeError):
+            errorString = f"The format of PyServer's response does not match expected format. Reponse JSON:\n{json}"
+            self.fail(errorString)
+
+    def testRestoreData_noProfiles(self):
+        dataSource_noProfiles = mod.ProfileManager([], self._examplePriorityList)
+        data_noProfiles = dataSource_noProfiles.createDict()
+
+        response = self.client.post("restore-data", json={"data" : data_noProfiles})
+        self.assertEqual(response.status_code, 200)
+        json = response.json()
+
+        try:
+            errorMessage = json["errorMessage"]
+            self.assertEqual(errorMessage, "None")
+
+            profileManager = json["profileManager"]
+            self._verifyProfileManagerDict(profileManager)
+
+            self.assertEqual(profileManager["priorityList"], data_noProfiles["priorityList"])
+            self.assertEqual(len(profileManager["profileList"]), len(data_noProfiles["profileList"]) + 1)
         except (KeyError, TypeError):
             errorString = f"The format of PyServer's response does not match expected format. Reponse JSON:\n{json}"
             self.fail(errorString)
@@ -230,6 +292,9 @@ class TestPyServer(testData.TestCase):
             self.fail(errorString)
 
     def testAddMod(self):
+        if self._testAPICalls == False:
+            self.skipTest("API tests are disabled")
+            
         response = self.client.post("add-mod", json={"data" : self._exampleData, 'profileIndex' : 0, 'url' : "https://modrinth.com/mod/sodium"})
         self.assertEqual(response.status_code, 200)
         json = response.json()

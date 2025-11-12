@@ -9,8 +9,8 @@
 
 .tile {
     position: relative;
-    flex: 0 1 250px;
-    width: 250px;
+    flex: 0 1 300px;
+    width: 300px;
     aspect-ratio: 1 / 1;
     background: linear-gradient(180deg, #414141 0%, #474747 100%);
     border: 1px solid transparent;
@@ -48,8 +48,8 @@
     top: 8px;
     right: 8px;
     z-index: 5;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     background: rgb(50, 50, 50);
     color: #ffffff;
@@ -68,8 +68,8 @@
     right: 44px;
     /* 8px (gap) + 30px (button width) + 6px buffer */
     z-index: 5;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     background: rgb(50, 50, 50);
     color: #0f1724;
@@ -93,8 +93,7 @@
     margin: 0 0 8px 0;
     color: #ffffff;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: break-word;
 }
 
 .mods-count {
@@ -107,4 +106,10 @@
     font-size: 1.15rem;
     font-weight: 600;
     color: #e7e7e7;
+}
+
+.function-output-profileSelect {
+    position: fixed;
+    top: 10px;
+    right: 10px;
 }

@@ -18,6 +18,7 @@ function App() {
         const [selectedProfile, setSelectedProfile] = useState()
         const [numProfiles, setNumProfiles] = useState(-1)
         const [output, setOutput] = useState('')
+        const [isLoading, setIsLoading] = useState(false)
 
         const storedData = localStorage.getItem('profiles')
         const parsedData = storedData !== (undefined || "undefined") ? JSON.parse(storedData) : blankProfileData
@@ -67,19 +68,20 @@ function App() {
         const displaySelectWindow = profileIndex < 0 || profileIndex >= numProfiles
 
         return (
-            <>
-                <DataFetcher updateData={setProfileData} setOutputText={setOutput} ref={requestRef} />
+            <div>
+                <DataFetcher updateData={setProfileData} setOutputText={setOutput} setLoading={setIsLoading} ref={requestRef} />
                 {
                     displaySelectWindow ?
-                        <ProfileSelectWindow profileList={parsedData?.profileList} requestRef={requestRef} /> :
+                        <ProfileSelectWindow profileList={parsedData?.profileList} requestRef={requestRef} isLoading={isLoading} /> :
                         <DetailsWindow
                             profileIndex={profileIndex}
                             profile={selectedProfile}
                             requestRef={requestRef}
                             functionOutputText={output}
+                            isLoading={isLoading}
                         />
                 }
-            </>
+            </div>
         )
     }
     catch (exception) {

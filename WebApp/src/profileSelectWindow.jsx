@@ -1,10 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NewProfilePopup from './newProfilePopup'
 import './styles/profileSelectWindow.css'
 
-function ProfileSelectWindow({ profileList, requestRef }) {
+function ProfileSelectWindow({ profileList, requestRef, isLoading }) {
     const [popupOpen, setPopupOpen] = useState(false)
+    const [funcOutputText, setFuncOutput] = useState('');
     const profiles = profileList ?? []
+
+    useEffect(() => {
+        if (isLoading == true) {
+            setFuncOutput("Loading...")
+        } else if (funcOutputText == "Loading...") {
+            setFuncOutput("")
+        }
+    }, [isLoading])
 
     function onTileClick(tileNum) {
         console.log("Going to details window for profile #" + tileNum)
@@ -18,6 +27,12 @@ function ProfileSelectWindow({ profileList, requestRef }) {
                 "remove-profile", { profileIndex: index },
                 "Failed to remove profile: ", "Profile successfully removed."
             )
+
+            if (data?.errorMessage != "None") {
+                setFuncOutput("Failed to remove profile.")
+            } else {
+                setFuncOutput("Profile successfully removed.")
+            }
         } else {
             console.error("requestRef is not set!")
         }
@@ -28,7 +43,8 @@ function ProfileSelectWindow({ profileList, requestRef }) {
     }
 
     return (
-        <>
+        <div className='profile-select-container'>
+            <div className='function-output-profileSelect'>{funcOutputText}</div>
             <section className="profile-grid">
                 {profiles.map((profile, i) => {
                     let readyCount = 0
@@ -78,8 +94,8 @@ function ProfileSelectWindow({ profileList, requestRef }) {
                 </div>
             </section>
 
-            <NewProfilePopup isOpen={popupOpen} setIsOpen={setPopupOpen} requestRef={requestRef} />
-        </>
+            <NewProfilePopup isOpen={popupOpen} setIsOpen={setPopupOpen} requestRef={requestRef} setFuncOutput={setFuncOutput} />
+        </div>
     )
 }
 

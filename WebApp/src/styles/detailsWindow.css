@@ -1,16 +1,15 @@
-.profile-layout {
-    min-height: 100vh;
-}
+/* .profile-layout {
+    height: 100vh;
+} */
 
 .left-column {
     position: fixed;
-    flex: 1;
+    top: 0;
     width: 49%;
-    height: 100vh;
+    height: 100%;
     padding: 16px;
     display: flex;
     flex-direction: column;
-    overflow-y: scroll;
 }
 
 .right-column {
@@ -18,7 +17,7 @@
     right: 0;
     top: 0;
     width: 49%;
-    height: 100vh;
+    height: 100%;
     padding: 16px;
     box-sizing: border-box;
     display: flex;
@@ -26,8 +25,12 @@
     align-items: flex-end;
 }
 
-.controls {
-    width: 100%;
+.info-row {
+    padding-bottom: 12px;
+}
+
+.menu-button {
+    height: 50px;
 }
 
 .add-mod {
@@ -37,6 +40,7 @@
     align-items: center;
     margin-top: auto;
     align-self: flex-end;
+    padding-top: 12px;
     padding-bottom: 24px;
 }
 
@@ -47,6 +51,7 @@
 
 .add-mod-button {
     width: 15%;
+    height: 50px;
 }
 
 .button-row {
@@ -61,6 +66,12 @@
 
 .version-input {
     height: 75%;
+}
+
+.function-output-detailsWindow {
+    position: fixed;
+    top: 7%;
+    right: 10px;
 }
 
 .download-row {
@@ -78,7 +89,6 @@
     .profile-layout {
         flex-direction: column;
         gap: 0px;
-        padding: 16px;
     }
 
     .left-column {
