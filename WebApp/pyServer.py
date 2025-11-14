@@ -45,7 +45,7 @@ async def runDataFunction(functionName, request: Request):
             newData = dataManager.getData()
 
             if newData["errorMessage"] != "None":
-                return {"errorMessage" : f"ERROR FETCHING NEW DATA AFTER RESTORING DATA: {newData["errorMessage"]}"}
+                return {"errorMessage" : f"ERROR FETCHING NEW DATA AFTER RESTORING DATA: {newData['errorMessage']}"}
             else:
                 return {
                     "profileManager" : newData["profileManager"],
@@ -56,9 +56,9 @@ async def runDataFunction(functionName, request: Request):
             newData = dataManager.getData()
 
             if functionOutput["errorMessage"] != "None":
-                return {"errorMessage" : f"ERROR IN FUNCTION '{functionName}': {functionOutput["errorMessage"]}"}
+                return {"errorMessage" : f"ERROR IN FUNCTION '{functionName}': {functionOutput['errorMessage']}"}
             elif newData["errorMessage"] != "None":
-                return {"errorMessage" : f"ERROR FETCHING NEW DATA AFTER FUNCTION CALL: {newData["errorMessage"]}"}
+                return {"errorMessage" : f"ERROR FETCHING NEW DATA AFTER FUNCTION CALL: {newData['errorMessage']}"}
             else:
                 return {
                     "profileManager" : newData["profileManager"],
