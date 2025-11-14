@@ -35,26 +35,13 @@ function App() {
         }, [profileData, profileIndex])
 
         const getProfileIndexFromURL = () => {
-            let index = null
+            // Extract the last part of the pathname (e.g., "/profile/0" -> "0")
+            const pathParts = window.location.pathname.split('/')
+            const lastPart = pathParts[pathParts.length - 1]
 
-            try {
-                const qp = new URLSearchParams(window.location.search).get('profile')
-                if (qp !== null) {
-                    const n = parseInt(qp, 10)
-                    if (!isNaN(n)) return n
-                }
-            } catch (exception) { }
-
-            const pathMatch = window.location.pathname && window.location.pathname.match(/profile=(\d+)/)
-            const hashMatch = window.location.hash && window.location.hash.match(/profile=(\d+)/)
-
-            if (pathMatch) {
-                index = parseInt(pathMatch[1], 10)
-            } else if (hashMatch) {
-                index = parseInt(hashMatch[1], 10)
-            }
-
-            return index !== null ? index : -1
+            // Try to parse it as an integer
+            const index = parseInt(lastPart, 10)
+            return !isNaN(index) ? index : -1
         }
 
         function getNumProfiles() {

@@ -18,7 +18,7 @@ function ProfileSelectWindow({ profileList, requestRef, isLoading }) {
     function onTileClick(tileNum) {
         console.log("Going to details window for profile #" + tileNum)
         const base = window.location.origin.replace(/\/+$/, "")
-        window.location.href = `${base}/profile=${tileNum}`
+        window.location.href = `${base}/ModTracker/profile/${tileNum}`
     }
 
     const removeProfile = async (index) => {
