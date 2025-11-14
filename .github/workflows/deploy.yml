@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - beta-5.0
+      - main
 
 jobs:
   build:
@@ -16,21 +16,20 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v3
-
-      - name: Navigate to WebApp directory
-        run: cd WebApp
+        with:
+          node-version: '18'
 
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+        run: npm ci --prefix ./WebApp
 
       - name: Build project
-        run: npm run build
+        run: npm run build --prefix ./WebApp
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
           name: production-files
-          path: ./dist
+          path: ./WebApp/dist
 
   deploy:
     name: Deploy
