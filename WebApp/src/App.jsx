@@ -14,7 +14,7 @@ function App() {
         }
 
         const [profileData, setProfileData] = useState([])
-        const [profileIndex, setProfileIndex] = useState(-1)
+        const [curProfileIndex, setProfileIndex] = useState(-1)
         const [selectedProfile, setSelectedProfile] = useState()
         const [numProfiles, setNumProfiles] = useState(-1)
         const [output, setOutput] = useState('')
@@ -24,25 +24,14 @@ function App() {
         const parsedData = storedData !== (undefined || "undefined") ? JSON.parse(storedData) : blankProfileData
 
         useEffect(() => {
-            setProfileIndex(getProfileIndexFromURL())
             setNumProfiles(getNumProfiles())
         }, [])
 
         useEffect(() => {
-            if (profileIndex >= 0 && profileData.profileList !== undefined) {
-                setSelectedProfile(profileData.profileList[profileIndex])
+            if (curProfileIndex >= 0 && profileData.profileList !== undefined) {
+                setSelectedProfile(profileData.profileList[curProfileIndex])
             }
-        }, [profileData, profileIndex])
-
-        const getProfileIndexFromURL = () => {
-            // Extract the last part of the pathname (e.g., "/profile/0" -> "0")
-            const pathParts = window.location.pathname.split('/')
-            const lastPart = pathParts[pathParts.length - 1]
-
-            // Try to parse it as an integer
-            const index = parseInt(lastPart, 10)
-            return !isNaN(index) ? index : -1
-        }
+        }, [profileData, curProfileIndex])
 
         function getNumProfiles() {
             if (parsedData == null) {
@@ -52,18 +41,24 @@ function App() {
             }
         }
 
-        const displaySelectWindow = profileIndex < 0 || profileIndex >= numProfiles
+        const displaySelectWindow = curProfileIndex < 0 || curProfileIndex >= numProfiles
 
         return (
             <div>
                 <DataFetcher updateData={setProfileData} setOutputText={setOutput} setLoading={setIsLoading} ref={requestRef} />
                 {
                     displaySelectWindow ?
-                        <ProfileSelectWindow profileList={parsedData?.profileList} requestRef={requestRef} isLoading={isLoading} /> :
+                        <ProfileSelectWindow
+                            profileList={parsedData?.profileList}
+                            requestRef={requestRef}
+                            setCurProfileIndex={setProfileIndex}
+                            isLoading={isLoading}
+                        /> :
                         <DetailsWindow
-                            profileIndex={profileIndex}
+                            profileIndex={curProfileIndex}
                             profile={selectedProfile}
                             requestRef={requestRef}
+                            setCurProfileIndex={setProfileIndex}
                             functionOutputText={output}
                             isLoading={isLoading}
                         />

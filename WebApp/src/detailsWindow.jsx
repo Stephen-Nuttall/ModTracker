@@ -8,7 +8,7 @@ import EditableText from './EditableText'
 
 import './styles/detailsWindow.css'
 
-function DetailsWindow({ profileIndex, profile, requestRef, isLoading }) {
+function DetailsWindow({ profileIndex, profile, requestRef, setCurProfileIndex, isLoading }) {
     const [priorityPopupOpen, OpenPriorityPopup] = useState(false)
     const [modToAddPriorityTo, setModToAddPriorityTo] = useState(-1)
     const [modInput, setModInput] = useState('');
@@ -108,8 +108,7 @@ function DetailsWindow({ profileIndex, profile, requestRef, isLoading }) {
 
     function backToSelectView() {
         console.log("Going to profile select window")
-        const base = window.location.origin.replace(/\/+$/, "");
-        window.location.href = base;
+        setCurProfileIndex(-1)
     }
 
     return (

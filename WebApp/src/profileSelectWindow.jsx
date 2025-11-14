@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import NewProfilePopup from './newProfilePopup'
 import './styles/profileSelectWindow.css'
 
-function ProfileSelectWindow({ profileList, requestRef, isLoading }) {
+function ProfileSelectWindow({ profileList, requestRef, setCurProfileIndex, isLoading }) {
     const [popupOpen, setPopupOpen] = useState(false)
     const [funcOutputText, setFuncOutput] = useState('');
     const profiles = profileList ?? []
@@ -17,8 +17,7 @@ function ProfileSelectWindow({ profileList, requestRef, isLoading }) {
 
     function onTileClick(tileNum) {
         console.log("Going to details window for profile #" + tileNum)
-        const base = window.location.origin.replace(/\/+$/, "")
-        window.location.href = `${base}/ModTracker/profile/${tileNum}`
+        setCurProfileIndex(tileNum)
     }
 
     const removeProfile = async (index) => {
