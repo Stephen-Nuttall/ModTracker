@@ -1,4 +1,4 @@
-name: Run FastAPI Server
+name: Deploy PyServer
 
 on:
   push:

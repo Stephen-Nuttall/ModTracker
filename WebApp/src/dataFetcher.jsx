@@ -37,7 +37,7 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
     const genericRequest = async (callName, params, errorOutput = false, successOutput = false, updateData = true) => {
         setIsLoading(true)
         try {
-            const url = `http://localhost:8000/${callName}`
+            const url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
             const fullParams = { data: profileData, ...params }
             console.log('Making post to ' + url + ' with current data + ' + JSON.stringify(params))
             const response = await axios.post(url, fullParams)
