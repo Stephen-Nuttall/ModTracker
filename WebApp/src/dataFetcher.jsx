@@ -37,9 +37,21 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
     const genericRequest = async (callName, params, errorOutput = false, successOutput = false, updateData = true) => {
         setIsLoading(true)
         try {
-            const url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
+            let url = ''
+            if (window.location.hostname == "stephen-nuttall.github.io") {
+                const fs = require('fs');
+                const path = require('path');
+
+                const filePath = path.join(__dirname, '..', '..', 'pyServer_IP.txt');
+                const hostname = fs.readFileSync(filePath, 'utf8').trim();
+
+                url = `${hostname}/${callName}`
+            } else {
+                url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
+                console.log('Making post to ' + url + ' with current data + ' + JSON.stringify(params))
+            }
+
             const fullParams = { data: profileData, ...params }
-            console.log('Making post to ' + url + ' with current data + ' + JSON.stringify(params))
             const response = await axios.post(url, fullParams)
 
             if (response.data.errorMessage != "None") {

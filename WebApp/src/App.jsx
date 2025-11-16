@@ -28,6 +28,7 @@ function App() {
         }, [])
 
         useEffect(() => {
+            setNumProfiles(getNumProfiles())
             if (curProfileIndex >= 0 && profileData.profileList !== undefined) {
                 setSelectedProfile(profileData.profileList[curProfileIndex])
             }
