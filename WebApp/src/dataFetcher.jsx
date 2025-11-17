@@ -38,12 +38,11 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
     const genericRequest = async (callName, params, errorOutput = false, successOutput = false, updateData = true) => {
         setIsLoading(true)
         try {
-            let url = ''
-            if (window.location.hostname == "stephen-nuttall.github.io") {
+            let url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
+            if (url.includes("github.io/")) {
                 const hostname = pyServer_IP.trim();
                 url = `${hostname}/${callName}`
             } else {
-                url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
                 console.log('Making post to ' + url + ' with current data + ' + JSON.stringify(params))
             }
 
