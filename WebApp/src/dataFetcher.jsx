@@ -1,5 +1,6 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, version } from 'react'
 import axios from 'axios'
+import pyServer_IP from '../../pyServer_IP.txt?raw';
 
 const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool) => { } }, requestRef) => {
     let startupInitiated = false
@@ -39,12 +40,7 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
         try {
             let url = ''
             if (window.location.hostname == "stephen-nuttall.github.io") {
-                const fs = require('fs');
-                const path = require('path');
-
-                const filePath = path.join(__dirname, '..', '..', 'pyServer_IP.txt');
-                const hostname = fs.readFileSync(filePath, 'utf8').trim();
-
+                const hostname = pyServer_IP.trim();
                 url = `${hostname}/${callName}`
             } else {
                 url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
