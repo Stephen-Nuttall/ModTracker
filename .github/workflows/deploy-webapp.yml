@@ -38,7 +38,7 @@ jobs:
         run: |
           umask 077
           cat > pyServer_IP.txt <<'EOF'
-          ${PYSERVER_IP}
+          ${PYSERVER_IP} TEST
           EOF
           chmod 600 pyServer_IP.txt
 
