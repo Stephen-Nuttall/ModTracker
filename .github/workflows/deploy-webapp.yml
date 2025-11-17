@@ -1,4 +1,4 @@
-name: Deploy Vite to GitHub Pages
+name: Deploy Web App to GitHub Pages
 
 on:
   push:
@@ -22,26 +22,47 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Create API_Keys.py from secrets
+        env:
+          API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+        run: |
+          umask 077
+          cat > API_Keys.py <<'EOF'
+          CurseForge = "${API_KEY}"
+          EOF
+          chmod 600 API_Keys.py
+
+      - name: Create pyServer_IP.txt from secrets
+        env:
+          PYSERVER_IP: ${{ secrets.PYSERVER_IP }}
+        run: |
+          umask 077
+          cat > pyServer_IP.txt <<'EOF'
+          ${PYSERVER_IP}
+          EOF
+          chmod 600 pyServer_IP.txt
+
       - name: Checkout
         uses: actions/checkout@v5
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
           cache: 'npm'
           cache-dependency-path: './WebApp/package-lock.json'
+
       - name: Install dependencies
         working-directory: ./WebApp
         run: npm ci
+
       - name: Build
         working-directory: ./WebApp
         run: npm run build
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: './WebApp/dist'
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
