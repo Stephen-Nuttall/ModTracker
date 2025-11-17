@@ -39,7 +39,7 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
         setIsLoading(true)
         try {
             let url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
-            if (url.includes("github.io/")) {
+            if (url.includes("github.io")) {
                 const hostname = pyServer_IP.trim();
                 url = `${hostname}/${callName}`
             } else {
