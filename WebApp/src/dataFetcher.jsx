@@ -1,6 +1,6 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, version } from 'react'
 import axios from 'axios'
-import pyServer_IP from './secrets/pyServer_IP.txt?raw';
+import pyServer_IP from '../../pyServer_IP.txt?raw';
 
 const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool) => { } }, requestRef) => {
     let startupInitiated = false
