@@ -44,6 +44,7 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
             } else {
                 url = `${pyServer_URL}/${callName}`
             }
+            console.log("REMOVE THIS CONSOLE MESSAGE: " + url)
             console.log('Making post to backend server with current user data and these parameters:\n' + JSON.stringify(params))
 
             const fullParams = { data: profileData, ...params }
