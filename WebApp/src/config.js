@@ -1,2 +1,3 @@
-const pyServer_URL = "http://localhost:8000"
+// If default value is kept, localhost:8000 will be used.
+const pyServer_URL = "LOCALHOST_PYSERVER"
 export default pyServer_URL

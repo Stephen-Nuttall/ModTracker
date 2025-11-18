@@ -38,12 +38,13 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
     const genericRequest = async (callName, params, errorOutput = false, successOutput = false, updateData = true) => {
         setIsLoading(true)
         try {
-            let url = `${pyServer_URL}/${callName}`
-            if (url.includes("github.io")) {
-                console.log('Making post to backend server with current user data and these parameters:\n' + JSON.stringify(params))
+            let url = ''
+            if (pyServer_URL == "LOCALHOST_PYSERVER") {
+                url = `http://localhost:8000/${callName}`
             } else {
-                console.log('Making post to ' + url + ' with current user data and these parameters:\n' + JSON.stringify(params))
+                url = `${pyServer_URL}/${callName}`
             }
+            console.log('Making post to backend server with current user data and these parameters:\n' + JSON.stringify(params))
 
             const fullParams = { data: profileData, ...params }
             const response = await axios.post(url, fullParams)

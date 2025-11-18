@@ -42,7 +42,7 @@ jobs:
           BACKEND_IP: ${{ secrets.PYSERVER_IP }}
         run: |
           # Replace a placeholder in your JS file with the actual IP
-          sed -i "s/http://localhost:8000/$BACKEND_IP/g" src/config.js
+          sed -i "s/LOCALHOST_PYSERVER/$BACKEND_IP/g" src/config.js
 
       - name: Build
         working-directory: ./WebApp
