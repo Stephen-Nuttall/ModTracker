@@ -27,7 +27,11 @@ jobs:
         env:
           BACKEND_IP: ${{ secrets.PYSERVER_IP }}
         run: |
+          echo "Before substitution:"
+          cat WebApp/src/config.js
           sed -i "s|LOCALHOST_PYSERVER|$BACKEND_IP|g" WebApp/src/config.js
+          echo "After substitution:"
+          cat WebApp/src/config.js
 
       - name: Checkout
         uses: actions/checkout@v5
