@@ -22,6 +22,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - name: Inject pyServer IP
+        env:
+          BACKEND_IP: ${{ secrets.PYSERVER_IP }}
+        run: |
+          sed -i "s|LOCALHOST_PYSERVER|$BACKEND_IP|g" WebApp/src/config.js
+
       - name: Checkout
         uses: actions/checkout@v5
 
@@ -35,13 +42,6 @@ jobs:
       - name: Install dependencies
         working-directory: ./WebApp
         run: npm ci
-
-      - uses: actions/checkout@v4
-      - name: Inject pyServer IP
-        env:
-          BACKEND_IP: ${{ secrets.PYSERVER_IP }}
-        run: |
-          sed -i "s|LOCALHOST_PYSERVER|$BACKEND_IP|g" WebApp/src/config.js
 
       - name: Build
         working-directory: ./WebApp
