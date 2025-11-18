@@ -33,7 +33,6 @@ jobs:
           chmod 600 API_Keys.py
 
       - name: Create pyServer_IP.txt from secrets
-        working-directory: 'WebApp'
         env:
           PYSERVER_IP: ${{ secrets.PYSERVER_IP }}
         run: |
@@ -47,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: secret-files
-          path: |
+          path: ./
             API_Keys.py
             pyServer_IP.txt
 
