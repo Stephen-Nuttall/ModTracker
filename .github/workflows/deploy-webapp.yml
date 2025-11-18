@@ -37,10 +37,10 @@ jobs:
           PYSERVER_IP: ${{ secrets.PYSERVER_IP }}
         run: |
           umask 077
-          cat > ./pyServer_IP.txt <<EOF
+          cat > ./WebApp/pyServer_IP.txt <<EOF
           ${PYSERVER_IP}
           EOF
-          chmod 600 ./pyServer_IP.txt
+          chmod 600 ./WebApp/pyServer_IP.txt
 
       - name: Upload secret files as artifact (keeps them after the job)
         uses: actions/upload-artifact@v4
