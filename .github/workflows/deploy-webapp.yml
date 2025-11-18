@@ -33,7 +33,7 @@ jobs:
           chmod 600 API_Keys.py
 
       - name: Create pyServer_IP.txt from secrets
-        working-directory: './WebApp'
+        working-directory: 'WebApp'
         env:
           PYSERVER_IP: ${{ secrets.PYSERVER_IP }}
         run: |
