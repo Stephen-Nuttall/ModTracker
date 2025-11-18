@@ -27,8 +27,8 @@ jobs:
           API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
         run: |
           umask 077
-          cat > API_Keys.py <<'EOF'
-          CurseForge = "${API_KEY}"
+          cat > API_Keys.py <<EOF
+          ${API_KEY}
           EOF
           chmod 600 API_Keys.py
 
@@ -37,7 +37,7 @@ jobs:
           PYSERVER_IP: ${{ secrets.PYSERVER_IP }}
         run: |
           umask 077
-          cat > pyServer_IP.txt <<'EOF'
+          cat > pyServer_IP.txt <<EOF
           ${PYSERVER_IP}
           EOF
           chmod 600 pyServer_IP.txt

@@ -1,6 +1,5 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, version } from 'react'
 import axios from 'axios'
-import pyServer_IP from '../../pyServer_IP.txt?raw';
 
 const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool) => { } }, requestRef) => {
     let startupInitiated = false
@@ -40,10 +39,18 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
         try {
             let url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
             if (url.includes("github.io")) {
-                const hostname = pyServer_IP.trim();
-                url = `${hostname}/${callName}`
+                try {
+                    const { default: pyServer_IP } = await import('../../pyServer_IP.txt?raw')
+
+                    const hostname = pyServer_IP.trim();
+                    url = `${hostname}/${callName}`
+
+                    console.log('Making post to backend server with current user data and these parameters:\n' + JSON.stringify(params))
+                } catch (error) {
+                    console.error('Error importing pyServer_IP module: ' + error.message + ". Proceding with default request URL.")
+                }
             } else {
-                console.log('Making post to ' + url + ' with current data + ' + JSON.stringify(params))
+                console.log('Making post to ' + url + ' with current user data and these parameters:\n' + JSON.stringify(params))
             }
 
             const fullParams = { data: profileData, ...params }
