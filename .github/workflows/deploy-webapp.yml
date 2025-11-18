@@ -41,7 +41,7 @@ jobs:
         env:
           BACKEND_IP: ${{ secrets.PYSERVER_IP }}
         run: |
-          sed -i "s|LOCALHOST_PYSERVER|$BACKEND_IP|g" src/config.js
+          sed -i "s|LOCALHOST_PYSERVER|$BACKEND_IP|g" WebApp/src/config.js
 
       - name: Build
         working-directory: ./WebApp
