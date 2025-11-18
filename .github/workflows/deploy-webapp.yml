@@ -22,34 +22,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Create API_Keys.py from secrets
-        env:
-          API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-        run: |
-          umask 077
-          cat > API_Keys.py <<EOF
-          CurseForge = ${API_KEY}
-          EOF
-          chmod 600 API_Keys.py
-
-      - name: Create pyServer_IP.txt from secrets
-        env:
-          PYSERVER_IP: ${{ secrets.PYSERVER_IP }}
-        run: |
-          umask 077
-          cat > pyServer_IP.txt <<EOF
-          ${PYSERVER_IP}
-          EOF
-          chmod 600 pyServer_IP.txt
-
-      - name: Upload secret files as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: secret-files
-          path: ./
-            API_Keys.py
-            pyServer_IP.txt
-
       - name: Checkout
         uses: actions/checkout@v5
 
@@ -63,6 +35,14 @@ jobs:
       - name: Install dependencies
         working-directory: ./WebApp
         run: npm ci
+
+      - uses: actions/checkout@v4
+      - name: Inject pyServer IP
+        env:
+          BACKEND_IP: ${{ secrets.PYSERVER_IP }}
+        run: |
+          # Replace a placeholder in your JS file with the actual IP
+          sed -i "s/http://localhost:8000/$BACKEND_IP/g" src/config.js
 
       - name: Build
         working-directory: ./WebApp
