@@ -40,11 +40,11 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
         try {
             let url = `${window.location.protocol}//${window.location.hostname}:8000/${callName}`
             if (url.includes("github.io")) {
-                console.log("Using url found in pyServer_IP.txt")
                 const hostname = pyServer_IP.trim();
                 url = `${hostname}/${callName}`
+            } else {
+                console.log('Making post to ' + url + ' with current data + ' + JSON.stringify(params))
             }
-            console.log('Making post to ' + url + ' with current data + ' + JSON.stringify(params))
 
             const fullParams = { data: profileData, ...params }
             const response = await axios.post(url, fullParams)

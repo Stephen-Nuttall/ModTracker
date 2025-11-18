@@ -38,9 +38,17 @@ jobs:
         run: |
           umask 077
           cat > pyServer_IP.txt <<'EOF'
-          ${PYSERVER_IP} TEST
+          ${PYSERVER_IP}
           EOF
           chmod 600 pyServer_IP.txt
+
+      - name: Upload secret files as artifact (keeps them after the job)
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-files
+          path: |
+            API_Keys.py
+            pyServer_IP.txt
 
       - name: Checkout
         uses: actions/checkout@v5
