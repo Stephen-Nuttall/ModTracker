@@ -1,6 +1,5 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, version } from 'react'
 import axios from 'axios'
-import pyServer_URL from './config'
 
 const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool) => { } }, requestRef) => {
     let startupInitiated = false
@@ -38,12 +37,8 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
     const genericRequest = async (callName, params, errorOutput = false, successOutput = false, updateData = true) => {
         setIsLoading(true)
         try {
-            let url = ''
-            if (pyServer_URL == "LOCALHOST_PYSERVER") {
-                url = `http://localhost:8000/${callName}`
-            } else {
-                url = `${pyServer_URL}/${callName}`
-            }
+            const urlBase = import.meta.process.env.BACKEND_IP || "http://localhost:8000"
+            const url = `${urlBase}/${callName}`
             console.log('Making post to backend server with current user data and these parameters:\n' + JSON.stringify(params))
 
             const fullParams = { data: profileData, ...params }

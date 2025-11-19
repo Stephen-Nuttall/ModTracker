@@ -37,19 +37,10 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          BACKEND_IP: ${{ secrets.BACKEND_IP }}
         working-directory: ./WebApp
         run: npm run build
-
-      - uses: actions/checkout@v4
-      - name: Inject pyServer IP
-        env:
-          BACKEND_IP: ${{ secrets.PYSERVER_IP }}
-        run: |
-          echo "Before substitution:"
-          cat WebApp/src/config.js
-          sed -i "s|LOCALHOST_PYSERVER|$BACKEND_IP|g" WebApp/src/config.js
-          echo "After substitution:"
-          cat WebApp/src/config.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
