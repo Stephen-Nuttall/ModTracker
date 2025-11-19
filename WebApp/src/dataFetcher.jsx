@@ -37,6 +37,7 @@ const DataFetcher = forwardRef(({ updateData, setOutputText, setLoading = (bool)
     const genericRequest = async (callName, params, errorOutput = false, successOutput = false, updateData = true) => {
         setIsLoading(true)
         try {
+            console.log(import.meta.env.BACKEND_IP)
             const urlBase = import.meta.env.BACKEND_IP || "http://localhost:8000"
             const url = `${urlBase}/${callName}`
             console.log('Making post to backend server with current user data and these parameters:\n' + JSON.stringify(params))
