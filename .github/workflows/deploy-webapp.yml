@@ -38,7 +38,7 @@ jobs:
 
       - name: Build
         env:
-          BACKEND_IP: ${{ secrets.BACKEND_IP }}
+          BACKEND_IP: ${{ secrets.PYSERVER_IP }}
         working-directory: ./WebApp
         run: npm run build
 
