@@ -6,9 +6,16 @@ sys.path.append(parent_dir)
 import Backend.mod as mod, DesktopApp.widgets as widgets, Backend.loadFromJson as loadFromJson, DesktopApp.modTable as modTable
 from PyQt6 import QtCore, QtGui, QtWidgets, QtTest
 
+_appInstance = QtWidgets.QApplication.instance()
+if _appInstance:
+    _primaryScreen = _appInstance.primaryScreen()
+    _scaleFactor = 1 / _primaryScreen.devicePixelRatio()
+else:
+    _scaleFactor = 1
 
 # Manages the two primary displays in the main window, including communication and switching displays. Also manages the small loading window.
 class WindowManager(QtWidgets.QStackedWidget):
+    global _scaleFactor
     _selectView:'ProfileSelectWindow'
     _profileManager:mod.ProfileManager
     _detailsView:'DetailsWindow'
@@ -23,14 +30,14 @@ class WindowManager(QtWidgets.QStackedWidget):
         window.resize(1000, 500)
 
         # update window manager to fit the window
-        self.setGeometry(QtCore.QRect(0, 0, 1920, 1080))
+        self.setGeometry(QtCore.QRect(0, 0, round(1920 * _scaleFactor), round(1080 * _scaleFactor)))
         window.setCentralWidget(self)
 
         # create profile manager and select view
         self._profileManager = mod.ProfileManager()
         self._selectView = ProfileSelectWindow(self._openDetailsView, self._profileManager)
         self._selectView.setParent(self)
-        self._selectView.setGeometry(QtCore.QRect(0, 0, 1920, 1080))
+        self._selectView.setGeometry(QtCore.QRect(0, 0, round(1920 * _scaleFactor), round(1080 * _scaleFactor)))
 
         # load profile data from json file (if enabled). Create and open a LoadingWindow (if enabled)
         if loadJson:
@@ -127,6 +134,8 @@ class LoadingWindow(QtWidgets.QWidget):
 # Adds a button for each button label provided. Will only show a 
 # MultipleChoiceWindow.exec() will return the number option chosen (1 indexed). If no option is chosen, it will return 0.
 class MultipleChoiceWindow(QtWidgets.QDialog):
+    global _scaleFactor
+
     buttonList = []
     inputField = None
 
@@ -137,9 +146,9 @@ class MultipleChoiceWindow(QtWidgets.QDialog):
             parent=None,
             windowTitle="Select an option",
 
-            button_width=250,
-            button_height=40,
-            button_fontSize=12,
+            button_width = 250,
+            button_height = 40,
+            button_fontSize = 12,
 
             showLabel=False,
             label_text="Select an option",

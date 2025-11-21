@@ -55,7 +55,7 @@ class tableManager():
 
     def getRowNameText(self, rowNum:int):
         if 0 <= rowNum < self._tableWidget.rowCount():
-            return self._tableWidget.item(rowNum, 0).text()
+            return self._tableWidget.cellWidget(rowNum, 0).labelText
     
     def getRowVersionText(self, rowNum:int):
         if 0 <= rowNum < self._tableWidget.rowCount():
@@ -134,19 +134,31 @@ class tableManager():
 
 # Displays the data held in ModTable_Manager and handles user interaction with the mod table.
 class tableWidget(QtWidgets.QTableWidget):
+    _appInstance = QtWidgets.QApplication.instance()
+    if _appInstance:
+        _primaryScreen = _appInstance.primaryScreen()
+        _scaleFactor = 1 / _primaryScreen.devicePixelRatio()
+    else:
+        _scaleFactor = 1
+
     _parentWidget:QtWidgets.QWidget
     _dropdownBtnList:list['PriorityDropdownManager'] = []
      
-    _tableLength = 1000
-    _tableHeight = 900
-    _headingHeight = 40
+    _tableLength = round(1000 * _scaleFactor)
+    _tableHeight = round(900 * _scaleFactor)
+    _headingHeight = round(40 * _scaleFactor)
     _numColumns = 4
     _columnNames = ["Mod Name", "Latest Version", "Ready/Priority", ""]
-    _columnWidths = [500, 160, 250, 10]
-    _rowHeight = 50
+    _columnWidths = [
+            round(500 * _scaleFactor), 
+            round(160 * _scaleFactor), 
+            round(250 * _scaleFactor), 
+            round(10 * _scaleFactor)
+        ]
+    _rowHeight = round(50 * _scaleFactor)
 
     # The font size for everything in the table
-    _fontSize = 14
+    _fontSize = round(14 * _scaleFactor)
 
     def __init__(self, parent, onRemoveRow=None, onDropCallback=None, reloadFunc=None):
         super().__init__(parent)
@@ -181,7 +193,7 @@ class tableWidget(QtWidgets.QTableWidget):
         for col in range(self._numColumns):
             item = QtWidgets.QTableWidgetItem()
             font = QtGui.QFont()
-            font.setPointSize(18)
+            font.setPointSize(round(18 * self._scaleFactor))
             item.setFont(font)
             item.setText(self._columnNames[col])
             self.setHorizontalHeaderItem(col, item)
@@ -225,10 +237,6 @@ class tableWidget(QtWidgets.QTableWidget):
 
     def _setRowName(self, rowNum:int, mod:mod.Mod):
         item = self._createBaseItem()
-
-        # if we're running from a file that isn't main.py, show testing text.
-        if sys.argv[0][-7:] != "main.py":
-            item.setText(mod.getName())
 
         nameItem = tableNameCell(mod)
         self.setCellWidget(rowNum, 0, nameItem)
@@ -294,6 +302,7 @@ class tableWidget(QtWidgets.QTableWidget):
 # Displays the mod's name and "open link in browser" icon, as well as holds the mod object.
 class tableNameCell(QtWidgets.QWidget):
     modObj:mod.Mod
+    labelText:str
     _textFontSize = 14
     _iconFontSize = 12
 
@@ -329,6 +338,8 @@ class tableNameCell(QtWidgets.QWidget):
         hbox.addStretch(1)  # Push content to the left
 
         self.setLayout(hbox)
+
+        self.labelText = self.modObj.getName()
 
 
 # Manages the dropdown menu that appears in the third column of the table which allows

@@ -2,7 +2,7 @@ name: Deploy Web App to GitHub Pages
 
 on:
   push:
-    branches: ['beta-5.0']
+    branches: ['main']
 
   workflow_dispatch:
 

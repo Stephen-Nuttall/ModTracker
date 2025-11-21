@@ -6,15 +6,23 @@ sys.path.append(parent_dir)
 from PyQt6 import QtCore, QtGui, QtWidgets, QtCharts
 import Backend.mod as mod
 
+_appInstance = QtWidgets.QApplication.instance()
+if _appInstance:
+    _primaryScreen = _appInstance.primaryScreen()
+    _scaleFactor = 1 / _primaryScreen.devicePixelRatio()
+else:
+    _scaleFactor = 1
+
 _btnFontSize = 18
 _specialSymbolFontSize = 16
 _labelFontSize = 12
 
 _fontelloPath:str
 
-
 # Button that when clicked, displays a dropdown menu.
 class DropdownBtn():
+    global _scaleFactor
+    
     _parentWidget:QtWidgets.QWidget
     _menuOptions:list[str]
     _buttonRect:QtCore.QRect
@@ -28,16 +36,26 @@ class DropdownBtn():
 
 
     def __init__(self, parentWidget:QtWidgets.QWidget, menuOptions:list[str], onOptionClick = None,
-                 buttonRect:QtCore.QRect = None, selectedOption = 0, buttonFontSize = 14,
+                 buttonRect:QtCore.QRect = None, selectedOption = 0, buttonFontSize = round(14 * _scaleFactor),
                  includeCarrot = True, customButtonText:str = None):
         self._parentWidget = parentWidget
         self._menuOptions = menuOptions
         self._onOptionClick = onOptionClick
-        self._buttonRect = buttonRect
         self._selectedOption = selectedOption
         self._fontSize = buttonFontSize
         self._includeCarrot = includeCarrot
         self._customButtonText = customButtonText
+
+        if buttonRect:
+            scaledGeometry = QtCore.QRect(
+                round(buttonRect.x() * _scaleFactor),
+                round(buttonRect.y() * _scaleFactor),
+                round(buttonRect.width() * _scaleFactor),
+                round(buttonRect.height() * _scaleFactor)
+            )
+            self._buttonRect = scaledGeometry
+        else:
+            self._buttonRect = buttonRect
 
         self._createButtonWidget()
         self._createMenuWidget()
@@ -111,6 +129,8 @@ class DropdownBtn():
 # This is the pie chart that displays how many of the mods in a profile are ready,
 # and then breaks down the rest by priority level.
 class PieChart():
+    global _scaleFactor
+    
     _parentWidget: QtWidgets.QWidget
     _modList: list[mod.Mod]
     _selectedVersion: str
@@ -120,8 +140,8 @@ class PieChart():
     _readySlice = mod.Priority("Ready", 0, 255, 0)
     _sliceSizes = {_readySlice: 0}
 
-    _titleFontSize = 24
-    _labelFontSize = 14
+    _titleFontSize = round(24 * _scaleFactor)
+    _labelFontSize = round(14 * _scaleFactor)
 
     def __init__(self, parent:QtWidgets.QWidget, modList:list[mod.Mod], selectedVersion:str):
         # Assign variables
@@ -132,7 +152,12 @@ class PieChart():
         self._series = QtCharts.QPieSeries()
         self._chartView = QtCharts.QChartView(parent=self._parentWidget)
         self._chartView.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        self._chartView.setGeometry(QtCore.QRect(1000, 50, 900, 900))
+        self._chartView.setGeometry(QtCore.QRect(
+            round(1000 * _scaleFactor), 
+            round(50 * _scaleFactor), 
+            round(900 * _scaleFactor), 
+            round(900 * _scaleFactor)
+        ))
 
         self.loadChart()
 
@@ -213,13 +238,15 @@ class PieChart():
 # Displays basic information about a profile that when clicked, will open the details view for that profile.
 # Can optionally be set to only display a + sign instead of default labels.
 class ProfileButton(QtWidgets.QPushButton):
+    global _scaleFactor
+    
     profile:mod.Profile
     widgetNum:int
 
     _widgetSize = 400
     _titleFontSize = 24
     _subtitleFontSize = 20
-    _plusSignFontSize = 32
+    _plusSignFontSize = round(24 * _scaleFactor)
 
     _nameLabel:QtWidgets.QLabel
     _modCountLabel:QtWidgets.QLabel
@@ -233,13 +260,13 @@ class ProfileButton(QtWidgets.QPushButton):
         self._onDelete = onDelete
         super().__init__()
 
-        self.setFixedSize(self._widgetSize, self._widgetSize)
+        self.setFixedSize(round(self._widgetSize * _scaleFactor), round(self._widgetSize * _scaleFactor))
         self.clicked.connect(self._clicked)
 
         if onlyDisplayPlusSign:
             self.setText("+")
             font = QtGui.QFont()
-            font.setPointSize(self._titleFontSize)
+            font.setPointSize(self._plusSignFontSize)
             font.setBold(True)
             self.setFont(font)
         else:
@@ -286,19 +313,17 @@ class ProfileButton(QtWidgets.QPushButton):
 
 # Grid layout embedded in the profile select window that contains all the profile buttons.
 class ProfileSelectLayout(QtWidgets.QGridLayout):
+    global _scaleFactor
+
     _profileWidgets:list[QtWidgets.QPushButton] = [] # currently unused
     _addProfileWidget:QtWidgets.QPushButton
 
-    _widgetSize = 400 # size of the profile widget (width and height)
-    _widgetSpacing = 35 # spacing between profile widgets
+    _widgetSize = round(400 * _scaleFactor) # size of the profile widget (width and height)
+    _widgetSpacing = round(35 * _scaleFactor) # spacing between profile widgets
     _widgetsPerRow = 4 # number of profile widgets per row
     _maxWidgets = 8 # maximum number of profile widgets
     _numWidgets = 0 # current number of profile widgets
-    _rowPadding = 30 # padding between the first row of profile widgets and the top of the window
-
-    _titleFontSize = 24  # size of the profile widget's name text
-    _subtitleFontSize = 20  # size of the rest of the text on a profile widget
-    _plusSignFontSize = 32  # size of the plus sign on the add profile widget
+    _rowPadding = 30 * _scaleFactor # padding between the first row of profile widgets and the top of the window
 
     def __init__(self, parent, onProfileClick, onCreateProfile, onProfileDelete, getProfileList):
         super().__init__(parent)
@@ -391,7 +416,7 @@ def _createLabelFont(fontSize:int = 0, bold = False, useSpecialSymbolFont = Fals
     
     if useSpecialSymbolFont:
         # Load custom font for special symbol
-        font.setPointSize(_specialSymbolFontSize)
+        font.setPointSize(round(_specialSymbolFontSize * _scaleFactor))
         global _fontelloPath
         font_path = _fontelloPath
         font_id = QtGui.QFontDatabase.addApplicationFont(font_path)
@@ -400,10 +425,10 @@ def _createLabelFont(fontSize:int = 0, bold = False, useSpecialSymbolFont = Fals
             if font_families:
                 font.setFamily(font_families[0])
     else:
-        font.setPointSize(_labelFontSize)
+        font.setPointSize(round(_labelFontSize * _scaleFactor))
 
     if fontSize > 0:
-        font.setPointSize(fontSize)
+        font.setPointSize(round(fontSize * _scaleFactor))
 
     font.setBold(bold)
 
@@ -430,7 +455,14 @@ def createButton(
     button = QtWidgets.QPushButton(parent=parent)
     button.setFont(font)
     button.setText(btnText)
-    button.setGeometry(geometry)
+
+    scaledGeometry = QtCore.QRect(
+        round(geometry.x() * _scaleFactor),
+        round(geometry.y() * _scaleFactor),
+        round(geometry.width() * _scaleFactor),
+        round(geometry.height() * _scaleFactor)
+    )
+    button.setGeometry(scaledGeometry)
 
     if onClickFunc:
         button.clicked.connect(onClickFunc)
@@ -439,10 +471,10 @@ def createButton(
         button.setObjectName(objectName)
 
     if minimumWidth > 0:
-        button.setMinimumWidth(minimumWidth)
+        button.setMinimumWidth(round(minimumWidth * _scaleFactor))
 
     if minimumHeight > 0:
-        button.setMinimumHeight(minimumHeight)
+        button.setMinimumHeight(round(minimumHeight * _scaleFactor))
 
     return button
 
@@ -462,8 +494,15 @@ def createLabel(
     label = QtWidgets.QLabel(parent=parent)
     label.setFont(font)
     label.setText(labelText)
-    label.setGeometry(geometry)
     label.setWordWrap(wordWrap)
+
+    scaledGeometry = QtCore.QRect(
+        round(geometry.x() * _scaleFactor),
+        round(geometry.y() * _scaleFactor),
+        round(geometry.width() * _scaleFactor),
+        round(geometry.height() * _scaleFactor)
+    )
+    label.setGeometry(scaledGeometry)
 
     if objectName != None:
         label.setObjectName(objectName)
@@ -489,7 +528,14 @@ def createTextField(
     textField = QtWidgets.QLineEdit(parent=parent)
     textField.setFont(font)
     textField.setPlaceholderText(placeholderText)
-    textField.setGeometry(geometry)
+    
+    scaledGeometry = QtCore.QRect(
+        round(geometry.x() * _scaleFactor),
+        round(geometry.y() * _scaleFactor),
+        round(geometry.width() * _scaleFactor),
+        round(geometry.height() * _scaleFactor)
+    )
+    textField.setGeometry(scaledGeometry)
 
     if objectName != None:
         textField.setObjectName(objectName)

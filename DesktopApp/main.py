@@ -1,11 +1,7 @@
-import sys, os, windows, ctypes
+import sys, os
 from PyQt6 import QtWidgets, QtGui
 
 if __name__ == "__main__":
-    # set app ID
-    # myappid = u'modtracker' # arbitrary string
-    # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-
     # create app
     print("Starting app")
     app = QtWidgets.QApplication(sys.argv)
@@ -29,6 +25,7 @@ if __name__ == "__main__":
         print("App icon could not be found.")
 
     # create UI and load from data from json file
+    import windows
     windowManager = windows.WindowManager(mainWindow, processEventsFunc=lambda : app.processEvents())
 
     # show window and close temporary loading window

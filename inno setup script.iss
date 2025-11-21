@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Mod Tracker"
-#define MyAppVersion "b4.0"
+#define MyAppVersion "b5.0"
 #define MyAppPublisher "Stephen Nuttall, Andrew Boland"
-#define MyAppURL "https://github.com/BigBoland41/ModTracker"
+#define MyAppURL "https://github.com/Stephen-Nuttall/ModTracker"
 #define MyAppExeName "Mod Tracker.exe"
 #define MyAppAssocName MyAppName + " File"
 #define MyAppAssocExt ".myp"
@@ -38,7 +38,7 @@ DisableProgramGroupPage=yes
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\Users\steph\OneDrive\Desktop\Mod Tracker Installer
 OutputBaseFilename=Mod_Tracker_{#MyAppVersion}_Setup
-SetupIconFile=C:\Users\steph\OneDrive\Documents\GitHub\Mod Tracker\icon.ico
+SetupIconFile=C:\Users\steph\OneDrive\Documents\GitHub\Mod Tracker\assets\icon.ico
 SolidCompression=yes
 WizardStyle=modern
 
@@ -50,7 +50,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "C:\Users\steph\OneDrive\Documents\GitHub\Mod Tracker\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\steph\OneDrive\Documents\GitHub\Mod Tracker\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\steph\OneDrive\Documents\GitHub\Mod Tracker\assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

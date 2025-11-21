@@ -156,12 +156,12 @@ class TestModTable(testData.TestCase):
 
         i = moveFrom
         while i < moveTo:
-            self.assertEqual(modList[i].getName(), tableWidget.item(i, 0).text(), f"Row {i} was not moved correctly. Range: {moveFrom} -> {moveTo}")
+            self.assertEqual(modList[i].getName(), tableWidget.cellWidget(i, 0).labelText, f"Row {i} was not moved correctly. Range: {moveFrom} -> {moveTo}")
             if moveFrom < moveTo:
                 i += 1
             elif moveFrom > moveTo:
                 i -= 1
-        self.assertEqual(modList[moveTo].getName(), tableWidget.item(moveTo, 0).text(), f"Row {moveTo} was not moved to the end of the range correctly. Range: {moveFrom} -> {moveTo}")
+        self.assertEqual(modList[moveTo].getName(), tableWidget.cellWidget(moveTo, 0).labelText, f"Row {moveTo} was not moved to the end of the range correctly. Range: {moveFrom} -> {moveTo}")
 
     def _swapMod(self, row1, row2):
         modTable = self._detailsView.getModTable()

@@ -12,7 +12,6 @@
     },
     "dependencies": {
         "axios": "^1.12.2",
-        "pyodide": "^0.28.3",
         "react": "^19.1.1",
         "react-color": "^2.19.3",
         "react-dom": "^19.1.1"
