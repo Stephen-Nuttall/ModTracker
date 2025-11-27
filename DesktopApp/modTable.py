@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-import Backend.mod as mod, sys, DesktopApp.widgets as widgets
+import mod, widgets
 
 
 # Manages the data displayed in the mod table and tells ModTable_Widget what to display.

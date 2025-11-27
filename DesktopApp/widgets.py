@@ -1,10 +1,5 @@
-# Add the parent directory to the Python path
-import sys, os
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
-
 from PyQt6 import QtCore, QtGui, QtWidgets, QtCharts
-import Backend.mod as mod
+import os, mod
 
 _appInstance = QtWidgets.QApplication.instance()
 if _appInstance:
@@ -409,6 +404,7 @@ class ProfileSelectLayout(QtWidgets.QGridLayout):
 # Automatically runs when widgets is imported in another file.
 def setFontelloPath():
     global _fontelloPath
+    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     _fontelloPath = os.path.join(parent_dir, "fonts", "fontello.ttf")
 
 def _createLabelFont(fontSize:int = 0, bold = False, useSpecialSymbolFont = False):

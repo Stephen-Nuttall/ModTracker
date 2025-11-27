@@ -1,9 +1,4 @@
-# Add the parent directory to the Python path
-import sys, os
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
-
-import Backend.mod as mod, DesktopApp.widgets as widgets, Backend.loadFromJson as loadFromJson, DesktopApp.modTable as modTable
+import os, mod, widgets, loadFromJson, modTable
 from PyQt6 import QtCore, QtGui, QtWidgets, QtTest
 
 _appInstance = QtWidgets.QApplication.instance()
@@ -52,7 +47,7 @@ class WindowManager(QtWidgets.QStackedWidget):
                 self._loadingWindow.close()
 
     def _loadProfile(self, printLoadingText=True):
-        import Backend.callModrinth as callModrinth, Backend.callCurseForge as callCurseForge
+        import DesktopApp.callModrinth as callModrinth, DesktopApp.callCurseForge as callCurseForge
         pingModrinth = callModrinth.ping()
         pingCurseForge = callCurseForge.ping()
 
@@ -257,7 +252,7 @@ class DetailsWindow(QtWidgets.QWidget):
         if customFileName:
             fileName = customFileName
         else:
-            fileName = "tests/testProfile.json"
+            fileName = "DesktopApp\\tests\\testProfile.json"
 
         self._exportProfile(fileName, printDebugMessage=False)
     
@@ -414,10 +409,12 @@ class ProfileSelectWindow(QtWidgets.QWidget):
         if directPath:
             fileName = directPath
         else:
-            fileName = "tests/testProfile"
+            fileName = "DesktopApp\\tests\\testProfile.json" 
 
         profile = self._importFromJSON(directPath=fileName, requireValidModURL=requireValidModURL)
-        self.addProfile(profile, "Test Profile")
+
+        if profile:
+            self.addProfile(profile, "Test Profile")
 
     # Getters
     def getProfile(self, index): return self._profileManager.getProfile(index)
