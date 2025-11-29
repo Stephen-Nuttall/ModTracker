@@ -62,15 +62,15 @@ def sortVersionList(curseforgeJson):
 
     sortedVersions = sorted(parsedVersions)
 
-    unparsedVersions = []
+    restoredVersions = []
     for versionComponents in sortedVersions:
         if len(versionComponents) == 3:
             versionStr = f"{versionComponents[0]}.{versionComponents[1]}.{versionComponents[2]}"
         else:
             versionStr = f"{versionComponents[0]}.{versionComponents[1]}"
-        unparsedVersions.append(versionStr)
+        restoredVersions.append(versionStr)
     
-    return unparsedVersions
+    return restoredVersions
 
 def modLoader_IDtoText(loaderID:int):
     match loaderID:

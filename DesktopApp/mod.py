@@ -47,11 +47,6 @@ class Mod(object):
     _modrinthData:dict # False if uninitialized
     _curseforgeData:dict # False if uninitialized
     
-    _curseforgeRegex = r"^https:\/\/(www\.)?curseforge\.com\/minecraft\/mc-mods\/[a-zA-Z0-9-_]+\/?$"
-    _modrinthRegex = r"^https:\/\/(www\.)?modrinth\.com\/mod\/[a-zA-Z0-9-_]+\/?$"
-
-    _requestTimeout = 10.0 # How many seconds to wait for an API call before timeout.
-    
     # can pass mod info directly for testing, but can also just call with a url and it will get relevant info from the api,
     # or directlty insert raw modrinth or curseforge json data.
     def __init__(self, modName = "Untitled Mod", modID = -1, modVersions = ["No versions found"],
@@ -65,7 +60,7 @@ class Mod(object):
         self._modrinthData = modrinthData
         self._curseforgeData = curseforgeData
         
-        if(url != None):
+        if (url != None):
             self.refreshMod()
 
         if modrinthData:
@@ -213,8 +208,10 @@ class Profile(object):
     def __init__(
             self, modList:list[Mod] = [],
             priorityList:list[Priority] = [
-                Priority("High Priority", 255, 85, 0),
-                Priority("Low Priority", 255, 255, 0)],
+                Priority("High Priority", red = 255, green = 128, blue = 0),
+                Priority("Medium Priority", red = 255, green = 196, blue = 0),
+                Priority("Low Priority", red = 255, green = 255, blue = 0)
+            ],
             selectedVersion:str = "1.21.5",
             name = "New Profile",
         ):

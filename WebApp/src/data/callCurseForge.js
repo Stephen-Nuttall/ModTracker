@@ -1,7 +1,3 @@
-// allows for tests to use API key from API_Keys.env
-import { config } from 'dotenv';
-config({ path: '.env' });
-
 const _curseforgeRegex = /^https:\/\/(www\.)?curseforge\.com\/minecraft\/mc-mods\/[a-zA-Z0-9-_]+\/?$/
 const _requestTimeout = 10000 // How many seconds to wait for an API call before timeout.
 const _allowedCategoryIDs = [6, 4906, 6814, 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441]
@@ -12,13 +8,32 @@ function verifyURL(url) {
 }
 
 const _genericCurseforgeCall = async (url, requestParameters = {}) => {
-    const apiKey = process.env.VITE_CURSEFORGE_API_KEY || import.meta.env.CURSEFORGE_API_KEY || import.meta.env.VITE_CURSEFORGE_API_KEY
-    let response
+    // Load API key. There are two potential places where the API key may be found:
+    // A) in the environment variables (import.meta.env.CURSEFORGE_API_KEY). If it's not there, try
+    // B) in '../API_Keys.js', which if it exists, contains export const CurseForge = "API KEY GOES HERE."
+    // If neither work, abort immediately.
+    let apiKey = import.meta.env.CURSEFORGE_API_KEY
+    if (apiKey === undefined || apiKey == "undefined") {
+        try {
+            const APIKeyFile = await import('../API_Keys.js')
+            apiKey = APIKeyFile.CurseForge
 
+            if (apiKey === undefined || apiKey == "undefined") {
+                throw new Error("API key reassign using '../API_Keys.js' failed.")
+            }
+        } catch (error) {
+            throw new Error("CURSEFORGE API KEY IS UNDEFINED. Attempt was made to fetch" +
+                " the key from import.meta.env.CURSEFORGE_API_KEY. When that failed, an" +
+                " attempt was made to fetch the key from '../API_Keys.js', which also" +
+                " failed. Additional info: " + error.message)
+        }
+    }
+
+    let response
     try {
         const urlWithParams = new URL(url)
         Object.entries(requestParameters).forEach(([key, value]) => {
-            urlWithParams.searchParams.append(key, value)
+            urlWithParams.searchParams.push(key, value)
         })
 
         response = await fetch(urlWithParams, {
@@ -78,26 +93,37 @@ const modData = async (mod_slug) => {
 
 function sortVersionList(curseforgeJson) {
     const fileIndexes = curseforgeJson.latestFilesIndexes
-    let parsedVersions = []
 
-    for (file of fileIndexes) {
-        parsedVersions.append(list(map(int, file.gameVersion.split('.'))))
-    }
+    const parsedVersions = fileIndexes.map((file) => {
+        const split = file.gameVersion.split('.')
+        return split.map(str => +str)
+    })
 
-    const sortedVersions = sorted(parsedVersions)
+    const sortedVersions = parsedVersions.sort((a, b) => {
+        for (let i = 0; i < Math.min(a.length, b.length); i++) {
+            if (a[i] !== b[i]) {
+                return a[i] - b[i];
+            }
+        }
 
-    let unparsedVersions = []
-    for (versionComponents of sortedVersions) {
+        return a.length - b.length;
+    })
+
+    const restoredVersions = sortedVersions.map((versionComponents) => {
+        let versionStr
+
         if (versionComponents.length == 3) {
             versionStr = `${versionComponents[0]}.${versionComponents[1]}.${versionComponents[2]}`
         }
         else {
             versionStr = `${versionComponents[0]}.${versionComponents[1]}`
         }
-        unparsedVersions.append(versionStr)
 
-        return unparsedVersions
-    }
+        return versionStr
+    })
+
+    const noDuplicateVersions = [...new Set(restoredVersions)]
+    return noDuplicateVersions
 }
 
 function modLoader_IDtoText(loaderID) {
@@ -149,7 +175,7 @@ const getDownloadLink = async (curseforgeJson, mod_id, loader, version) => {
 
 //     for (entry of result["data"]) {
 //         if (entry["primaryCategoryId"] in _allowedCategoryIDs) {
-//             validResults.append(entry)
+//             validResults.push(entry)
 //         }
 //     }
 
