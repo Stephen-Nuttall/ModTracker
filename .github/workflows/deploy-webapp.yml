@@ -39,6 +39,7 @@ jobs:
       - name: Build
         env:
           BACKEND_IP: ${{ secrets.PYSERVER_IP }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
         working-directory: ./WebApp
         run: npm run build
 

@@ -1,15 +1,12 @@
 __pycache__
-tests/__pycache__
 API_Keys.py
 .vscode
 .venv
 fonts/demo.html
-deprecated
-/__pycache__
-__pycache__/readJarFile.cpython-312.pyc
 /build
 /dist
 *.spec
+*.env*
 
 # Logs
 logs
@@ -35,4 +32,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-pyServer_IP.txt
+
