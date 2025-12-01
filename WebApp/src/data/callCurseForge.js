@@ -147,7 +147,6 @@ function modLoader_IDtoText(loaderID) {
     }
 }
 
-// Returns false is no download link can be found for the given mod, mod loader, and Minecraft version.
 const getDownloadLink = async (curseforgeJson, mod_id, loader, version) => {
     const fileIndexes = curseforgeJson.latestFilesIndexes
 
@@ -162,11 +161,15 @@ const getDownloadLink = async (curseforgeJson, mod_id, loader, version) => {
 
             if (downloadLink) {
                 return downloadLink
+            } else {
+                console.log(`Attempted to download ${data.data.fileName}, but its download link is ${downloadLink}`)
             }
         }
     }
 
-    return false
+    let error = new Error(`No download link could be found for ${curseforgeJson.name} for ${version} and ${loader}`)
+    error.name = "Download Unavailable"
+    throw error
 }
 
 // const searchCurseforge = async (modName) => {

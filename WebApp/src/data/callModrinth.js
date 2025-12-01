@@ -56,7 +56,6 @@ const modVersionList = async (mod_slug) => {
     return await _genericModrinthCall(url)
 }
 
-// Returns false is no download link can be found for the given mod, mod loader, and Minecraft version.
 const getDownloadLink = async (mod_slug, loader, version) => {
     loader = loader.toLowerCase()
     const versionList = await modVersionList(mod_slug)
@@ -69,7 +68,9 @@ const getDownloadLink = async (mod_slug, loader, version) => {
         }
     }
 
-    return false
+    let error = new Error(`No download link could be found for ${mod_slug} for ${version} and ${loader}`)
+    error.name = "Download Unavailable"
+    throw error
 }
 
 /*

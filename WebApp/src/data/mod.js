@@ -1,5 +1,6 @@
 import callModrinth from '../data/callModrinth.js'
 import callCurseForge from '../data/callCurseForge.js'
+import { error } from 'console'
 
 class Priority {
     name = "New Priority Level"
@@ -28,10 +29,7 @@ class Priority {
     }
 
     equals(other) {
-        if (!(other instanceof Priority)) {
-            return false
-        }
-        return this.name === other.name && this.r === other.r && this.g === other.g && this.b === other.b
+        return other instanceof Priority && this.name === other.name && this.r === other.r && this.g === other.g && this.b === other.b
     }
 
     hash() {
@@ -53,11 +51,11 @@ class Mod {
 
     constructor(
         url = null,
+        modPriority = new Priority(),
+        tablePosition = -1,
         modName = "Untitled Mod",
         modID = -1,
         modVersions = ["No versions found"],
-        modPriority = new Priority(),
-        tablePosition = -1,
         modrinthData = null,
         curseforgeData = null
     ) {
@@ -71,12 +69,6 @@ class Mod {
         this.#modrinthData = modrinthData
         this.#curseforgeData = curseforgeData
 
-        if (url !== null) {
-            // console.log("This mod was initialized with a URL. Note that an API" +
-            //     " call will not be made automatically, so refresh() must be manually" +
-            //     " called. This is because Javascript does not support async functions" +
-            //     " in a class's constructor.")
-        }
         if (modrinthData) {
             this.#extractModrinth()
         } else if (curseforgeData) {
@@ -85,7 +77,7 @@ class Mod {
     }
 
     toString() {
-        return `${this.#name}, version: ${this.getCurrentVersion()}, priority: ${this.priority}`
+        return `${this.#name}, latest version: ${this.getCurrentVersion()}, priority: ${this.priority}`
     }
 
     lessThan(other) {
@@ -116,10 +108,9 @@ class Mod {
     getCurrentVersion() { return this.#versions[this.#versions.length - 1] }
 
     getVersionList() { return this.#versions }
+    getVersions() { return this.#versions }
 
     getURL() { return this.#url }
-
-    getVersions() { return this.#versions }
 
     getModrinthData() { return this.#modrinthData }
 
@@ -127,7 +118,7 @@ class Mod {
 
     getTablePosition() { return this.tablePosition }
 
-    isValid() { return this.#modrinthData || this.#curseforgeData }
+    validData() { return this.#modrinthData != null || this.#curseforgeData != null }
 
     verifyURL() {
         const curseforge = callModrinth.verifyURL(this.#url)
@@ -136,7 +127,7 @@ class Mod {
     }
 
     async refresh() {
-        await this.callAPIs()
+        await this.#callAPIs()
 
         if (callModrinth.verifyURL(this.#url)) {
             if (this.#modrinthData) {
@@ -153,32 +144,30 @@ class Mod {
         }
     }
 
-    async callAPIs() {
-        const mod_slug = this.#url.replace(/\/$/, "").split("/").pop()
-        if (callModrinth.verifyURL(this.#url)) {
-            this.#modrinthData = await callModrinth.modData(mod_slug)
+    async getDownloadLink(loader, version) {
+        if (!this.#versions.includes(version)) {
+            let error = new Error(`Attempted to download ${this.#name} for ${version}, but it's not available for that version.`)
+            error.name = "Mod unavailable for this version"
+            throw error
         }
-        if (callCurseForge.verifyURL(this.#url)) {
-            this.#curseforgeData = await callCurseForge.modData(mod_slug)
-        }
-    }
 
-    downloadMod(loader, version, preventDownload = false) {
         const mod_slug = this.#url.replace(/\/$/, "").split("/").pop()
-        let downloadLink = false
+        let downloadLink
+
         if (this.#modrinthData) {
-            downloadLink = callModrinth.downloadMod(mod_slug, loader, version)
+            downloadLink = await callModrinth.getDownloadLink(mod_slug, loader, version)
         } else if (this.#curseforgeData) {
-            downloadLink = callCurseForge.downloadMod(this.#curseforgeData, this.#ID, loader, version)
-        }
-        if (downloadLink) {
-            if (!preventDownload) {
-                window.open(downloadLink, "#blank")
-            }
-            return downloadLink
+            downloadLink = await callCurseForge.getDownloadLink(this.#curseforgeData, this.#ID, loader, version)
         } else {
-            return false
+            let error = new Error(`Attempted to download ${this.#name}, but it does not have a valid data for Modrinth or CurseForge.`)
+            error.name = "Invalid data"
+            throw error
         }
+
+        if (downloadLink == false) {
+            console.log(`Download link for ${this.#name} is ${downloadLink}`)
+        }
+        return downloadLink
     }
 
     createDict() {
@@ -189,6 +178,16 @@ class Mod {
             url: this.#url,
             versions: this.#versions,
             tablePosition: this.tablePosition
+        }
+    }
+
+    async #callAPIs() {
+        const mod_slug = this.#url.replace(/\/$/, "").split("/").pop()
+        if (callModrinth.verifyURL(this.#url)) {
+            this.#modrinthData = await callModrinth.modData(mod_slug)
+        }
+        if (callCurseForge.verifyURL(this.#url)) {
+            this.#curseforgeData = await callCurseForge.modData(mod_slug)
         }
     }
 
@@ -215,27 +214,19 @@ class Mod {
 }
 
 class Profile {
-    modList = []
-    priorityList = [
-        Priority("High Priority", red = 255, green = 128, blue = 0),
-        Priority("Medium Priority", red = 255, green = 196, blue = 0),
-        Priority("Low Priority", red = 255, green = 255, blue = 0)
-    ]
+    #modList = []
+    #priorityList
     selectedVersion = "1.21.5"
     name = "New Profile"
 
     constructor(
         modList = [],
-        priorityList = [
-            Priority("High Priority", red = 255, green = 128, blue = 0),
-            Priority("Medium Priority", red = 255, green = 196, blue = 0),
-            Priority("Low Priority", red = 255, green = 255, blue = 0)
-        ],
+        priorityList = [],
         selectedVersion = "1.21.5",
         name = "New Profile"
     ) {
-        this.modList = modList
-        this.priorityList = priorityList
+        this.#modList = modList
+        this.#priorityList = priorityList
         this.selectedVersion = selectedVersion
         this.name = name
     }
@@ -243,8 +234,8 @@ class Profile {
     toString() {
         let output = `${this.name}:\n`
 
-        if (this.modList.length > 0) {
-            this.modList.forEach(mod => {
+        if (this.#modList.length > 0) {
+            this.#modList.forEach(mod => {
                 output += mod.toString() + "\n"
             })
         } else {
@@ -254,90 +245,85 @@ class Profile {
         return output.trim()
     }
 
-    getModList() { return this.modList }
+    getModList() { return this.#modList }
 
-    getMod(index) { return this.modList[index] }
+    getMod(index) { return this.#modList[index] }
 
-    getPriorityList() { return this.priorityList }
+    getPriorityList() { return this.#priorityList }
 
     getSelectedVersion() { return this.selectedVersion }
 
-    addMod(inputString) {
-        let newMod
-        try {
-            newMod = new Mod(
-                inputString,
-                undefined,
-                undefined,
-                undefined,
-                this.priorityList[0],
-                this.modList.length
-            )
-        } catch (error) {
-            if (error instanceof RangeError) {
-                this.priorityList = [
-                    Priority("High Priority", red = 255, green = 128, blue = 0),
-                    Priority("Medium Priority", red = 255, green = 196, blue = 0),
-                    Priority("Low Priority", red = 255, green = 255, blue = 0)
-                ]
-                newMod = new Mod(
-                    inputString,
-                    undefined,
-                    undefined,
-                    undefined,
-                    this.priorityList[0],
-                    this.modList.length
-                )
-            } else {
-                throw error
-            }
+    async addMod(url) {
+        if (url === undefined || !(callModrinth.verifyURL(url) || callCurseForge.verifyURL(url))) {
+            throw new Error("URL provided is invalid.")
         }
-        if (newMod.isValid()) {
-            this.modList.push(newMod)
-            return true
+
+        const priority = this.#priorityList[0] || new Priority("High Priority", 255, 128, 0)
+        let newMod = new Mod(url, priority, this.#modList.length)
+
+        await newMod.refresh()
+        if (newMod.validData()) {
+            this.#modList.push(newMod)
         } else {
-            return false
+            throw new Error("Mod does not have valid modrinth data or curseforge data.")
         }
     }
 
     removeMod(index) {
-        try {
-            const mod = this.modList[index]
-            if (mod) {
-                this.modList.splice(index, 1)
-                return true
-            } else {
-                return false
-            }
-        } catch (e) {
-            return false
+        if (index < 0 || index >= this.#modList.length) {
+            throw new RangeError(`Tried to remove mod at index ${index}, but that index is out of range!`)
+        }
+
+        const mod = this.#modList[index]
+        if (mod) {
+            this.#modList.splice(index, 1)
+        } else {
+            throw new Error(`Tried to remove mod at index ${index}, but it was falsey!`)
         }
     }
 
-    refresh(selectedVersion) {
-        this.selectedVersion = selectedVersion
-        this.modList.forEach(curMod => {
-            curMod.refreshMod()
+    async refresh(/*selectedVersion = null*/) {
+        // if (selectedVersion != null) {
+        //     this.selectedVersion = selectedVersion
+        // }
+
+        this.#modList.forEach(async curMod => {
+            await curMod.refresh()
         })
     }
 
-    downloadReadyMods(selectedModLoader, preventDownload = false) {
-        const successfulDownloads = []
+    async downloadReadyMods(selectedModLoader, preventDownload = false) {
+        let downloadLinks = []
 
-        this.modList.forEach(mod => {
-            if (mod.getVersionList().includes(this.selectedVersion)) {
-                successfulDownloads.push(mod.downloadMod(selectedModLoader, this.selectedVersion, preventDownload))
-            } else {
-                successfulDownloads.push(false)
+        for (const mod of this.#modList) {
+            try {
+                const link = await mod.getDownloadLink(selectedModLoader, this.selectedVersion)
+                downloadLinks.push(link)
+            } catch (error) {
+                if (error.name = "Mod unavailable for this version") {
+                    downloadLinks.push(false)
+                } else if (error.name = "Invalid data") {
+                    downloadLinks.push(false)
+                } else if (error.name = "Download Unavailable") {
+                    downloadLinks.push(false)
+                } else {
+                    throw error
+                }
+            }
+        }
+
+        downloadLinks.forEach(link => {
+            if (link && !preventDownload) {
+                window.open(link, "_blank")
             }
         })
 
-        return successfulDownloads
+        return downloadLinks
     }
 
     exportProfile(path, profileName, printDebugMessage = true) {
         if (path) {
-            const profile = new Profile(this.modList, this.priorityList, this.selectedVersion, profileName)
+            const profile = new Profile(this.#modList, this.#priorityList, this.selectedVersion, profileName)
             if (printDebugMessage) {
                 console.log(`Exporting profile data to ${path}`)
             }
@@ -356,28 +342,25 @@ class Profile {
     getPercentReady() {
         let readyMods = 0
 
-        this.modList.forEach(mod => {
+        this.#modList.forEach(mod => {
             if (mod.getVersionList().includes(this.selectedVersion)) {
                 readyMods++
             }
         })
 
-        if (this.modList.length === 0) {
+        if (this.#modList.length === 0) {
             return 0
         } else {
-            return (readyMods / this.modList.length) * 100
+            return (readyMods / this.#modList.length) * 100
         }
     }
 
     createDict() {
-        const modlist = this.modList.map(mod => mod.createDict())
-        const prioritylist = this.priorityList.map(priority => priority.createDict())
-
+        const modlist = this.#modList.map(mod => mod.createDict())
         return {
             name: this.name,
             version: this.selectedVersion,
-            modlist,
-            priorityList: prioritylist
+            modlist
         }
     }
 }
@@ -386,8 +369,13 @@ class ProfileManager {
     #profileList
     #priorityList
     #allowWriteToFile
+    #defaultPriorityList = [
+        new Priority("High Priority", 255, 128, 0),
+        new Priority("Medium Priority", 255, 196, 0),
+        new Priority("Low Priority", 255, 255, 0)
+    ]
 
-    constructor(profileList = [], priorityList = [], allowWriteToFile = true) {
+    constructor(profileList = [], priorityList = this.#defaultPriorityList, allowWriteToFile = true) {
         this.#profileList = profileList
         this.#priorityList = priorityList
         this.#allowWriteToFile = allowWriteToFile
