@@ -48,7 +48,7 @@ describe('CurseForge API Functions', () => {
     test('getDownloadLink function', async () => {
         const modData = await callCurseForge.modData("sodium")
 
-        const result = await callCurseForge.getDownloadLink(modData, modData.id, "Fabric", "1.21.5")
+        const result = await callCurseForge.getDownloadLink(modData, "Fabric", "1.21.5")
         expect(result != false).toBe(true)
     })
 })

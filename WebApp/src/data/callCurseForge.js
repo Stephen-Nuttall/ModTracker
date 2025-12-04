@@ -147,7 +147,7 @@ function modLoader_IDtoText(loaderID) {
     }
 }
 
-const getDownloadLink = async (curseforgeJson, mod_id, loader, version) => {
+const getDownloadLink = async (curseforgeJson, loader, version) => {
     const fileIndexes = curseforgeJson.latestFilesIndexes
 
     // Get the FileId of the first file (from a sorted list) that has the right mod loader, and use it to get that file's download link
@@ -155,7 +155,7 @@ const getDownloadLink = async (curseforgeJson, mod_id, loader, version) => {
         // if file's gameVersion matches version, the file has a modLoader entry,
         // and that modLoader entry matches loader, then make an API call for the download link
         if (file.gameVersion == version && "modLoader" in file && (file.modLoader == 0 || modLoader_IDtoText(file.modLoader) == loader)) {
-            const url = `https://api.curseforge.com/v1/mods/${mod_id}/files/${file.fileId}`
+            const url = `https://api.curseforge.com/v1/mods/${curseforgeJson.id}/files/${file.fileId}`
             const data = await _genericCurseforgeCall(url)
             const downloadLink = data.data.downloadUrl
 
