@@ -4,18 +4,15 @@ import mod from './mod.js'
 
 class Profile {
     #modList = []
-    #priorityList
     selectedVersion = "1.21.5"
     name = "New Profile"
 
     constructor(
         modList = [],
-        priorityList = [],
         selectedVersion = "1.21.5",
         name = "New Profile"
     ) {
         this.#modList = modList
-        this.#priorityList = priorityList
         this.selectedVersion = selectedVersion
         this.name = name
     }
@@ -36,9 +33,9 @@ class Profile {
 
     getModList() { return this.#modList }
 
-    getMod(index) { return this.#modList[index] }
+    getNumMods() { return this.#modList.length }
 
-    getPriorityList() { return this.#priorityList }
+    getMod(index) { return this.#modList[index] }
 
     getSelectedVersion() { return this.selectedVersion }
 
@@ -47,7 +44,7 @@ class Profile {
             throw new Error("URL provided is invalid.")
         }
 
-        const priority = this.#priorityList[0] || new mod.Priority("High Priority", 255, 128, 0)
+        const priority = new mod.Priority("High Priority", 255, 128, 0)
         let newMod = new mod.Mod(url, priority, this.#modList.length)
 
         await newMod.refresh()
@@ -140,12 +137,12 @@ class ProfileManager {
     #profileList
     #priorityList
     #allowWriteToFile
+    #storageLocation = "profiles"
     #defaultPriorityList = [
         new mod.Priority("High Priority", 255, 128, 0),
         new mod.Priority("Medium Priority", 255, 196, 0),
         new mod.Priority("Low Priority", 255, 255, 0)
     ]
-    #storageLocation = "profiles"
 
     constructor(profileList = [], priorityList = this.#defaultPriorityList, allowWriteToFile = true) {
         this.#profileList = profileList
@@ -157,19 +154,13 @@ class ProfileManager {
 
     getProfileList() { return this.#profileList }
 
+    getProfile(index) { this.#profileList[index] }
+
+    getNumPriorities() { return this.#priorityList.length }
+
     getPriorityList() { return this.#priorityList }
 
-    getProfile(index) {
-        if (this.#profileList.length > 0) {
-            try {
-                return this.#profileList[index]
-            } catch (e) {
-                return null
-            }
-        } else {
-            return null
-        }
-    }
+    getPriority(index) { this.#priorityList[index] }
 
     addProfile(newProfile, profileName = null, saveToFile = true) {
         if (!newProfile) {
@@ -180,67 +171,52 @@ class ProfileManager {
         }
 
         this.#profileList.push(newProfile)
-        this.updatePriorityLists()
-        this.sortModLists()
+        this.#sortModLists()
 
         if (saveToFile && this.#allowWriteToFile) {
-            this.saveToJson()
+            this.saveToStorage()
         }
     }
 
-    deleteProfile(numProfile) {
+    removeProfile(numProfile) {
         this.#profileList.splice(numProfile, 1)
-        this.sortModLists()
-        this.updatePriorityLists()
-        this.saveToJson()
+        this.#sortModLists()
+        this.saveToStorage()
     }
 
-    addPriority(newPriority) {
-        this.#priorityList.push(newPriority)
-    }
+    addPriority(newPriority) { this.#priorityList.push(newPriority) }
 
-    sortModLists() {
-        this.#profileList.forEach(profile => {
-            profile.modList.sort((a, b) => a.lessThan(b) ? -1 : 1)
-        })
-    }
-
-    updatePriorityLists() {
-        this.#profileList.forEach(profile => {
-            profile.modList.forEach(mod => {
-                if (!this.#priorityList.some(priority => priority.equals(mod.priority))) {
-                    this.#priorityList.push(mod.priority)
-                }
-            })
-        })
-
-        this.#profileList.forEach(profile => {
-            profile.priorityList = this.#priorityList
-        })
-    }
+    removePriority(index) { this.#priorityList.splice(index, 1) }
 
     saveToStorage() {
-        localStorage.setItem(this.#storageLocation, JSON.stringify(this.createDict()))
+        localStorage.setItem(this.#storageLocation, JSON.stringify(this.#createDict(), null, 4))
     }
 
     loadFromStorage() {
         const storedData = localStorage.getItem('profiles')
         const parsedData = JSON.parse(storedData)
 
-        this.importData(parsedData)
+        this.#importData(parsedData)
     }
 
-    importData(data, requireValidModURL = true) {
+    #importData(data, requireValidModURL = true) {
         // TODO: loadFromJson.js
     }
 
-    createDict() {
+    #createDict() {
         const profileList = this.#profileList.map(profile => profile.createDict())
         const priorityList = this.#priorityList.map(priority => priority.createDict())
 
         return {
             profileList,
             priorityList
+        }
+    }
+
+    #sortModLists() {
+        for (let profile of this.#profileList) {
+            let modlist = profile.getModList()
+            modlist.sort((a, b) => a.lessThan(b) ? -1 : 1)
         }
     }
 }
