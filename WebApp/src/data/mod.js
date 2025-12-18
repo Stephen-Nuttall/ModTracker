@@ -87,16 +87,28 @@ class Mod {
         }
     }
 
-    equals(other) {
+    equals(other, enableDebug = false) {
         if (!(other instanceof Mod)) {
+            if (enableDebug) {
+                console.debug("other is not a mod object")
+            }
             return false
         }
-        return (
+        const result = (
             this.#name === other.#name &&
             this.#id === other.#id &&
             this.#url === other.#url &&
             JSON.stringify(this.#versions) === JSON.stringify(other.#versions)
         )
+
+        if (enableDebug) {
+            console.debug(`${this.#name} === ${other.#name} (${this.#name === other.#name}) &&\n` +
+                `${this.#id} === ${other.#id} (${this.#id === other.#id}) &&\n` +
+                `${this.#url} === ${other.#url} (${this.#url === other.#url}) &&\n` +
+                `${JSON.stringify(this.#versions)} === ${JSON.stringify(other.#versions)} ` +
+                `(${JSON.stringify(this.#versions) === JSON.stringify(other.#versions)})\n= ${result}`)
+        }
+        return result
     }
 
     // Getters
@@ -181,9 +193,17 @@ class Mod {
 
     async #callAPIs() {
         const mod_slug = this.#url.replace(/\/$/, "").split("/").pop()
+
+        if (!(callModrinth.verifyURL(this.#url) || callCurseForge.verifyURL(this.#url))) {
+            let error = new Error("This mod object's URL is neither a valid Modrinth URL or a valid CurseForge URL")
+            error.name = "Invalid URL"
+            throw error
+        }
+
         if (callModrinth.verifyURL(this.#url)) {
             this.#modrinthData = await callModrinth.modData(mod_slug)
         }
+
         if (callCurseForge.verifyURL(this.#url)) {
             this.#curseforgeData = await callCurseForge.modData(mod_slug)
         }

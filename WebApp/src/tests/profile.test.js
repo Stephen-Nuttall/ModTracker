@@ -90,6 +90,24 @@ const modlist = [
     mod_netherHeight_modrinth, mod_entityculling_modrinth, mod_JEI_curseforge
 ]
 
+const longModlist = [
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth,
+    mod_fabricAPI_modrinth, mod_sodium_curseforge, mod_worldedit_curseforge, mod_netherHeight_modrinth, mod_entityculling_modrinth
+]
+
 describe("Testing Profile Objects", async () => {
     test("Create Profile Objects", () => {
         let profile1 = new profile.Profile()
@@ -156,6 +174,11 @@ describe("Testing Profile Objects", async () => {
 
         await profile1.refresh()
         await profile2.refresh()
+    })
+
+    test("Refresh Profile - Speed Test", async () => {
+        let profileObj = new profile.Profile(longModlist)
+        await profileObj.refresh()
     })
 
     test("Download Ready Mods - Modrinth", async () => {
@@ -235,6 +258,11 @@ describe("Testing Profile Objects", async () => {
         expect(quiltLinks_2[0]).toBeFalsy()
         expect(quiltLinks_2[1]).toBeFalsy()
     }, 10000)
+
+    test("Download Ready Mods - Speed Test", async () => {
+        let profileObj = new profile.Profile(longModlist)
+        const downloadLinks = await profileObj.downloadReadyMods("Fabric", true)
+    })
 })
 
 
@@ -324,7 +352,6 @@ describe("Testing Profile Manager Objects", () => {
             [new profile.Profile([mod_sodium_modrinth, mod_clothConfig_modrinth, mod_boingBoing_curseforge]), new profile.Profile()])
 
         manager.saveToStorage()
-        console.log(localStorageMock.getItem("profiles"))
         expect(localStorageMock.getItem("profiles")).toBe(`{
     "profileList": [
         {

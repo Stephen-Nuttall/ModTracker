@@ -4,7 +4,11 @@ const _allowedCategoryIDs = [6, 4906, 6814, 423, 424, 425, 426, 427, 428, 429, 4
 
 // Verify if the URL this mod was initialized with is specifically a Curseforge URL
 function verifyURL(url) {
-    return (url.match(_curseforgeRegex) != null)
+    if (!url) {
+        return false
+    } else {
+        return (url.match(_curseforgeRegex) != null)
+    }
 }
 
 const _genericCurseforgeCall = async (url, requestParameters = {}) => {

@@ -68,35 +68,35 @@ class Profile {
         }
     }
 
-    async refresh(/*selectedVersion = null*/) {
-        // if (selectedVersion != null) {
-        //     this.selectedVersion = selectedVersion
-        // }
-
-        this.#modList.forEach(async curMod => {
-            await curMod.refresh()
-        })
+    async refresh() {
+        await Promise.all(
+            this.#modList.map(async curMod => {
+                try {
+                    await curMod.refresh()
+                } catch (error) {
+                    console.error(`Failed to refresh mod '${curMod.name}': ${error}`)
+                }
+            })
+        )
     }
 
     async downloadReadyMods(selectedModLoader, preventDownload = false) {
-        let downloadLinks = []
-
-        for (const mod of this.#modList) {
-            try {
-                const link = await mod.getDownloadLink(selectedModLoader, this.selectedVersion)
-                downloadLinks.push(link)
-            } catch (error) {
-                if (error.name = "Mod unavailable for this version") {
-                    downloadLinks.push(false)
-                } else if (error.name = "Invalid data") {
-                    downloadLinks.push(false)
-                } else if (error.name = "Download Unavailable") {
-                    downloadLinks.push(false)
-                } else {
-                    throw error
+        let downloadLinks = await Promise.all(
+            this.#modList.map(async (curMod) => {
+                try {
+                    const link = await curMod.getDownloadLink(selectedModLoader, this.selectedVersion);
+                    return link;
+                } catch (error) {
+                    if (error.name === "Mod unavailable for this version" ||
+                        error.name === "Invalid data" ||
+                        error.name === "Download Unavailable") {
+                        return false;
+                    } else {
+                        throw error; // Re-throw unexpected errors
+                    }
                 }
-            }
-        }
+            })
+        );
 
         downloadLinks.forEach(link => {
             if (link && !preventDownload) {
@@ -128,7 +128,7 @@ class Profile {
         return {
             name: this.name,
             version: this.selectedVersion,
-            modlist
+            modlist: modlist
         }
     }
 }

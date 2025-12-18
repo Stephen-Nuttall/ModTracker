@@ -93,7 +93,15 @@ describe("Testing Mod Objects", () => {
 
     test("Call APIs", async () => {
         for (const modObj of modlist) {
-            await modObj.refresh()
+            try {
+                await modObj.refresh()
+            } catch (error) {
+                if (error.name = "Invalid URL" && modObj.getURL() == "https://www.curseforge.com/minecrafods/sodium") {
+                    // all is good! This URL is supposed to be invalid
+                } else {
+                    throw error
+                }
+            }
         }
     })
 

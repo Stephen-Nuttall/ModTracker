@@ -3,7 +3,11 @@ const _requestTimeout = 10000 // How many milliseconds to wait for an API call b
 
 // Verify if the URL this mod was initialized with is specifically a Modrinth URL
 const verifyURL = (url) => {
-    return (url.match(_modrinthRegex) != null)
+    if (!url) {
+        return false
+    } else {
+        return (url.match(_modrinthRegex) != null)
+    }
 }
 
 const _genericModrinthCall = async (url, requestParameters = {}) => {
