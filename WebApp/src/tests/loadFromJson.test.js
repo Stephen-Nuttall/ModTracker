@@ -196,7 +196,7 @@ describe("Dict to Profile", () => {
     })
 
     test("Blank data", () => {
-        expect(() => { loadFromJson.createProfile({}, false) }).toThrowError("Cannot load profile from this data. Dictionary is blank.")
+        expect(() => { loadFromJson.createProfile({}, false) }).toThrowError("Cannot load profile from this data. Data.modlist is undefined.")
         const resultProfile = loadFromJson.createProfile({ modlist: [] }, false)
 
         expect(resultProfile.name).toBe(comparisonProfile_blank.name)

@@ -11,7 +11,7 @@ function ChartManager({ profile }) {
             const priority = mod.priority
             const existingPriority = priorityLevels.find(pr => pr.label === priority.name)
 
-            if (versions.includes(profile.version)) {
+            if (versions.includes(profile.selectedVersion)) {
                 readyMods.value++
             } else if (existingPriority) {
                 existingPriority.value += 1

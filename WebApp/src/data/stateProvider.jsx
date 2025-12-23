@@ -1,4 +1,3 @@
-import { proxy } from 'valtio'
 import profile from './profile.js'
 import loadFromJson from '../data/loadFromJson.js'
 
@@ -19,5 +18,4 @@ if (storedData) {
     }
 }
 
-const profileState = proxy(profileManager)
-export default profileState
+export default profileManager

@@ -124,6 +124,10 @@ class Profile {
         }
     }
 
+    toJSON() {
+        return this.createDict()
+    }
+
     createDict() {
         const modlist = this._modList.map(mod => mod.createDict())
         return {
@@ -206,7 +210,7 @@ class ProfileManager {
     }
 
     _createDict() {
-        const profileList = this._profileList.map(profile => profile.createDict())
+        const profileList = this._profileList.map(profile => profile.toJSON())
         const priorityList = this._priorityList.map(priority => priority.createDict())
 
         return {

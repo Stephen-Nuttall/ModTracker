@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import profileManager from '../data/stateProvider.jsx'
 
-import ModTable from "./modTable";
-import '../styles/modTable.css';
+import ModTable from "./modTable"
+import '../styles/modTable.css'
 
 const TableManager = ({ profile, OpenPriorityPopup, setModToAddPriorityTo }) => {
     const [managerHash, forceRerender] = useState("")
@@ -26,11 +26,12 @@ const TableManager = ({ profile, OpenPriorityPopup, setModToAddPriorityTo }) => 
         } else {
             console.error("PriorityIndex of " + priorityIndex + " is out of range")
         }
-    };
+    }
 
     const handleDelete = async (tableIndex) => {
         profile.removeMod(tableIndex)
-    };
+        forceRerender(profileManager.hash())
+    }
 
     return (
         <div className='table-manager'>

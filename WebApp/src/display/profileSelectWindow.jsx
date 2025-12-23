@@ -5,6 +5,8 @@ import NewProfilePopup from '../widgets/newProfilePopup'
 import '../styles/profileSelectWindow.css'
 
 function ProfileSelectWindow({ setCurProfileIndex, isLoading }) {
+    const [managerHash, forceRerender] = useState("")
+
     const [popupOpen, setPopupOpen] = useState(false)
     const [funcOutputText, setFuncOutput] = useState('')
     const profiles = profileManager.getProfileList()
@@ -24,10 +26,12 @@ function ProfileSelectWindow({ setCurProfileIndex, isLoading }) {
 
     function removeProfile(index) {
         profileManager.removeProfile(index)
+        forceRerender(profileManager.hash() + " ")
     }
 
     function editProfile(index) {
         console.log("placeholder")
+        forceRerender(profileManager.hash())
     }
 
     return (

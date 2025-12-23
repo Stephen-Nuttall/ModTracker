@@ -33,6 +33,7 @@ function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
         console.log("adding mod with URL " + modInput)
         await profile.addMod(modInput)
         profileManager.saveToStorage()
+        forceRerender(profileManager.hash())
     }
 
     function reloadProfile() {

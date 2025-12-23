@@ -56,8 +56,12 @@ function createMod(data) {
 // convert JSON data into a profile object
 function createProfile(data, requireValidModURL = true) {
     if (data === undefined) {
-        let error = new TypeError("Cannot load profile  from this data. Data is undefined.")
+        let error = new TypeError("Cannot load profile from this data. Data is undefined.")
         error.name = "Undefined profile data"
+        throw error
+    } else if (data.modlist === undefined) {
+        let error = new TypeError("Cannot load profile from this data. Data.modlist is undefined.")
+        error.name = "Undefined profile modlist"
         throw error
     } else if (Object.keys(data).length === 0) {
         let error = new TypeError("Cannot load profile from this data. Dictionary is blank.")
