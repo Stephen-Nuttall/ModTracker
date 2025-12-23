@@ -1,50 +1,31 @@
-import { useState } from 'react';
+import { useState } from 'react'
+import profileManager from '../data/stateProvider.jsx'
+
 import TextInputBox from './textInputBox';
 import FilePickerButton from './filePickerButton';
+
+import profile from '../data/profile.js'
+import loadFromJson from '../data/loadFromJson.js'
 import '../styles/popup.css'
 
-function NewProfilePopup({ isOpen = false, setIsOpen, requestRef, setFuncOutput }) {
+function NewProfilePopup({ isOpen = false, setIsOpen, setFuncOutput }) {
     const [nameInput, setNameInput] = useState("")
 
-    const createBlankProfile = async () => {
-        if (requestRef.current) {
-            const data = await requestRef.current?.genericRequest(
-                "add-profile", { profileName: nameInput },
-                "Failed to add profile: ", "Profile " + nameInput + " successfully added."
-            )
-
-            if (data?.errorMessage != "None") {
-                setFuncOutput("Failed to create profile.")
-            } else {
-                setFuncOutput("Profile successfully created.")
-            }
-        } else {
-            console.error("requestRef is not set!")
-        }
+    function createBlankProfile() {
+        profileManager.addProfile(new profile.Profile(), nameInput)
     }
 
-    const importProfile = async (parsedData, errorMessage = null) => {
+    function importProfile(parsedData, errorMessage = null) {
         if (parsedData == null || parsedData === undefined) {
             console.error("parsed JSON data is null or undefined")
         }
         else if (errorMessage != null) {
-            console.error("Error parsing JSON data: " + errorMessage)
-        }
-        else if (!requestRef.current) {
-            console.error("requestRef is not set!")
+            console.error("Error parsing JSON into dictionary: " + errorMessage)
         }
         else {
-            const data = await requestRef.current?.genericRequest(
-                "add-profile", { profileName: nameInput, profileData: parsedData },
-                "Failed to import profile: ", "Profile " + nameInput + " successfully imported."
-            )
+            let newProfile = loadFromJson.createProfile(parsedData)
+            profileManager.addProfile(newProfile, nameInput)
             setIsOpen(false)
-
-            if (data?.errorMessage != "None") {
-                setFuncOutput("Failed to import profile.")
-            } else {
-                setFuncOutput("Profile successfully imported.")
-            }
         }
     }
 

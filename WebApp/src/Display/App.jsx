@@ -1,79 +1,34 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
+import profileManager from '../data/stateProvider.jsx'
 
-import DataFetcher from '../dataFetcher.jsx'
 import ProfileSelectWindow from './profileSelectWindow.jsx'
 import DetailsWindow from './detailsWindow.jsx'
 
 function App() {
-    try {
-        const requestRef = useRef(null)
+    const [curProfileIndex, setProfileIndex] = useState(-1)
+    const [output, setOutput] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
 
-        const blankProfileData = {
-            "profileList": [],
-            "priorityList": []
-        }
+    const displaySelectWindow = curProfileIndex < 0 || curProfileIndex >= profileManager.getNumProfiles()
 
-        const [profileData, setProfileData] = useState([])
-        const [curProfileIndex, setProfileIndex] = useState(-1)
-        const [selectedProfile, setSelectedProfile] = useState()
-        const [numProfiles, setNumProfiles] = useState(-1)
-        const [output, setOutput] = useState('')
-        const [isLoading, setIsLoading] = useState(false)
-
-        const storedData = localStorage.getItem('profiles')
-        const parsedData = storedData !== (undefined || "undefined") ? JSON.parse(storedData) : blankProfileData
-
-        useEffect(() => {
-            setNumProfiles(getNumProfiles())
-        }, [])
-
-        useEffect(() => {
-            setNumProfiles(getNumProfiles())
-            if (curProfileIndex >= 0 && profileData.profileList !== undefined) {
-                setSelectedProfile(profileData.profileList[curProfileIndex])
-            }
-        }, [profileData, curProfileIndex])
-
-        function getNumProfiles() {
-            if (parsedData == null) {
-                return 0
-            } else {
-                return parsedData.profileList.length
-            }
-        }
-
-        const displaySelectWindow = curProfileIndex < 0 || curProfileIndex >= numProfiles
-
+    if (profileManager === undefined) {
+        console.error("Profile Manager is undefined!")
+        throw new Error("Profile Manager is undefined!")
+    } else if (displaySelectWindow) {
         return (
-            <div>
-                <DataFetcher updateData={setProfileData} setOutputText={setOutput} setLoading={setIsLoading} ref={requestRef} />
-                {
-                    displaySelectWindow ?
-                        <ProfileSelectWindow
-                            profileList={parsedData?.profileList}
-                            requestRef={requestRef}
-                            setCurProfileIndex={setProfileIndex}
-                            isLoading={isLoading}
-                        /> :
-                        <DetailsWindow
-                            profileIndex={curProfileIndex}
-                            profile={selectedProfile}
-                            requestRef={requestRef}
-                            setCurProfileIndex={setProfileIndex}
-                            functionOutputText={output}
-                            isLoading={isLoading}
-                        />
-                }
-            </div>
+            <ProfileSelectWindow
+                setCurProfileIndex={setProfileIndex}
+                isLoading={isLoading}
+            />
         )
-    }
-    catch (exception) {
+    } else {
         return (
-            <>
-                <h2>Sorry! A fatal error occured when trying to load the site.</h2>
-                <div>Exception caught: {exception.message}</div>
-                {console.error(exception)}
-            </>
+            <DetailsWindow
+                profileIndex={curProfileIndex}
+                setCurProfileIndex={setProfileIndex}
+                functionOutputText={output}
+                isLoading={isLoading}
+            />
         )
     }
 }

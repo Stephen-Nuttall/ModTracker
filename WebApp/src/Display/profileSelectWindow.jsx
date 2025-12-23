@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
+import profileManager from '../data/stateProvider.jsx'
+
 import NewProfilePopup from '../widgets/newProfilePopup'
 import '../styles/profileSelectWindow.css'
 
-function ProfileSelectWindow({ profileList, requestRef, setCurProfileIndex, isLoading }) {
+function ProfileSelectWindow({ setCurProfileIndex, isLoading }) {
     const [popupOpen, setPopupOpen] = useState(false)
-    const [funcOutputText, setFuncOutput] = useState('');
-    const profiles = profileList ?? []
+    const [funcOutputText, setFuncOutput] = useState('')
+    const profiles = profileManager.getProfileList()
 
     useEffect(() => {
         if (isLoading == true) {
@@ -20,24 +22,11 @@ function ProfileSelectWindow({ profileList, requestRef, setCurProfileIndex, isLo
         setCurProfileIndex(tileNum)
     }
 
-    const removeProfile = async (index) => {
-        if (requestRef.current) {
-            const data = await requestRef.current?.genericRequest(
-                "remove-profile", { profileIndex: index },
-                "Failed to remove profile: ", "Profile successfully removed."
-            )
-
-            if (data?.errorMessage != "None") {
-                setFuncOutput("Failed to remove profile.")
-            } else {
-                setFuncOutput("Profile successfully removed.")
-            }
-        } else {
-            console.error("requestRef is not set!")
-        }
+    function removeProfile(index) {
+        profileManager.removeProfile(index)
     }
 
-    const editProfile = async (profileIndex) => {
+    function editProfile(index) {
         console.log("placeholder")
     }
 
@@ -46,22 +35,15 @@ function ProfileSelectWindow({ profileList, requestRef, setCurProfileIndex, isLo
             <div className='function-output-profileSelect'>{funcOutputText}</div>
             <section className="profile-grid">
                 {profiles.map((profile, i) => {
-                    let readyCount = 0
-                    for (const mod of profile.modlist) {
-                        if (mod.versions.includes(profile.version)) {
-                            readyCount++
-                        }
-                    }
-
-                    const modsCount = Number(profile.modlist.length || 0)
-                    const percent = modsCount ? Math.round((readyCount / modsCount) * 100) : 0
+                    const modsCount = profile.getNumMods()
+                    const percent = profile.getPercentReady()
 
                     return (
                         <div key={i} className="tile" role="button" onClick={() => onTileClick(i)}>
                             <div className="tile-inner">
                                 <h2 className="profile-name">{profile.name}</h2>
                                 <div className="mods-count">{modsCount} mods</div>
-                                <div className="ready">{percent}% ready for {profile.version}</div>
+                                <div className="ready">{percent}% ready for {profile.selectedVersion}</div>
                             </div>
 
                             {/* <button className="tile-edit" onClick={
@@ -93,7 +75,7 @@ function ProfileSelectWindow({ profileList, requestRef, setCurProfileIndex, isLo
                 </div>
             </section>
 
-            <NewProfilePopup isOpen={popupOpen} setIsOpen={setPopupOpen} requestRef={requestRef} setFuncOutput={setFuncOutput} />
+            <NewProfilePopup isOpen={popupOpen} setIsOpen={setPopupOpen} profileManager={profileManager} setFuncOutput={setFuncOutput} />
         </div>
     )
 }

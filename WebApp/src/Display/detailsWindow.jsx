@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import profileManager from '../data/stateProvider.jsx'
 
 import TableManager from '../widgets/tableManager'
 import NewPriorityPopup from '../widgets/newPriorityPopup'
@@ -8,12 +9,17 @@ import EditableText from '../widgets/EditableText'
 
 import '../styles/detailsWindow.css'
 
-function DetailsWindow({ profileIndex, profile, requestRef, setCurProfileIndex, isLoading }) {
+function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
+    const [managerHash, forceRerender] = useState("")
+
     const [priorityPopupOpen, OpenPriorityPopup] = useState(false)
     const [modToAddPriorityTo, setModToAddPriorityTo] = useState(-1)
     const [modInput, setModInput] = useState('');
     const [versionInput, setVersionInput] = useState('');
     const [funcOutputText, setFuncOutput] = useState('');
+
+    const profile = profileManager.getProfile(profileIndex)
+    const modlist = profile.getModList()
 
     useEffect(() => {
         if (isLoading == true) {
@@ -24,71 +30,31 @@ function DetailsWindow({ profileIndex, profile, requestRef, setCurProfileIndex, 
     }, [isLoading])
 
     const addMod = async () => {
-        if (requestRef.current) {
-            const data = await requestRef.current?.genericRequest(
-                "add-mod", { url: modInput, profileIndex: profileIndex },
-                "Failed to add mod: ", "Mod successfully added."
-            )
-
-            if (data?.errorMessage != "None") {
-                setFuncOutput("Unable to add this mod. Check the URL you provided and try again.")
-            } else {
-                setFuncOutput("Mod successfully added.")
-            }
-        } else {
-            console.error("requestRef is not set!")
-        }
+        console.log("adding mod with URL " + modInput)
+        await profile.addMod(modInput)
+        profileManager.saveToStorage()
     }
 
-    const reloadProfile = async (newProfileName = "") => {
-        let name = newProfileName.length > 0 ? newProfileName : profile?.name
-        let version = versionInput.length > 0 ? versionInput : profile?.version
+    function reloadProfile() {
+        const version = versionInput.length > 0 ? versionInput : profile.selectedVersion
+        profile.selectedVersion = version
 
-        if (requestRef.current) {
-            const data = await requestRef.current?.genericRequest(
-                "update-profile", { profileIndex: profileIndex, profileVersion: version, profileName: name },
-                "Failed to update profile: ", "Profile successfully refreshed."
-            )
-
-            if (data?.errorMessage != "None") {
-                setFuncOutput("Failed to update profile.")
-            } else {
-                setFuncOutput("Profile successfully refreshed.")
-            }
-        } else {
-            console.error("requestRef is not set!")
-        }
+        profile.refresh()
+        profileManager.saveToStorage()
+        forceRerender(profileManager.hash())
     }
 
-    const renameProfile = async (profileName) => {
-        reloadProfile(profileName)
+    function renameProfile(profileName) {
+        profile.name = profileName
+        profileManager.saveToStorage()
+        forceRerender(profileManager.hash())
     }
 
-    const downloadMods = async () => {
+    function downloadMods() {
         let select = document.getElementById("loaderDropdown")
         let loader = select.value
 
-        if (requestRef.current) {
-            const data = await requestRef.current?.genericRequest(
-                "download-mods", { profileIndex: profileIndex, modLoader: loader },
-                "Failed to download mods: ", false, false
-            )
-
-            let numSuccess = 0
-            if (data.errorMessage == "None") {
-                for (let url of data.downloadLinks) {
-                    if (url != false) {
-                        window.open(url, '_blank')
-                        numSuccess++
-                    }
-                }
-            }
-
-            console.log("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profile?.version)
-            setFuncOutput("Successfully downloaded " + numSuccess + " " + loader + " mods for " + profile?.version)
-        } else {
-            console.error("requestRef is not set!")
-        }
+        profile.downloadReadyMods(loader)
     }
 
     function exportProfile() {
@@ -118,15 +84,14 @@ function DetailsWindow({ profileIndex, profile, requestRef, setCurProfileIndex, 
                 <div className="left-column">
                     <div className="info-row">
                         <h2>
-                            <EditableText value={profile?.name} onChange={renameProfile} />
+                            <EditableText value={profile.name} onChange={renameProfile} />
                         </h2>
-                        <label>Selected Version: {profile?.version}</label>
+                        <label>Selected Version: {profile.selectedVersion}</label>
                     </div>
 
                     <TableManager
                         profile={profile}
-                        requestRef={requestRef}
-                        profileIndex={profileIndex}
+                        priorityList={profileManager.getPriorityList()}
                         OpenPriorityPopup={OpenPriorityPopup}
                         setModToAddPriorityTo={setModToAddPriorityTo}
                     />
@@ -175,9 +140,7 @@ function DetailsWindow({ profileIndex, profile, requestRef, setCurProfileIndex, 
             <NewPriorityPopup
                 isOpen={priorityPopupOpen}
                 setIsOpen={OpenPriorityPopup}
-                requestRef={requestRef}
-                profileIndex={profileIndex}
-                priorityList={profile?.priorityList}
+                profileManager={profileManager}
                 modToAddPriorityTo={modToAddPriorityTo}
             />
         </>

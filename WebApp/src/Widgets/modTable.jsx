@@ -1,6 +1,8 @@
+import profileManager from '../data/stateProvider.jsx'
 import '../styles/modTable.css';
 
-const ModTable = ({ modList, priorityList, onPriorityChange, onDelete, selectedVersion }) => {
+const ModTable = ({ modList, onPriorityChange, onDelete, selectedVersion }) => {
+    const priorityList = profileManager.getPriorityList()
     const darkTextThreshold = 219
 
     let priorityNames = []
@@ -19,19 +21,19 @@ const ModTable = ({ modList, priorityList, onPriorityChange, onDelete, selectedV
                 </tr>
             </thead>
             <tbody>
-                {modList.map((mod) => (
-                    <tr key={mod.tablePos}>
-                        <td className='name-column'>{mod.name}</td>
+                {modList.map((mod, modIndex) => (
+                    <tr key={modIndex}>
+                        <td className='name-column'>{mod.getName()}</td>
                         <td
                             className='version-column'
                             style={{
-                                backgroundColor: mod.versions.includes(selectedVersion)
+                                backgroundColor: mod.getVersions().includes(selectedVersion)
                                     ? 'rgb(0, 125, 0)'
                                     : '',
                             }}
                         >
-                            {mod.versions.at(-1)}
-                            {mod.versions.includes(selectedVersion) && <span> ✔</span>}
+                            {mod.getVersions().at(-1)}
+                            {mod.getVersions().includes(selectedVersion) && <span> ✔</span>}
                         </td>
                         <td
                             className='priority-column'
@@ -42,7 +44,7 @@ const ModTable = ({ modList, priorityList, onPriorityChange, onDelete, selectedV
                             <select
                                 key={mod.priority.name}
                                 value={priorityNames.indexOf(mod.priority.name)}
-                                onChange={(e) => onPriorityChange(mod.tablePos, e.target.value)}
+                                onChange={(e) => onPriorityChange(modIndex, e.target.value)}
                                 className="priority-dropdown"
                                 style={{
                                     color: mod.priority.r >= darkTextThreshold
@@ -52,10 +54,10 @@ const ModTable = ({ modList, priorityList, onPriorityChange, onDelete, selectedV
                                         : 'white'
                                 }}
                             >
-                                {priorityList.map((priority, index) => (
+                                {priorityList.map((priority, priorityIndex) => (
                                     <option
                                         key={priority.name}
-                                        value={index}
+                                        value={priorityIndex}
                                         style={{
                                             backgroundColor: `rgb(${priority.r}, ${priority.g}, ${priority.b})`,
                                             color: priority.r >= darkTextThreshold
@@ -73,7 +75,7 @@ const ModTable = ({ modList, priorityList, onPriorityChange, onDelete, selectedV
                         </td>
                         <td className='delete-column'>
                             <button
-                                onClick={() => onDelete(mod.tablePos)}
+                                onClick={() => onDelete(modIndex)}
                                 className="delete-button"
                             >
                                 X

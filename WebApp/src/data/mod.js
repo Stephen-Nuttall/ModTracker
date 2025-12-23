@@ -32,7 +32,7 @@ class Priority {
     }
 
     hash() {
-        return JSON.stringify({ name: this.name, r: this.r, g: this.g, b: this.b })
+        return JSON.stringify(this.createDict())
     }
 }
 
@@ -40,13 +40,13 @@ class Mod {
     priority = new Priority()
     tablePosition = -1
 
-    #name = "Untitled Mod"
-    #id = -1
-    #url = null
-    #versions = ["No versions found"]
+    _name = "Untitled Mod"
+    _id = -1
+    _url = null
+    _versions = ["No versions found"]
 
-    #modrinthData = null
-    #curseforgeData = null
+    _modrinthData = null
+    _curseforgeData = null
 
     constructor(
         url = null,
@@ -61,29 +61,29 @@ class Mod {
         this.priority = modPriority
         this.tablePosition = tablePosition
 
-        this.#name = modName
-        this.#id = modID
-        this.#url = url
-        this.#versions = modVersions
-        this.#modrinthData = modrinthData
-        this.#curseforgeData = curseforgeData
+        this._name = modName
+        this._id = modID
+        this._url = url
+        this._versions = modVersions
+        this._modrinthData = modrinthData
+        this._curseforgeData = curseforgeData
 
         if (modrinthData) {
-            this.#extractModrinth()
+            this._extractModrinth()
         } else if (curseforgeData) {
-            this.#extractCurseforge()
+            this._extractCurseforge()
         }
     }
 
     toString() {
-        return `${this.#name}, latest version: ${this.getCurrentVersion()}, priority: ${this.priority}`
+        return `${this._name}, latest version: ${this.getCurrentVersion()}, priority: ${this.priority}`
     }
 
     lessThan(other) {
         if (this.tablePosition > 0 || other.tablePosition > 0) {
             return this.tablePosition < other.tablePosition
         } else {
-            return this.#name < other.#name
+            return this._name < other._name
         }
     }
 
@@ -95,87 +95,87 @@ class Mod {
             return false
         }
         const result = (
-            this.#name === other.#name &&
-            this.#id === other.#id &&
-            this.#url === other.#url &&
-            JSON.stringify(this.#versions) === JSON.stringify(other.#versions)
+            this._name === other._name &&
+            this._id === other._id &&
+            this._url === other._url &&
+            JSON.stringify(this._versions) === JSON.stringify(other._versions)
         )
 
         if (enableDebug) {
-            console.debug(`${this.#name} === ${other.#name} (${this.#name === other.#name}) &&\n` +
-                `${this.#id} === ${other.#id} (${this.#id === other.#id}) &&\n` +
-                `${this.#url} === ${other.#url} (${this.#url === other.#url}) &&\n` +
-                `${JSON.stringify(this.#versions)} === ${JSON.stringify(other.#versions)} ` +
-                `(${JSON.stringify(this.#versions) === JSON.stringify(other.#versions)})\n= ${result}`)
+            console.debug(`${this._name} === ${other._name} (${this._name === other._name}) &&\n` +
+                `${this._id} === ${other._id} (${this._id === other._id}) &&\n` +
+                `${this._url} === ${other._url} (${this._url === other._url}) &&\n` +
+                `${JSON.stringify(this._versions)} === ${JSON.stringify(other._versions)} ` +
+                `(${JSON.stringify(this._versions) === JSON.stringify(other._versions)})\n= ${result}`)
         }
         return result
     }
 
     // Getters
-    getName() { return this.#name }
+    getName() { return this._name }
 
-    getID() { return this.#id }
+    getID() { return this._id }
 
-    getCurrentVersion() { return this.#versions[this.#versions.length - 1] }
+    getCurrentVersion() { return this._versions[this._versions.length - 1] }
 
-    getVersionList() { return this.#versions }
-    getVersions() { return this.#versions }
+    getVersionList() { return this._versions }
+    getVersions() { return this._versions }
 
-    getURL() { return this.#url }
+    getURL() { return this._url }
 
-    getModrinthData() { return this.#modrinthData }
+    getModrinthData() { return this._modrinthData }
 
-    getCurseforgeData() { return this.#curseforgeData }
+    getCurseforgeData() { return this._curseforgeData }
 
     getTablePosition() { return this.tablePosition }
 
-    validData() { return this.#modrinthData != null || this.#curseforgeData != null }
+    validData() { return this._modrinthData != null || this._curseforgeData != null }
 
     verifyURL() {
-        const curseforge = callModrinth.verifyURL(this.#url)
-        const modrinth = callCurseForge.verifyURL(this.#url)
+        const curseforge = callModrinth.verifyURL(this._url)
+        const modrinth = callCurseForge.verifyURL(this._url)
         return modrinth || curseforge
     }
 
     async refresh() {
-        await this.#callAPIs()
+        await this._callAPIs()
 
-        if (callModrinth.verifyURL(this.#url)) {
-            if (this.#modrinthData) {
-                this.#extractModrinth()
-            } else if (this.#curseforgeData) {
-                this.#extractCurseforge()
+        if (callModrinth.verifyURL(this._url)) {
+            if (this._modrinthData) {
+                this._extractModrinth()
+            } else if (this._curseforgeData) {
+                this._extractCurseforge()
             }
-        } else if (callCurseForge.verifyURL(this.#url)) {
-            if (this.#curseforgeData) {
-                this.#extractCurseforge()
-            } else if (this.#modrinthData) {
-                this.#extractModrinth()
+        } else if (callCurseForge.verifyURL(this._url)) {
+            if (this._curseforgeData) {
+                this._extractCurseforge()
+            } else if (this._modrinthData) {
+                this._extractModrinth()
             }
         }
     }
 
     async getDownloadLink(loader, version) {
-        if (!this.#versions.includes(version)) {
-            let error = new Error(`Attempted to download ${this.#name} for ${version}, but it's not available for that version.`)
+        if (!this._versions.includes(version)) {
+            let error = new Error(`Attempted to download ${this._name} for ${version}, but it's not available for that version.`)
             error.name = "Mod unavailable for this version"
             throw error
         }
 
         let downloadLink
-        if (callModrinth.verifyURL(this.#url)) {
-            const mod_slug = this.#url.replace(/\/$/, "").split("/").pop()
+        if (callModrinth.verifyURL(this._url)) {
+            const mod_slug = this._url.replace(/\/$/, "").split("/").pop()
             downloadLink = await callModrinth.getDownloadLink(mod_slug, loader, version)
-        } else if (this.#curseforgeData) {
-            downloadLink = await callCurseForge.getDownloadLink(this.#curseforgeData, loader, version)
+        } else if (this._curseforgeData) {
+            downloadLink = await callCurseForge.getDownloadLink(this._curseforgeData, loader, version)
         } else {
-            let error = new Error(`Attempted to download ${this.#name}, but it does not have a valid data for Modrinth or CurseForge.`)
+            let error = new Error(`Attempted to download ${this._name}, but it does not have a valid data for Modrinth or CurseForge.`)
             error.name = "Invalid data"
             throw error
         }
 
         if (downloadLink == false) {
-            console.log(`Download link for ${this.#name} is ${downloadLink}`)
+            console.log(`Download link for ${this._name} is ${downloadLink}`)
         }
         return downloadLink
     }
@@ -183,52 +183,52 @@ class Mod {
     createDict() {
         return {
             priority: this.priority.createDict(),
-            name: this.#name,
-            id: this.#id,
-            url: this.#url,
-            versions: this.#versions,
+            name: this._name,
+            id: this._id,
+            url: this._url,
+            versions: this._versions,
             tablePosition: this.tablePosition
         }
     }
 
-    async #callAPIs() {
-        const mod_slug = this.#url.replace(/\/$/, "").split("/").pop()
+    async _callAPIs() {
+        const mod_slug = this._url.replace(/\/$/, "").split("/").pop()
 
-        if (!(callModrinth.verifyURL(this.#url) || callCurseForge.verifyURL(this.#url))) {
+        if (!(callModrinth.verifyURL(this._url) || callCurseForge.verifyURL(this._url))) {
             let error = new Error("This mod object's URL is neither a valid Modrinth URL or a valid CurseForge URL")
             error.name = "Invalid URL"
             throw error
         }
 
-        if (callModrinth.verifyURL(this.#url)) {
-            this.#modrinthData = await callModrinth.modData(mod_slug)
+        if (callModrinth.verifyURL(this._url)) {
+            this._modrinthData = await callModrinth.modData(mod_slug)
         }
 
-        if (callCurseForge.verifyURL(this.#url)) {
-            this.#curseforgeData = await callCurseForge.modData(mod_slug)
+        if (callCurseForge.verifyURL(this._url)) {
+            this._curseforgeData = await callCurseForge.modData(mod_slug)
         }
     }
 
-    #extractModrinth() {
-        if (!this.#modrinthData) {
+    _extractModrinth() {
+        if (!this._modrinthData) {
             return null
         }
 
-        this.#name = this.#modrinthData.title
-        this.#id = this.#modrinthData.id
-        this.#versions = this.#modrinthData.game_versions
+        this._name = this._modrinthData.title
+        this._id = this._modrinthData.id
+        this._versions = this._modrinthData.game_versions
     }
 
-    #extractCurseforge() {
-        if (!this.#curseforgeData) {
+    _extractCurseforge() {
+        if (!this._curseforgeData) {
             return null
         }
 
-        this.#name = this.#curseforgeData.name
-        this.#id = this.#curseforgeData.id
-        this.#versions = callCurseForge.sortVersionList(this.#curseforgeData)
-        if (!this.#url) {
-            this.#url = this.#curseforgeData.links.websiteUrl
+        this._name = this._curseforgeData.name
+        this._id = this._curseforgeData.id
+        this._versions = callCurseForge.sortVersionList(this._curseforgeData)
+        if (!this._url) {
+            this._url = this._curseforgeData.links.websiteUrl
         }
     }
 }

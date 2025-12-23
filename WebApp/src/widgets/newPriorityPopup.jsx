@@ -1,13 +1,17 @@
-import { useState } from 'react';
-import { SketchPicker } from 'react-color';
-import TextInputBox from './textInputBox';
+import { useState } from 'react'
+import { SketchPicker } from 'react-color'
+import profileManager from '../data/stateProvider.jsx'
+
+import TextInputBox from './textInputBox'
+import mod from '../data/mod.js'
 import '../styles/popup.css'
 
-function NewPriorityPopup({ isOpen = false, setIsOpen, requestRef, priorityList, profileIndex, modToAddPriorityTo }) {
+function NewPriorityPopup({ isOpen = false, setIsOpen, modToAddPriorityTo }) {
+    const priorityList = profileManager.getPriorityList()
     const [textInput, setTextInput] = useState("")
-    const [color, setColor] = useState({ r: 255, g: 255, b: 255, a: 1 });
+    const [color, setColor] = useState({ r: 255, g: 255, b: 255, a: 1 })
 
-    const createNewPriority = async () => {
+    function createNewPriority() {
         if (textInput === undefined || textInput == "") {
             console.log("Failed to add priority level: PriorityName (" + textInput + ") is invalid.")
             return
@@ -16,38 +20,25 @@ function NewPriorityPopup({ isOpen = false, setIsOpen, requestRef, priorityList,
             return
         } else {
             let priorityNames = []
-            for (let i = 0; i < priorityList.length; i++) {
-                priorityNames.push(priorityList[i].name)
+            for (const priority of priorityList) {
+                priorityNames.push(priority.name)
             }
 
             if (priorityNames.includes(textInput)) {
                 console.log("Failed to add priority level: There is already a priority named " + textInput + " in the priority list.")
                 setOutput("Can't create priority level. There is already a priority level named '" + textInput + "'!")
                 return
+            } else {
+                const priority = new mod.Priority(textInput, color.r, color.g, color.b)
+                profileManager.addPriority(priority)
+                modToAddPriorityTo.priority = priority
             }
-        }
-
-        if (requestRef.current) {
-            const data = await requestRef.current?.genericRequest(
-                "add-priority",
-                {
-                    profileIndex: profileIndex,
-                    modIndex: modToAddPriorityTo,
-                    priorityName: textInput,
-                    red: color.r,
-                    green: color.g,
-                    blue: color.b
-                },
-                "Failed to add new priority level: "
-            )
-        } else {
-            console.error("requestRef is not set!")
         }
     }
 
     const handleColorChange = (color) => {
-        setColor(color.rgb);
-    };
+        setColor(color.rgb)
+    }
 
     return (
         <div className='popupContainer'>
@@ -95,7 +86,7 @@ function NewPriorityPopup({ isOpen = false, setIsOpen, requestRef, priorityList,
                 </div>
             )}
         </div>
-    );
+    )
 }
 
-export default NewPriorityPopup;
+export default NewPriorityPopup

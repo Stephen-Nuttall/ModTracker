@@ -3,7 +3,7 @@ import callCurseForge from '../data/callCurseForge.js'
 import mod from './mod.js'
 
 class Profile {
-    #modList = []
+    _modList = []
     selectedVersion = "1.21.5"
     name = "New Profile"
 
@@ -12,7 +12,7 @@ class Profile {
         selectedVersion = "1.21.5",
         name = "New Profile"
     ) {
-        this.#modList = modList
+        this._modList = modList
         this.selectedVersion = selectedVersion
         this.name = name
     }
@@ -20,8 +20,8 @@ class Profile {
     toString() {
         let output = `${this.name}:\n`
 
-        if (this.#modList.length > 0) {
-            this.#modList.forEach(mod => {
+        if (this._modList.length > 0) {
+            this._modList.forEach(mod => {
                 output += mod.toString() + "\n"
             })
         } else {
@@ -31,11 +31,11 @@ class Profile {
         return output.trim()
     }
 
-    getModList() { return this.#modList }
+    getModList() { return this._modList }
 
-    getNumMods() { return this.#modList.length }
+    getNumMods() { return this._modList.length }
 
-    getMod(index) { return this.#modList[index] }
+    getMod(index) { return this._modList[index] }
 
     getSelectedVersion() { return this.selectedVersion }
 
@@ -45,24 +45,25 @@ class Profile {
         }
 
         const priority = new mod.Priority("High Priority", 255, 128, 0)
-        let newMod = new mod.Mod(url, priority, this.#modList.length)
+        let newMod = new mod.Mod(url, priority, this._modList.length)
 
         await newMod.refresh()
+
         if (newMod.validData()) {
-            this.#modList.push(newMod)
+            this._modList.push(newMod)
         } else {
             throw new Error("Mod does not have valid modrinth data or curseforge data.")
         }
     }
 
     removeMod(index) {
-        if (index < 0 || index >= this.#modList.length) {
+        if (index < 0 || index >= this._modList.length) {
             throw new RangeError(`Tried to remove mod at index ${index}, but that index is out of range!`)
         }
 
-        const mod = this.#modList[index]
+        const mod = this._modList[index]
         if (mod) {
-            this.#modList.splice(index, 1)
+            this._modList.splice(index, 1)
         } else {
             throw new Error(`Tried to remove mod at index ${index}, but it was falsey!`)
         }
@@ -70,7 +71,7 @@ class Profile {
 
     async refresh() {
         await Promise.all(
-            this.#modList.map(async curMod => {
+            this._modList.map(async curMod => {
                 try {
                     await curMod.refresh()
                 } catch (error) {
@@ -82,7 +83,7 @@ class Profile {
 
     async downloadReadyMods(selectedModLoader, preventDownload = false) {
         let downloadLinks = await Promise.all(
-            this.#modList.map(async (curMod) => {
+            this._modList.map(async (curMod) => {
                 try {
                     const link = await curMod.getDownloadLink(selectedModLoader, this.selectedVersion);
                     return link;
@@ -110,21 +111,21 @@ class Profile {
     getPercentReady() {
         let readyMods = 0
 
-        this.#modList.forEach(mod => {
+        this._modList.forEach(mod => {
             if (mod.getVersionList().includes(this.selectedVersion)) {
                 readyMods++
             }
         })
 
-        if (this.#modList.length === 0) {
+        if (this._modList.length === 0) {
             return 0
         } else {
-            return (readyMods / this.#modList.length) * 100
+            return ((readyMods / this._modList.length) * 100).toFixed(2)
         }
     }
 
     createDict() {
-        const modlist = this.#modList.map(mod => mod.createDict())
+        const modlist = this._modList.map(mod => mod.createDict())
         return {
             name: this.name,
             version: this.selectedVersion,
@@ -134,35 +135,33 @@ class Profile {
 }
 
 class ProfileManager {
-    #profileList
-    #priorityList
-    #allowWriteToFile
-    #storageLocation = "profiles"
-    #defaultPriorityList = [
+    _profileList
+    _priorityList
+    _storageLocation = "profiles"
+    _defaultPriorityList = [
         new mod.Priority("High Priority", 255, 128, 0),
         new mod.Priority("Medium Priority", 255, 196, 0),
         new mod.Priority("Low Priority", 255, 255, 0)
     ]
 
-    constructor(profileList = [], priorityList = this.#defaultPriorityList, allowWriteToFile = true) {
-        this.#profileList = profileList
-        this.#priorityList = priorityList
-        this.#allowWriteToFile = allowWriteToFile
+    constructor(profileList = [], priorityList = this._defaultPriorityList) {
+        this._profileList = profileList
+        this._priorityList = priorityList
     }
 
-    getNumProfiles() { return this.#profileList.length }
+    getNumProfiles() { return this._profileList.length }
 
-    getProfileList() { return this.#profileList }
+    getProfileList() { return this._profileList }
 
-    getProfile(index) { this.#profileList[index] }
+    getProfile(index) { return this._profileList[index] }
 
-    getNumPriorities() { return this.#priorityList.length }
+    getNumPriorities() { return this._priorityList.length }
 
-    getPriorityList() { return this.#priorityList }
+    getPriorityList() { return this._priorityList }
 
-    getPriority(index) { this.#priorityList[index] }
+    getPriority(index) { return this._priorityList[index] }
 
-    addProfile(newProfile, profileName = null, saveToFile = true) {
+    addProfile(newProfile, profileName = null) {
         if (!newProfile) {
             throw new Error("Attempted to add a blank profile object to this profile manager.")
         }
@@ -170,42 +169,45 @@ class ProfileManager {
             newProfile.name = profileName
         }
 
-        this.#profileList.push(newProfile)
-        this.#sortModLists()
-
-        if (saveToFile && this.#allowWriteToFile) {
-            this.saveToStorage()
-        }
-    }
-
-    removeProfile(numProfile) {
-        this.#profileList.splice(numProfile, 1)
-        this.#sortModLists()
+        this._profileList.push(newProfile)
+        this._sortModLists()
         this.saveToStorage()
     }
 
-    addPriority(newPriority) { this.#priorityList.push(newPriority) }
+    removeProfile(numProfile) {
+        this._profileList.splice(numProfile, 1)
+        this._sortModLists()
+        this.saveToStorage()
+    }
 
-    removePriority(index) { this.#priorityList.splice(index, 1) }
+    addPriority(newPriority) {
+        this._priorityList.push(newPriority)
+        this.saveToStorage()
+    }
+
+    removePriority(index) {
+        this._priorityList.splice(index, 1)
+        this.saveToStorage()
+    }
+
+    refreshProfiles() {
+        for (const profile of this._profileList) {
+            profile.refresh()
+        }
+        this.saveToStorage()
+    }
 
     saveToStorage() {
-        localStorage.setItem(this.#storageLocation, JSON.stringify(this.#createDict(), null, 4))
+        localStorage.setItem(this._storageLocation, JSON.stringify(this._createDict(), null, 4))
     }
 
-    loadFromStorage() {
-        const storedData = localStorage.getItem('profiles')
-        const parsedData = JSON.parse(storedData)
-
-        this.#importData(parsedData)
+    hash() {
+        return JSON.stringify(this._createDict())
     }
 
-    #importData(data, requireValidModURL = true) {
-        // TODO: loadFromJson.js
-    }
-
-    #createDict() {
-        const profileList = this.#profileList.map(profile => profile.createDict())
-        const priorityList = this.#priorityList.map(priority => priority.createDict())
+    _createDict() {
+        const profileList = this._profileList.map(profile => profile.createDict())
+        const priorityList = this._priorityList.map(priority => priority.createDict())
 
         return {
             profileList,
@@ -213,8 +215,8 @@ class ProfileManager {
         }
     }
 
-    #sortModLists() {
-        for (let profile of this.#profileList) {
+    _sortModLists() {
+        for (let profile of this._profileList) {
             let modlist = profile.getModList()
             modlist.sort((a, b) => a.lessThan(b) ? -1 : 1)
         }

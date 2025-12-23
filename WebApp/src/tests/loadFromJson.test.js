@@ -196,7 +196,7 @@ describe("Dict to Profile", () => {
     })
 
     test("Blank data", () => {
-        expect(() => { loadFromJson.createProfile({}, false) }).toThrowError("data.modlist is not iterable")
+        expect(() => { loadFromJson.createProfile({}, false) }).toThrowError("Cannot load profile from this data. Dictionary is blank.")
         const resultProfile = loadFromJson.createProfile({ modlist: [] }, false)
 
         expect(resultProfile.name).toBe(comparisonProfile_blank.name)
@@ -245,7 +245,7 @@ describe("Dict to Profile Manager", () => {
     })
 
     test("Blank data", () => {
-        expect(() => { loadFromJson.createProfileManager({}) }).toThrowError("dataList is not iterable")
+        expect(() => { loadFromJson.createProfileManager({}) }).toThrowError("Cannot load profile manager from this data. Dictionary is blank")
 
         const resultManager_blankData = loadFromJson.createProfileManager({ profileList: [], priorityList: [] })
         expect(resultManager_blankData.getProfileList()).toStrictEqual(comparisonManager_blank.getProfileList())

@@ -277,6 +277,14 @@ describe("Testing Profile Manager Objects", () => {
         ])
     })
 
+    test("Test Get Profile", () => {
+        const manager = new profile.ProfileManager([new profile.Profile()])
+        const prof = manager.getProfile(0)
+
+        prof.name = "whatup"
+        expect(manager.getProfile(0).name).toBe("whatup")
+    })
+
     test("Add Profiles", () => {
         let managerList = [
             new profile.ProfileManager(),
@@ -345,6 +353,15 @@ describe("Testing Profile Manager Objects", () => {
         expect(manager2.getNumPriorities()).toBe(1)
         manager2.removePriority(0)
         expect(manager2.getNumPriorities()).toBe(0)
+    })
+
+    test("Reload Profiles", () => {
+        let manager = new profile.ProfileManager([
+            new profile.Profile([mod_sodium_modrinth, mod_clothConfig_modrinth, mod_boingBoing_curseforge]),
+            new profile.Profile([mod_entityculling_modrinth, mod_netherHeight_modrinth])
+        ])
+
+        manager.refreshProfiles()
     })
 
     test("Save to Storage", () => {
