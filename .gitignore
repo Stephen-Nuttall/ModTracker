@@ -8,6 +8,7 @@ fonts/demo.html
 *.spec
 *.env*
 API_Keys.js
+WebApp/coverage
 
 # Logs
 logs
