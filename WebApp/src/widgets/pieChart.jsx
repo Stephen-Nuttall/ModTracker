@@ -1,3 +1,4 @@
+import React from "react";
 import '../styles/pieChart.css'
 
 function polarToCartesian(cx, cy, r, angleDeg) {

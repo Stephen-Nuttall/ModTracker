@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React from "react"
 import profileManager from '../data/stateProvider.jsx'
 
 import TableManager from '../widgets/tableManager'
@@ -10,18 +10,17 @@ import EditableText from '../widgets/EditableText'
 import '../styles/detailsWindow.css'
 
 function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
-    const [managerHash, forceRerender] = useState("")
+    const [managerHash, forceRerender] = React.useState("")
 
-    const [priorityPopupOpen, OpenPriorityPopup] = useState(false)
-    const [modToAddPriorityTo, setModToAddPriorityTo] = useState(-1)
-    const [modInput, setModInput] = useState('');
-    const [versionInput, setVersionInput] = useState('');
-    const [funcOutputText, setFuncOutput] = useState('');
+    const [priorityPopupOpen, OpenPriorityPopup] = React.useState(false)
+    const [modToAddPriorityTo, setModToAddPriorityTo] = React.useState(-1)
+    const [modInput, setModInput] = React.useState('');
+    const [versionInput, setVersionInput] = React.useState('');
+    const [funcOutputText, setFuncOutput] = React.useState('');
 
     const profile = profileManager.getProfile(profileIndex)
-    const modlist = profile.getModList()
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (isLoading == true) {
             setFuncOutput("Loading...")
         } else if (funcOutputText == "Loading...") {
@@ -30,10 +29,17 @@ function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
     }, [isLoading])
 
     const addMod = async () => {
-        console.log("adding mod with URL " + modInput)
-        await profile.addMod(modInput)
-        profileManager.saveToStorage()
-        forceRerender(profileManager.hash())
+        try {
+            await profile.addMod(modInput)
+            profileManager.saveToStorage()
+            setFuncOutput("Mod added successfully.")
+        } catch (error) {
+            if (error.name == "Invalid URL") {
+                setFuncOutput("Could not add that mod! Please check the URL and try again.")
+            } else {
+                throw error
+            }
+        }
     }
 
     function reloadProfile() {
@@ -74,7 +80,6 @@ function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
     }
 
     function backToSelectView() {
-        console.log("Going to profile select window")
         setCurProfileIndex(-1)
     }
 
@@ -95,6 +100,7 @@ function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
                         priorityList={profileManager.getPriorityList()}
                         OpenPriorityPopup={OpenPriorityPopup}
                         setModToAddPriorityTo={setModToAddPriorityTo}
+                        forceRerender={forceRerender}
                     />
 
                     <div className="add-mod">

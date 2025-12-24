@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React from "react"
 import profileManager from '../data/stateProvider.jsx'
 
 import TextInputBox from './textInputBox';
@@ -9,7 +9,7 @@ import loadFromJson from '../data/loadFromJson.js'
 import '../styles/popup.css'
 
 function NewProfilePopup({ isOpen = false, setIsOpen, setFuncOutput }) {
-    const [nameInput, setNameInput] = useState("")
+    const [nameInput, setNameInput] = React.useState("")
 
     function createBlankProfile() {
         profileManager.addProfile(new profile.Profile(), nameInput)

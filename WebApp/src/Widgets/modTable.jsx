@@ -1,3 +1,4 @@
+import React from "react"
 import profileManager from '../data/stateProvider.jsx'
 import '../styles/modTable.css';
 
@@ -6,7 +7,12 @@ const ModTable = ({ modList, onPriorityChange, onDelete, selectedVersion }) => {
     const darkTextThreshold = 219
 
     let priorityNames = []
-    for (let i = 0; i < priorityList.length; i++) {
+    let listLength = priorityList?.length
+    if (listLength === undefined) {
+        listLength = 0
+    }
+
+    for (let i = 0; i < listLength; i++) {
         priorityNames.push(priorityList[i].name)
     }
 

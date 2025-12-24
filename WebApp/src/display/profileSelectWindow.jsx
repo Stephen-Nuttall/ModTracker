@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react'
+import React from 'react'
 import profileManager from '../data/stateProvider.jsx'
-
 import NewProfilePopup from '../widgets/newProfilePopup'
 import '../styles/profileSelectWindow.css'
 
 function ProfileSelectWindow({ setCurProfileIndex, isLoading }) {
-    const [managerHash, forceRerender] = useState("")
+    const [managerHash, forceRerender] = React.useState("")
 
-    const [popupOpen, setPopupOpen] = useState(false)
-    const [funcOutputText, setFuncOutput] = useState('')
+    const [popupOpen, setPopupOpen] = React.useState(false)
+    const [funcOutputText, setFuncOutput] = React.useState('')
     const profiles = profileManager.getProfileList()
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (isLoading == true) {
             setFuncOutput("Loading...")
         } else if (funcOutputText == "Loading...") {

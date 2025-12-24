@@ -41,7 +41,9 @@ class Profile {
 
     async addMod(url) {
         if (url === undefined || !(callModrinth.verifyURL(url) || callCurseForge.verifyURL(url))) {
-            throw new Error("URL provided is invalid.")
+            const error = new Error("URL provided is invalid.")
+            error.name = "Invalid URL"
+            throw error
         }
 
         const priority = new mod.Priority("High Priority", 255, 128, 0)

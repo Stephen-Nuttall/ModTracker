@@ -1,9 +1,9 @@
-import { useRef, useState } from "react"
+import React from "react"
 
 function FilePickerButton({ onFileLoaded, acceptedFiles = ".json,application/json", className = '', buttonClassName = '' }) {
-    const inputRef = useRef(null)
-    const [error, setError] = useState(null)
-    const [fileName, setFileName] = useState("")
+    const inputRef = React.useRef(null)
+    const [error, setError] = React.useState(null)
+    const [fileName, setFileName] = React.useState("")
 
     const handleButtonClick = () => {
         setError(null)

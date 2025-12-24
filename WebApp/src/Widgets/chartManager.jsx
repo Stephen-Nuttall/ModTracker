@@ -1,3 +1,4 @@
+import React from "react"
 import PieChart from "./pieChart"
 
 function ChartManager({ profile }) {

@@ -1,3 +1,5 @@
+import React from "react";
+
 const TextInputBox = ({ onTextChange, onPressEnter = () => { }, placeholderText = "", length = 50, className }) => {
     function onKeyDown(e) {
         if (e.key === "Enter") { }

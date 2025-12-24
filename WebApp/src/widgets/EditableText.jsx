@@ -1,13 +1,13 @@
-import { useState, useRef, useEffect } from "react";
+import React from "react"
 
 function EditableText({ value = "", onChange = () => { }, placeholder = "Double-click to edit" }) {
-    const [editing, setEditing] = useState(false);
-    const [draft, setDraft] = useState(value);
-    const inputRef = useRef(null);
+    const [editing, setEditing] = React.useState(false);
+    const [draft, setDraft] = React.useState(value);
+    const inputRef = React.useRef(null);
 
-    useEffect(() => setDraft(value), [value]);
+    React.useEffect(() => setDraft(value), [value]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (editing && inputRef.current) {
             inputRef.current.focus();
             inputRef.current.select();

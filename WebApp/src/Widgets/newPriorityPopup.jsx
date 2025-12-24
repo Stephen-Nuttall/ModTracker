@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React from "react"
 import { SketchPicker } from 'react-color'
 import profileManager from '../data/stateProvider.jsx'
 
@@ -8,8 +8,8 @@ import '../styles/popup.css'
 
 function NewPriorityPopup({ isOpen = false, setIsOpen, modToAddPriorityTo }) {
     const priorityList = profileManager.getPriorityList()
-    const [textInput, setTextInput] = useState("")
-    const [color, setColor] = useState({ r: 255, g: 255, b: 255, a: 1 })
+    const [textInput, setTextInput] = React.useState("")
+    const [color, setColor] = React.useState({ r: 255, g: 255, b: 255, a: 1 })
 
     function createNewPriority() {
         if (textInput === undefined || textInput == "") {
