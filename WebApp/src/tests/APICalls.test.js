@@ -2,6 +2,9 @@ import { expect, test, describe } from 'vitest';
 import callModrinth from '../data/callModrinth.js'
 import callCurseForge from '../data/callCurseForge.js'
 
+import API_Key from "./API_Keys.js"
+vi.stubEnv('VITE_CURSEFORGE_API_KEY', API_Key)
+
 describe('Modrinth API Functions', () => {
     test('verifyURL function', () => {
         expect(callModrinth.verifyURL("https://modrinth.com/mod/sodium/")).toBe(true)
@@ -36,19 +39,55 @@ describe('CurseForge API Functions', () => {
     })
 
     test('ping function', async () => {
-        const result = await callCurseForge.ping()
-        expect(result != null).toBe(true)
+        try {
+            const result = await callCurseForge.ping()
+            expect(result != null).toBe(true)
+        } catch (error) {
+            if (error.name = "API Key could not be fetched") {
+                throw new Error(
+                    "CurseForge API key could not be fetched. "
+                    + "Please create an API_Keys.js file with the following contents:\n."
+                    + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
+                )
+            } else {
+                throw error
+            }
+        }
     })
 
     test('modData function', async () => {
-        const result = await callCurseForge.modData("sodium")
-        expect(result.name).toBe('Sodium')
+        try {
+            const result = await callCurseForge.modData("sodium")
+            expect(result.name).toBe('Sodium')
+        } catch (error) {
+            if (error.name = "API Key could not be fetched") {
+                throw new Error(
+                    "CurseForge API key could not be fetched. "
+                    + "Please create an API_Keys.js file with the following contents:\n."
+                    + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
+                )
+            } else {
+                throw error
+            }
+        }
     })
 
     test('getDownloadLink function', async () => {
-        const modData = await callCurseForge.modData("sodium")
+        try {
+            const modData = await callCurseForge.modData("sodium")
 
-        const result = await callCurseForge.getDownloadLink(modData, "Fabric", "1.21.5")
-        expect(result != false).toBe(true)
+            const result = await callCurseForge.getDownloadLink(modData, "Fabric", "1.21.5")
+            expect(result != false).toBe(true)
+        } catch (error) {
+            if (error.name = "API Key could not be fetched") {
+                throw new Error(
+                    "CurseForge API key could not be fetched. "
+                    + "Please create an API_Keys.js file with the following contents:\n."
+                    + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
+                )
+            } else {
+                throw error
+            }
+        }
     })
 })

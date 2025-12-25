@@ -205,6 +205,7 @@ class ProfileManager {
 
     saveToStorage() {
         localStorage.setItem(this._storageLocation, JSON.stringify(this._createDict(), null, 4))
+        console.log("Data successfully saved to local storage.")
     }
 
     hash() {

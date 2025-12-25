@@ -2,6 +2,9 @@ import { expect, test, describe, vi } from 'vitest';
 import mod from '../data/mod.js'
 import profile from '../data/profile.js'
 
+import API_Key from "./API_Keys.js"
+vi.stubEnv('VITE_CURSEFORGE_API_KEY', API_Key)
+
 const localStorageMock = (() => {
     let store = {};
     return {
@@ -166,19 +169,43 @@ describe("Testing Profile Objects", async () => {
     })
 
     test("Refresh Profile", async () => {
-        let mod_curseforge = new mod.Mod("https://www.curseforge.com/minecraft/mc-mods/sodium")
-        let mod_modrinth = new mod.Mod("https://modrinth.com/mod/cloth-config")
+        try {
+            let mod_curseforge = new mod.Mod("https://www.curseforge.com/minecraft/mc-mods/sodium")
+            let mod_modrinth = new mod.Mod("https://modrinth.com/mod/cloth-config")
 
-        let profile1 = new profile.Profile([mod_curseforge, mod_modrinth, mod_fabricAPI_modrinth])
-        let profile2 = new profile.Profile()
+            let profile1 = new profile.Profile([mod_curseforge, mod_modrinth, mod_fabricAPI_modrinth])
+            let profile2 = new profile.Profile()
 
-        await profile1.refresh()
-        await profile2.refresh()
+            await profile1.refresh()
+            await profile2.refresh()
+        } catch (error) {
+            if (error.name = "API Key could not be fetched") {
+                throw new Error(
+                    "CurseForge API key could not be fetched. "
+                    + "Please create an API_Keys.js file with the following contents:\n."
+                    + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
+                )
+            } else {
+                throw error
+            }
+        }
     })
 
     test("Refresh Profile - Speed Test", async () => {
-        let profileObj = new profile.Profile(longModlist)
-        await profileObj.refresh()
+        try {
+            let profileObj = new profile.Profile(longModlist)
+            await profileObj.refresh()
+        } catch (error) {
+            if (error.name = "API Key could not be fetched") {
+                throw new Error(
+                    "CurseForge API key could not be fetched. "
+                    + "Please create an API_Keys.js file with the following contents:\n."
+                    + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
+                )
+            } else {
+                throw error
+            }
+        }
     })
 
     test("Download Ready Mods - Modrinth", async () => {
@@ -221,47 +248,71 @@ describe("Testing Profile Objects", async () => {
     }, 10000)
 
     test("Download Ready Mods - CurseForge", async () => {
-        let profile1 = new profile.Profile([mod_JEI_curseforge, mod_boingBoing_curseforge])
-        profile1.selectedVersion = "1.21.1"
+        try {
+            let profile1 = new profile.Profile([mod_JEI_curseforge, mod_boingBoing_curseforge])
+            profile1.selectedVersion = "1.21.1"
 
-        const forgeLinks_1 = await profile1.downloadReadyMods("Forge", true)
-        expect(forgeLinks_1[0]).toBeTruthy()
-        expect(forgeLinks_1[1]).toBeFalsy()
+            const forgeLinks_1 = await profile1.downloadReadyMods("Forge", true)
+            expect(forgeLinks_1[0]).toBeTruthy()
+            expect(forgeLinks_1[1]).toBeFalsy()
 
-        const fabricLinks_1 = await profile1.downloadReadyMods("Fabric", true)
-        expect(fabricLinks_1[0]).toBeTruthy()
-        expect(fabricLinks_1[1]).toBeTruthy()
+            const fabricLinks_1 = await profile1.downloadReadyMods("Fabric", true)
+            expect(fabricLinks_1[0]).toBeTruthy()
+            expect(fabricLinks_1[1]).toBeTruthy()
 
-        const neoforgeLinks_1 = await profile1.downloadReadyMods("NeoForge", true)
-        expect(neoforgeLinks_1[0]).toBeTruthy()
-        expect(neoforgeLinks_1[1]).toBeTruthy()
+            const neoforgeLinks_1 = await profile1.downloadReadyMods("NeoForge", true)
+            expect(neoforgeLinks_1[0]).toBeTruthy()
+            expect(neoforgeLinks_1[1]).toBeTruthy()
 
-        const quiltLinks_1 = await profile1.downloadReadyMods("Quilt", true)
-        expect(quiltLinks_1[0]).toBeFalsy()
-        expect(quiltLinks_1[1]).toBeFalsy()
+            const quiltLinks_1 = await profile1.downloadReadyMods("Quilt", true)
+            expect(quiltLinks_1[0]).toBeFalsy()
+            expect(quiltLinks_1[1]).toBeFalsy()
 
-        profile1.selectedVersion = "1.20.1"
+            profile1.selectedVersion = "1.20.1"
 
-        const forgeLinks_2 = await profile1.downloadReadyMods("Forge", true)
-        expect(forgeLinks_2[0]).toBeTruthy()
-        expect(forgeLinks_2[1]).toBeTruthy()
+            const forgeLinks_2 = await profile1.downloadReadyMods("Forge", true)
+            expect(forgeLinks_2[0]).toBeTruthy()
+            expect(forgeLinks_2[1]).toBeTruthy()
 
-        const fabricLinks_2 = await profile1.downloadReadyMods("Fabric", true)
-        expect(fabricLinks_2[0]).toBeTruthy()
-        expect(fabricLinks_2[1]).toBeFalsy()
+            const fabricLinks_2 = await profile1.downloadReadyMods("Fabric", true)
+            expect(fabricLinks_2[0]).toBeTruthy()
+            expect(fabricLinks_2[1]).toBeFalsy()
 
-        const neoforgeLinks_2 = await profile1.downloadReadyMods("NeoForge", true)
-        expect(neoforgeLinks_2[0]).toBeFalsy()
-        expect(neoforgeLinks_2[1]).toBeFalsy()
+            const neoforgeLinks_2 = await profile1.downloadReadyMods("NeoForge", true)
+            expect(neoforgeLinks_2[0]).toBeFalsy()
+            expect(neoforgeLinks_2[1]).toBeFalsy()
 
-        const quiltLinks_2 = await profile1.downloadReadyMods("Quilt", true)
-        expect(quiltLinks_2[0]).toBeFalsy()
-        expect(quiltLinks_2[1]).toBeFalsy()
+            const quiltLinks_2 = await profile1.downloadReadyMods("Quilt", true)
+            expect(quiltLinks_2[0]).toBeFalsy()
+            expect(quiltLinks_2[1]).toBeFalsy()
+        } catch (error) {
+            if (error.name = "API Key could not be fetched") {
+                throw new Error(
+                    "CurseForge API key could not be fetched. "
+                    + "Please create an API_Keys.js file with the following contents:\n."
+                    + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
+                )
+            } else {
+                throw error
+            }
+        }
     }, 10000)
 
     test("Download Ready Mods - Speed Test", async () => {
-        let profileObj = new profile.Profile(longModlist)
-        const downloadLinks = await profileObj.downloadReadyMods("Fabric", true)
+        try {
+            let profileObj = new profile.Profile(longModlist)
+            const downloadLinks = await profileObj.downloadReadyMods("Fabric", true)
+        } catch (error) {
+            if (error.name = "API Key could not be fetched") {
+                throw new Error(
+                    "CurseForge API key could not be fetched. "
+                    + "Please create an API_Keys.js file with the following contents:\n."
+                    + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
+                )
+            } else {
+                throw error
+            }
+        }
     })
 })
 
@@ -355,7 +406,7 @@ describe("Testing Profile Manager Objects", () => {
         expect(manager2.getNumPriorities()).toBe(0)
     })
 
-    test("Reload Profiles", () => {
+    test("Refresh Profiles", () => {
         let manager = new profile.ProfileManager([
             new profile.Profile([mod_sodium_modrinth, mod_clothConfig_modrinth, mod_boingBoing_curseforge]),
             new profile.Profile([mod_entityculling_modrinth, mod_netherHeight_modrinth])

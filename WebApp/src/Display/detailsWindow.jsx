@@ -9,7 +9,7 @@ import EditableText from '../widgets/EditableText'
 
 import '../styles/detailsWindow.css'
 
-function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
+function DetailsWindow({ profileIndex, setCurProfileIndex }) {
     const [managerHash, forceRerender] = React.useState("")
 
     const [priorityPopupOpen, OpenPriorityPopup] = React.useState(false)
@@ -17,6 +17,7 @@ function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
     const [modInput, setModInput] = React.useState('');
     const [versionInput, setVersionInput] = React.useState('');
     const [funcOutputText, setFuncOutput] = React.useState('');
+    const [isLoading, setIsLoading] = React.useState(false)
 
     const profile = profileManager.getProfile(profileIndex)
 
@@ -30,12 +31,20 @@ function DetailsWindow({ profileIndex, setCurProfileIndex, isLoading }) {
 
     const addMod = async () => {
         try {
+            setIsLoading(true)
+
             await profile.addMod(modInput)
             profileManager.saveToStorage()
+
+            setIsLoading(false)
             setFuncOutput("Mod added successfully.")
         } catch (error) {
+            setIsLoading(false)
+
             if (error.name == "Invalid URL") {
                 setFuncOutput("Could not add that mod! Please check the URL and try again.")
+            } else if (error.name == "API Key could not be fetched") {
+                setFuncOutput("Error: CurseForge API key could not be accessed.")
             } else {
                 throw error
             }

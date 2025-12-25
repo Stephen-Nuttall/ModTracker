@@ -5,8 +5,9 @@ import { render, screen, fireEvent, waitFor, within, getByText } from "@testing-
 import DetailsWindow from "../display/detailsWindow"
 import profileManager from "../data/stateProvider.jsx"
 import loadFromJson from "../data/loadFromJson.js"
-import profile from "../data/profile.js"
 
+import API_Key from "./API_Keys.js"
+vi.stubEnv('VITE_CURSEFORGE_API_KEY', API_Key)
 
 const mockSetCurProfileIndex = vi.fn()
 const mockProfile = loadFromJson.createProfile({
@@ -76,11 +77,6 @@ describe("General Widgets", () => {
         expect(mockSetCurProfileIndex).toHaveBeenCalledWith(-1)
     })
 
-    test("displays loading message when isLoading is true", () => {
-        render(<DetailsWindow profileIndex={0} setCurProfileIndex={mockSetCurProfileIndex} isLoading={true} />)
-        expect(screen.getByText("Loading...")).toBeInTheDocument()
-    })
-
     test("download ready mods", () => {
         const profile = profileManager.getProfile(0)
         const downloadModsSpy = vi.spyOn(profile, "downloadReadyMods")
@@ -120,8 +116,17 @@ describe("Mod Table", () => {
         fireEvent.click(addButton)
 
         await waitFor(() => expect(addModSpy).toHaveBeenCalled())
-        await screen.findByText(/Ice Cream/i)
-        expect(screen.getByText(/Ice Cream/i)).toBeInTheDocument()
+
+        try {
+            await screen.findByText(/Ice Cream/i)
+            expect(screen.getByText(/Ice Cream/i)).toBeInTheDocument()
+        } catch (error) {
+            if (error.name == "TestingLibraryElementError") {
+                throw new Error("Could not find /Ice Cream/i in document.")
+            } else {
+                throw error
+            }
+        }
     })
 
     test("Add mod (with invalid link)", async () => {

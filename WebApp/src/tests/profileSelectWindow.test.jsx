@@ -8,6 +8,9 @@ import ProfileSelectWindow from "../display/profileSelectWindow.jsx"
 import { describe, test, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
+import API_Key from "./API_Keys.js"
+vi.stubEnv('VITE_CURSEFORGE_API_KEY', API_Key)
+
 vi.mock('../widgets/newProfilePopup', () => ({
     default: () => <div data-testid="new-profile-popup" />
 }))
@@ -62,28 +65,6 @@ test('calls setCurProfileIndex when tile is clicked', () => {
 
     fireEvent.click(screen.getByText('Mock Profile').closest('.tile'))
     expect(mockSetCurProfileIndex).toHaveBeenCalledWith(0)
-})
-
-test('displays "Loading..." when isLoading is true', async () => {
-    const { rerender } = render(<ProfileSelectWindow setCurProfileIndex={mockSetCurProfileIndex} isLoading={false} />)
-
-    rerender(<ProfileSelectWindow setCurProfileIndex={mockSetCurProfileIndex} isLoading={true} />)
-
-    await waitFor(() => {
-        expect(screen.getByText('Loading...')).toBeInTheDocument()
-    })
-})
-
-test('clears loading text when isLoading becomes false', async () => {
-    const { rerender } = render(<ProfileSelectWindow setCurProfileIndex={mockSetCurProfileIndex} isLoading={true} />)
-
-    await waitFor(() => expect(screen.getByText('Loading...')).toBeInTheDocument())
-
-    rerender(<ProfileSelectWindow setCurProfileIndex={mockSetCurProfileIndex} isLoading={false} />)
-
-    await waitFor(() => {
-        expect(screen.queryByText('Loading...')).not.toBeInTheDocument()
-    })
 })
 
 test('removes profile when close button is clicked', () => {

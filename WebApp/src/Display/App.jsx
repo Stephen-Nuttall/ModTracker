@@ -7,7 +7,6 @@ import DetailsWindow from './detailsWindow.jsx'
 function App() {
     const [curProfileIndex, setProfileIndex] = useState(-1)
     const [output, setOutput] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
 
     const displaySelectWindow = curProfileIndex < 0 || curProfileIndex >= profileManager.getNumProfiles()
 
@@ -18,7 +17,6 @@ function App() {
         return (
             <ProfileSelectWindow
                 setCurProfileIndex={setProfileIndex}
-                isLoading={isLoading}
             />
         )
     } else {
@@ -27,7 +25,6 @@ function App() {
                 profileIndex={curProfileIndex}
                 setCurProfileIndex={setProfileIndex}
                 functionOutputText={output}
-                isLoading={isLoading}
             />
         )
     }

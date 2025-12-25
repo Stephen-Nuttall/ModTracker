@@ -174,9 +174,6 @@ class Mod {
             throw error
         }
 
-        if (downloadLink == false) {
-            console.log(`Download link for ${this._name} is ${downloadLink}`)
-        }
         return downloadLink
     }
 

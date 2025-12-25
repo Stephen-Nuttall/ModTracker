@@ -3,11 +3,12 @@ import profileManager from '../data/stateProvider.jsx'
 import NewProfilePopup from '../widgets/newProfilePopup'
 import '../styles/profileSelectWindow.css'
 
-function ProfileSelectWindow({ setCurProfileIndex, isLoading }) {
+function ProfileSelectWindow({ setCurProfileIndex }) {
     const [managerHash, forceRerender] = React.useState("")
 
     const [popupOpen, setPopupOpen] = React.useState(false)
     const [funcOutputText, setFuncOutput] = React.useState('')
+    const [isLoading, setIsLoading] = React.useState(false)
     const profiles = profileManager.getProfileList()
 
     React.useEffect(() => {
@@ -19,7 +20,6 @@ function ProfileSelectWindow({ setCurProfileIndex, isLoading }) {
     }, [isLoading])
 
     function onTileClick(tileNum) {
-        console.log("Going to details window for profile #" + tileNum)
         setCurProfileIndex(tileNum)
     }
 

@@ -14,22 +14,33 @@ function verifyURL(url) {
 const _genericCurseforgeCall = async (url, requestParameters = {}) => {
     // Load API key. There are two potential places where the API key may be found:
     // A) in the environment variables (import.meta.env.CURSEFORGE_API_KEY). If it's not there, try
-    // B) in '../API_Keys.js', which if it exists, contains export const CurseForge = "API KEY GOES HERE."
+    // B) in 'public/API_Keys.json', which if it exists, contains export const CurseForge = "API KEY GOES HERE."
     // If neither work, abort immediately.
+
     let apiKey = import.meta.env.CURSEFORGE_API_KEY
+
+    if (apiKey === undefined || apiKey == "undefined") {
+        apiKey = import.meta.env.VITE_CURSEFORGE_API_KEY
+    }
+
     if (apiKey === undefined || apiKey == "undefined") {
         try {
-            const APIKeyFile = await import('../API_Keys.js')
-            apiKey = APIKeyFile.CurseForge
+            const res = await fetch('/ModTracker/API_Keys.json')
+        } catch {
+            const error = new Error("CURSEFORGE API KEY COULD NOT BE FETCHED. Attempt was made to fetch" +
+                " the key from import.meta.env.CURSEFORGE_API_KEY. When that failed, an attempt was" +
+                " made to fetch the key from 'public/API_Keys.json', but that file could not be found.")
+            error.name = "API Key could not be fetched"
+            throw error
+        }
 
-            if (apiKey === undefined || apiKey == "undefined") {
-                throw new Error("API key reassign using '../API_Keys.js' failed.")
-            }
-        } catch (error) {
-            throw new Error("CURSEFORGE API KEY IS UNDEFINED. Attempt was made to fetch" +
-                " the key from import.meta.env.CURSEFORGE_API_KEY. When that failed, an" +
-                " attempt was made to fetch the key from '../API_Keys.js', which also" +
-                " failed. Additional info: " + error.message)
+        if (res.ok) {
+            const json = await res.json()
+            apiKey = json.CurseForge
+        } else {
+            const error = new Error("CURSEFORGE API KEY COULD NOT BE FETCHED. 'public/API_Keys.json' was found but could not be read.")
+            error.name = "API Key could not be fetched"
+            throw error
         }
     }
 

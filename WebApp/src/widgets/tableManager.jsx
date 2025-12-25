@@ -21,8 +21,8 @@ const TableManager = ({ profile, OpenPriorityPopup, setModToAddPriorityTo, force
 
             if (priority !== undefined) {
                 mod.priority = priority
+                profileManager.saveToStorage()
                 forceRerender(profileManager.hash())
-                console.log(`'${mod.getName()}' has been set to '${priority.name}'`)
             } else {
                 throw new Error("Could not update priority. Priority object at given index is undefined.")
             }
@@ -33,6 +33,7 @@ const TableManager = ({ profile, OpenPriorityPopup, setModToAddPriorityTo, force
 
     const handleDelete = async (tableIndex) => {
         profile.removeMod(tableIndex)
+        profileManager.saveToStorage()
         forceRerender(profileManager.hash())
     }
 
