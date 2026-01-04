@@ -12,8 +12,7 @@ Mod Tracker is a website that keeps track of the mods you're waiting on to updat
 
 **[Visit Mod Tracker Here!](https://stephen-nuttall.github.io/ModTracker/)**
 
-[...or download the desktop app here!](https://github.com/Stephen-Nuttall/ModTracker/releases)
-[Click here for download instructions](#how-to-download-desktop-app)
+[...or download the desktop app here!](https://github.com/Stephen-Nuttall/ModTracker/releases) *[Click here for download instructions](#how-to-download-desktop-app)*
 
 Screenshot of Mod Tracker Web:
 ![Screenshot - Mod Tracker Web](assets/screenshot%203.png)
@@ -24,15 +23,14 @@ Screenshot of Mod Tracker Desktop:
 *Please note that both the website and desktop app are still in beta, so expect some bugs. If you encounter a bug or have ideas to improve Mod Tracker, create an issue on our [issues page](https://github.com/Stephen-Nuttall/ModTracker/issues).*
 
 
-## Changes in Beta 5.0
-- **New web version!!!** Mod Tracker is now available at https://stephen-nuttall.github.io/ModTracker/. The web version has all the same features as the desktop app, except for importing a profile from your mods folder.
-- UI elements in the desktop app now scale with Windows' scale setting (found under display settings). This will prevent graphical issues when this setting isn't set to 100%, such as most of the UI rendering off-screen. Note that the desktop app still does not scale with resolution or window sizes.
-- Bugfixes and refactoring.
-
-If there are any issues with this version Mod Tracker, report it on our [issues page](https://github.com/Stephen-Nuttall/ModTracker/issues).
+## Changes in Beta 6.0
+- **Massive performance improvements for the web app!** The front end and backend servers have been merged into one after rewriting the entire back end in javascript. The initial two server approach turned out to be really inefficent and unnecessary for this project.
+- Bugfixes, as well as a new suite of unit tests for the web app.
 
 
-## How to Download Desktop App
+## How to Download Mod Tracker Desktop
+Mod Tracker also has an app for Windows!
+> Please note that Mod Tracker is not recognized by Windows and it will trigger a warning when you try to install it. If you do not feel comfortable brushing off theis warning (which is completely understandable), we recommend you [visit the web version of Mod Tracker](https://stephen-nuttall.github.io/ModTracker/).
 1. Go to our [releases page](https://github.com/Stephen-Nuttall/ModTracker/releases).
 2. Open the assets dropdown on the latest release, and download the installer.
 3. Run the installer, and you should be good!
@@ -42,29 +40,36 @@ Alternatively, you can install the executable directly from the latest action on
 
 ## Technical Details
 For those who want to clone this repository, here's some helpful information.
-- Mod Tracker Web uses a React front end that talks to a python backend server.
-- Mod Tracker Desktop is a python app whose front end is built with the PyQt6 library.
-- The frontends for each app are in the WebApp and DesktopApp folders respectively. The backend code, which is shared between the two, is in the Backend folder.
+- Mod Tracker Web uses React and Nodejs running on one web server. The files for the web app can be found entirely in the WebApp folder, and you should run your npm commands from that directory.
+- Mod Tracker Desktop is a python app whose front end is built with the PyQt6 library. The files for the desktop app can be found entirely in the DesktopApp folder.
 
-Required Python libraries:
-- requests
-- (for web app only) fastapi
-- (for desktop app only) PyQt6
-- (for desktop app only) PyQt6-Charts
-- (for desktop app only) levenshtein
+### Instructions for Mod Tracker Web:
+To run the web app in your development environment:
+- Install nodejs. Verify the installation by running `node -v `and `npm -v`.
+- Ensure your are in the WebApp directory.
+- Run `npm install` to install dependencies listed in package.json.
+- Run `npm run dev` to start the development server. The site can be found at http://localhost:5173/ by default.
 
-To run Mod Tracker Web in your IDE:
-- Install Python 3 and the required libraries listed above (You do not need to install ones used for the desktop app).
-- Ensure localhost ports 5173 and 8000 are available.
-- In your python virtual environment and from the WebApp directory, run `./runServers.ps1`. (Note: this script accepts an optional -Path argument. Example use: `./WebApp/runServers.ps1 -Path "./WebApp"`)
-- Open http://localhost:5173/ in your web browser.
-- To build and run the web app for production, start by `cd`ing to the WebApp folder
-    - run `npm run build` and `npm run preview --host` to build and run the front end.
-    - run `python -m uvicorn pyServer:app --reload --host 0.0.0.0` to run the back end.
+To build and run the web app for production:
+- Ensure your are in the WebApp directory.
+- run `npm run build` and `npm run preview --host` to build and run the front end.
+- run `python -m uvicorn pyServer:app --reload --host 0.0.0.0` to run the back end.
 
-To run Mod Tracker Desktop in your IDE:
-- Install Python 3 and the required libraries listed above (You do not need to install ones used for the web app).
-- Create a file called API_Keys.py and create a variable inside it called CurseForge. Set it to your API key for CurseForge. Do not use our API key for your project.
+To run the unit tests for the web app:
+- Ensure you are in the WebApp directory.
+- Make a file in the tests directory called API_Keys.js. Set it to have the following contents:
+```
+const CurseForge = "!!! YOUR CURSEFORGE API KEY HERE !!!"
+export default CurseForge
+```
+This is a simple way to inject the API key into the tests, as the test server cannot read the public folder. **Do not use our internal API key for your project.**
+- Run `npm run test`. You can also generate a test converage report with `npm run test_coverage`.
+
+### Instructions for Mod Tracker Desktop:
+To run the desktop app in your development environment:
+- Install Python 3
+- Install the required libraries using pip: requests, PyQt6, PyQt6-Charts, and levenshtein
+- Create a file called API_Keys.py in the DesktopApp folder and create a variable inside it called CurseForge. Set it to your API key for CurseForge. **Do not use our internal API key for your project.**
 - Run `DesktopApp/main.py`.
 
 To generate your own executable:
@@ -78,4 +83,4 @@ To generate your own installer:
 
 To run unit tests, run the tests.py file. You can also test specific modules using a file with the test_ prefix, found in the tests directory.
 
-<sup> README updated 11/20/2025 (unless I forgot to update this)
+<sup> README updated 1/3/2026 (unless I forgot to update this)

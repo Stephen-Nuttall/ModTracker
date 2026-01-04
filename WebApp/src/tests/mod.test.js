@@ -151,7 +151,7 @@ describe("Testing Mod Objects", () => {
         expect(downloadLink_2).toBe("https://edge.forgecdn.net/files/6382/664/sodium-fabric-0.6.13%2bmc1.21.5.jar")
 
         const downloadLink_3 = await mod_JEI_curseforge.getDownloadLink("Forge", "1.21.1")
-        expect(downloadLink_3).toBe("https://edge.forgecdn.net/files/7364/647/jei-1.21.1-forge-19.27.0.335.jar")
+        expect(downloadLink_3).toBe("https://edge.forgecdn.net/files/7391/681/jei-1.21.1-forge-19.27.0.336.jar")
 
         const downloadLink_4 = await mod_boingBoing_curseforge.getDownloadLink("Fabric", "1.21.1")
         expect(downloadLink_4).toBe("https://edge.forgecdn.net/files/7284/964/boingboingitem-fabric-1.21.1-0.2.jar")
