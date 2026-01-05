@@ -29,10 +29,10 @@ function ProfileSelectWindow({ setCurProfileIndex }) {
         forceRerender(profileManager.hash() + " ")
     }
 
-    function editProfile(index) {
-        console.log("placeholder")
-        forceRerender(profileManager.hash())
-    }
+    // function editProfile(index) {
+    //     console.log("placeholder")
+    //     forceRerender(profileManager.hash())
+    // }
 
     return (
         <div className='profile-select-container'>

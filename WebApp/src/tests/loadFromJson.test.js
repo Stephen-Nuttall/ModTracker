@@ -62,6 +62,15 @@ const modData_onlyOptionalParams = {
     versions: ["1.21.11", "1.21.10", "1.21.9"],
 }
 
+const modData_blankPriorityData = {
+    priority: {},
+    name: "Fully defined mod",
+    id: 158932801,
+    url: "https://modrinth.com/mod/sodium/",
+    versions: ["1.21.11", "1.21.10", "1.21.9"],
+    tablePosition: 2
+}
+
 const comparisonMod_onlyOptionalParams = new mod.Mod(
     undefined,
     undefined,
@@ -154,6 +163,18 @@ describe("Dict to Mod", () => {
         const resultMod_refreshed = loadFromJson.createMod(data_refreshed)
         expect(comparisonMod.equals(resultMod_refreshed)).toBe(true)
     })
+
+    test("Blank data", () => {
+        expect(() => { loadFromJson.createMod({}) }).toThrowError("Cannot load mod from this data. Dictionary is blank.")
+    })
+
+    test("Undefined data", () => {
+        expect(() => { loadFromJson.createMod(undefined) }).toThrowError("Cannot load mod from this data. Data is undefined.")
+    })
+
+    test("Blank or undefined priority data", () => {
+        expect(() => { loadFromJson.createMod(modData_blankPriorityData) }).toThrowError("Cannot load priority from this data. Dictionary is blank.")
+    })
 })
 
 describe("Dict to Profile", () => {
@@ -203,6 +224,10 @@ describe("Dict to Profile", () => {
         expect(resultProfile.version).toBe(comparisonProfile_blank.version)
         expect(resultProfile.getModList()).toStrictEqual([])
     })
+
+    test("Undefined data", () => {
+        expect(() => { loadFromJson.createProfile(undefined, false) }).toThrowError("Cannot load profile from this data. Data is undefined.")
+    })
 })
 
 describe("Dict to Profile Manager", () => {
@@ -250,5 +275,9 @@ describe("Dict to Profile Manager", () => {
         const resultManager_blankData = loadFromJson.createProfileManager({ profileList: [], priorityList: [] })
         expect(resultManager_blankData.getProfileList()).toStrictEqual(comparisonManager_blank.getProfileList())
         expect(resultManager_blankData.getPriorityList() == comparisonManager_blank.getPriorityList()).toBe(false) // default priority list
+    })
+
+    test("Undefined data", () => {
+        expect(() => { loadFromJson.createProfileManager(undefined) }).toThrowError("Cannot load profile manager from this data. Data is undefined.")
     })
 })

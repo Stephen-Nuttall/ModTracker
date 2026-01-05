@@ -12,7 +12,10 @@ function FilePickerButton({ onFileLoaded, acceptedFiles = ".json,application/jso
 
     const handleFileChange = async (e) => {
         const file = e.target.files && e.target.files[0]
-        if (!file) return
+        if (!file) {
+            console.log("No file selected.")
+            return
+        }
         setFileName(file.name)
 
         try {
@@ -54,6 +57,7 @@ function FilePickerButton({ onFileLoaded, acceptedFiles = ".json,application/jso
                 accept={acceptedFiles}
                 style={{ display: "none" }}
                 onChange={handleFileChange}
+                data-testid="file-input"
             />
 
             {fileName && <div style={{ textAlign: "center" }}>Selected: {fileName}</div>}

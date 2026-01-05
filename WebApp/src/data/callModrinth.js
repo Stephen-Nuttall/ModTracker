@@ -32,6 +32,18 @@ const _genericModrinthCall = async (url, requestParameters = {}) => {
         }
     }
 
+    // const rateLimitLimit = parseInt(response.headers.get('x-ratelimit-limit'))
+    // const rateLimitRemaining = parseInt(response.headers.get('x-ratelimit-remaining'))
+    // const rateLimitReset = parseInt(response.headers.get('x-ratelimit-reset'))
+
+    // if (rateLimitRemaining == 0) {
+    //     console.warn("Modrinth API rate limit met! This call had to wait until the limit reset.")
+    // } else if (rateLimitRemaining <= rateLimitLimit * 0.1) {
+    //     console.log(`Approaching Modrinth API rate limit! Limit remaining: ${rateLimitRemaining}/${rateLimitLimit}. Limit will reset in ${rateLimitReset} seconds.`)
+    // } else {
+    //     console.debug(`Modrinth API rate limit remaining: ${rateLimitRemaining}/${rateLimitLimit}. Limit will reset in ${rateLimitReset} seconds.`)
+    // }
+
     const statusCode = response.status
     const text = await response.text()
 
