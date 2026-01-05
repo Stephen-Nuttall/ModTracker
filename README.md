@@ -45,42 +45,49 @@ For those who want to clone this repository, here's some helpful information.
 
 ### Instructions for Mod Tracker Web:
 To run the web app in your development environment:
-- Install nodejs. Verify the installation by running `node -v `and `npm -v`.
-- Ensure your are in the WebApp directory.
-- Run `npm install` to install dependencies listed in package.json.
-- Run `npm run dev` to start the development server. The site can be found at http://localhost:5173/ by default.
+1. Install nodejs. Verify the installation by running `node -v `and `npm -v`.
+2. Ensure your are in the WebApp directory.
+3. Inject the API key into the project using environment variables OR a json file.
+    - These are easy ways to inject the API key into the project without exposing it on our GitHub page. **Do not use our internal API key for your project.**
+    - Environment variable approach: Set an enviroment variable CURSEFORGE_API_KEY or VITE_CURSEFORGE_API_KEY to your API key.
+    - JSON file approach:
+        - Create a public folder if it doesn't already exist, and add a file called API_Keys.json to it.
+        - Set it to have the following contents: `{ "CurseForge": "!!! YOUR CURSEFORGE API KEY HERE !!!" }`.
+4. Run `npm install` to install dependencies listed in package.json.
+5. Run `npm run dev` to start the development server. The site can be found at http://localhost:5173/ by default.
 
 To build and run the web app for production:
-- Ensure your are in the WebApp directory.
-- run `npm run build` and `npm run preview --host` to build and run the front end.
-- run `python -m uvicorn pyServer:app --reload --host 0.0.0.0` to run the back end.
+1. Follow the steps for running the web app in your development environment first.
+2. Ensure your are in the WebApp directory.
+3. run `npm run build` and `npm run preview --host` to build and run.
 
 To run the unit tests for the web app:
-- Ensure you are in the WebApp directory.
-- Make a file in the tests directory called API_Keys.js. Set it to have the following contents:
-```
-const CurseForge = "!!! YOUR CURSEFORGE API KEY HERE !!!"
-export default CurseForge
-```
-This is a simple way to inject the API key into the tests, as the test server cannot read the public folder. **Do not use our internal API key for your project.**
-- Run `npm run test`. You can also generate a test converage report with `npm run test_coverage`.
+1. Follow the steps for running the web app in your development environment first.
+2. Ensure you are in the WebApp directory.
+3. Make a file in the tests directory called API_Keys.js.
+    - Set it to have the following contents: `const CurseForge = "!!! YOUR CURSEFORGE API KEY HERE !!!"; export default CurseForge;`
+    - This is only required for running tests with vitest. The vitest server cannot read the public folder and this is easier and more reliable than injecting an environment variable.
+    - **Do not use our internal API key for your project.**
+4. Run `npm run test`. You can also generate a test converage report with `npm run test_coverage`.
 
 ### Instructions for Mod Tracker Desktop:
 To run the desktop app in your development environment:
-- Install Python 3
-- Install the required libraries using pip: requests, PyQt6, PyQt6-Charts, and levenshtein
-- Create a file called API_Keys.py in the DesktopApp folder and create a variable inside it called CurseForge. Set it to your API key for CurseForge. **Do not use our internal API key for your project.**
-- Run `DesktopApp/main.py`.
+1. Install Python 3 and open the DesktopApp directory in a python virtual environment
+2. Install the required libraries using pip: requests, PyQt6, PyQt6-Charts, and levenshtein
+3. Create a file called API_Keys.py in the DesktopApp folder and create a variable inside it called CurseForge. Set it to your API key for CurseForge. **Do not use our internal API key for your project.**
+4. Run `DesktopApp/main.py`.
 
 To generate your own executable:
-- Install the pyinstaller library (make sure you also have other libraries installed).
-- Run `pyinstaller --name "Mod Tracker" --onefile --noconsole --icon=assets/icon.ico --paths="." DesktopApp/main.py --add-data "fonts/fontello.ttf;fonts" --add-data "Backend;Backend"`.
-- The executable can then be found in the newly generated dist directory.
+1. Follow the steps for running the desktop app in your development environment first.
+2. Install the pyinstaller library (make sure you also have other libraries installed).
+3. Run `pyinstaller --name "Mod Tracker" --onefile --noconsole --icon=assets/icon.ico --paths="." DesktopApp/main.py --add-data "fonts/fontello.ttf;fonts" --add-data "Backend;Backend"`.
+4. The executable can then be found in the newly generated dist directory.
 
 To generate your own installer:
-- Download [Inno Setup](https://jrsoftware.org/isinfo.php).
-- Run inno setup script.iss with Inno Setup. Make sure you've already built the executable.
+1. Follow the steps for running the desktop app in your development environment first.
+2. Download [Inno Setup](https://jrsoftware.org/isinfo.php).
+3. Run inno setup script.iss with Inno Setup. Make sure you've already built the executable.
 
 To run unit tests, run the tests.py file. You can also test specific modules using a file with the test_ prefix, found in the tests directory.
 
-<sup> README updated 1/3/2026 (unless I forgot to update this)
+<sup> README updated 1/4/2026 (unless I forgot to update this)

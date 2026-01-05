@@ -20,6 +20,7 @@ function ProfileSelectWindow({ setCurProfileIndex }) {
     }, [isLoading])
 
     function onTileClick(tileNum) {
+        profileManager.refreshPriorityList()
         setCurProfileIndex(tileNum)
     }
 

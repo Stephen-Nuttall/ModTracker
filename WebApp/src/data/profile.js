@@ -101,11 +101,13 @@ class Profile {
             })
         );
 
-        downloadLinks.forEach(link => {
-            if (link && !preventDownload) {
-                window.open(link, "_blank")
+        if (!preventDownload) {
+            for (const link of downloadLinks) {
+                if (link) {
+                    window.open(link, "_blank")
+                }
             }
-        })
+        }
 
         return downloadLinks
     }
@@ -206,6 +208,26 @@ class ProfileManager {
     saveToStorage() {
         localStorage.setItem(this._storageLocation, JSON.stringify(this._createDict(), null, 4))
         console.log("Data successfully saved to local storage.")
+    }
+
+    // ensures that all priorities used by mods are in the priority list
+    refreshPriorityList() {
+        for (const profile of this._profileList) {
+            for (const mod of profile.getModList()) {
+                const modPriority = mod.priority
+                let priorityExists = false
+                for (const existingPriority of this._priorityList) {
+                    if (modPriority.name === existingPriority.name) {
+                        priorityExists = true
+                        break
+                    }
+                }
+
+                if (!priorityExists) {
+                    this._priorityList.push(modPriority)
+                }
+            }
+        }
     }
 
     hash() {

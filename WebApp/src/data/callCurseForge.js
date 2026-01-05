@@ -13,7 +13,7 @@ function verifyURL(url) {
 
 const _genericCurseforgeCall = async (url, requestParameters = {}) => {
     // Load API key. There are two potential places where the API key may be found:
-    // A) in the environment variables (import.meta.env.CURSEFORGE_API_KEY). If it's not there, try
+    // A) in the environment variables (import.meta.env.CURSEFORGE_API_KEY or import.meta.env.VITE_CURSEFORGE_API_KEY). If it's not there, try
     // B) in 'public/API_Keys.json', which if it exists, contains export const CurseForge = "API KEY GOES HERE."
     // If neither work, abort immediately.
 
@@ -23,25 +23,31 @@ const _genericCurseforgeCall = async (url, requestParameters = {}) => {
         apiKey = import.meta.env.VITE_CURSEFORGE_API_KEY
     }
 
-    if (apiKey === undefined || apiKey == "undefined") {
-        try {
+    try {
+        if (apiKey === undefined || apiKey == "undefined") {
             const res = await fetch('/ModTracker/API_Keys.json')
-        } catch {
-            const error = new Error("CURSEFORGE API KEY COULD NOT BE FETCHED. Attempt was made to fetch" +
-                " the key from import.meta.env.CURSEFORGE_API_KEY. When that failed, an attempt was" +
-                " made to fetch the key from 'public/API_Keys.json', but that file could not be found.")
-            error.name = "API Key could not be fetched"
-            throw error
-        }
 
-        if (res.ok) {
-            const json = await res.json()
-            apiKey = json.CurseForge
-        } else {
-            const error = new Error("CURSEFORGE API KEY COULD NOT BE FETCHED. 'public/API_Keys.json' was found but could not be read.")
-            error.name = "API Key could not be fetched"
-            throw error
+            if (res === undefined) {
+                const undefinedError = new Error("API_Keys.json was found but response came back undefined.")
+                undefinedError.name = "API Key could not be fetched"
+                throw undefinedError
+            }
+
+            if (res.ok) {
+                const json = await res.json()
+                apiKey = json.CurseForge
+            } else {
+                const badStatusError = new Error("API_Keys.json was found but could not be read. Response status: " + res.status)
+                badStatusError.name = "API Key could not be fetched"
+                throw badStatusError
+            }
         }
+    } catch (error) {
+        const genericAPIFetchError = new Error("CURSEFORGE API KEY COULD NOT BE FETCHED. Attempt was made to fetch" +
+            " the key from import.meta.env.CURSEFORGE_API_KEY. When that failed, an attempt was" +
+            " made to fetch the key from 'public/API_Keys.json', but that file could not be found.")
+        genericAPIFetchError.name = "API Key could not be fetched"
+        throw genericAPIFetchError
     }
 
     let response
@@ -62,7 +68,7 @@ const _genericCurseforgeCall = async (url, requestParameters = {}) => {
                 `CurseForge API request timed out after ${_requestTimeout} seconds`
             )
         } else {
-            throw new Error(`Failed to reach CurseForge API. ${error.message}`)
+            throw new Error(`Failed to reach CurseForge API. ${error.name}: ${error.message}`)
         }
     }
 
@@ -85,6 +91,11 @@ const ping = async () => {
 }
 
 const modData = async (mod_slug) => {
+    if (mod_slug === undefined) {
+        let error = new Error("Mod slug provided is undefined.")
+        error.name = "Mod Slug Undefined"
+        throw error
+    }
     const url = `https://api.curseforge.com/v1/mods/search?gameId=432&slug=${mod_slug}`
     const json = await _genericCurseforgeCall(url)
 
@@ -99,7 +110,9 @@ const modData = async (mod_slug) => {
     }
     catch (error) {
         if (error instanceof RangeError) {
-            throw new Error(`No search results were found for slug '${mod_slug}'`)
+            let searchError = new Error(`No search results were found for slug '${mod_slug}'`)
+            searchError.name = "No Results Found"
+            throw searchError
         } else {
             throw error
         }

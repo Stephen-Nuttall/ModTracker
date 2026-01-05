@@ -140,18 +140,12 @@ class Mod {
     async refresh() {
         await this._callAPIs()
 
-        if (callModrinth.verifyURL(this._url)) {
-            if (this._modrinthData) {
-                this._extractModrinth()
-            } else if (this._curseforgeData) {
-                this._extractCurseforge()
-            }
-        } else if (callCurseForge.verifyURL(this._url)) {
-            if (this._curseforgeData) {
-                this._extractCurseforge()
-            } else if (this._modrinthData) {
-                this._extractModrinth()
-            }
+        if (this._modrinthData) {
+            this._extractModrinth()
+        }
+
+        if (this._curseforgeData) {
+            this._extractCurseforge()
         }
     }
 
