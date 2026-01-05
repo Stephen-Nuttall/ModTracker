@@ -6,7 +6,7 @@ import TextInputBox from './textInputBox'
 import mod from '../data/mod.js'
 import '../styles/popup.css'
 
-function NewPriorityPopup({ isOpen = false, setIsOpen, modToAddPriorityTo }) {
+function NewPriorityPopup({ isOpen = false, setIsOpen, modToAddPriorityTo, setOutput }) {
     const priorityList = profileManager.getPriorityList()
     const [textInput, setTextInput] = React.useState("")
     const [color, setColor] = React.useState({ r: 255, g: 255, b: 255, a: 1 })
@@ -14,9 +14,11 @@ function NewPriorityPopup({ isOpen = false, setIsOpen, modToAddPriorityTo }) {
     function createNewPriority() {
         if (textInput === undefined || textInput == "") {
             console.log("Failed to add priority level: PriorityName (" + textInput + ") is invalid.")
+            setOutput("Error creating priority level.")
             return
         } else if (modToAddPriorityTo == -1) {
             console.log("Failed to add priority level: modToAddPriorityTo (" + modToAddPriorityTo + ") is not set.")
+            setOutput("Error creating priority level.")
             return
         } else {
             let priorityNames = []
@@ -26,7 +28,7 @@ function NewPriorityPopup({ isOpen = false, setIsOpen, modToAddPriorityTo }) {
 
             if (priorityNames.includes(textInput)) {
                 console.log("Failed to add priority level: There is already a priority named " + textInput + " in the priority list.")
-                setOutput("Can't create priority level. There is already a priority level named '" + textInput + "'!")
+                setOutput("Can't create priority level. There is already a priority level named '" + textInput + "'")
                 return
             } else {
                 const priority = new mod.Priority(textInput, color.r, color.g, color.b)
@@ -61,6 +63,7 @@ function NewPriorityPopup({ isOpen = false, setIsOpen, modToAddPriorityTo }) {
                                 color={color}
                                 onChange={handleColorChange}
                                 className='colorPicker'
+                                testid='color-picker'
                             />
                         </div>
                         <div className='popupButtonArea'>

@@ -160,6 +160,7 @@ function DetailsWindow({ profileIndex, setCurProfileIndex }) {
                 setIsOpen={OpenPriorityPopup}
                 profileManager={profileManager}
                 modToAddPriorityTo={modToAddPriorityTo}
+                setOutput={setFuncOutput}
             />
         </>
     );
