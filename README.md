@@ -24,8 +24,11 @@ Screenshot of Mod Tracker Desktop:
 
 
 ## Changes in Beta 6.0
-- **Massive performance improvements for the web app!** The front end and backend servers have been merged into one after rewriting the entire back end in javascript. The initial two server approach turned out to be really inefficent and unnecessary for this project.
+- **Massive performance improvements for the web app!** The frontend and backend servers have been merged into one after rewriting the entire back end in javascript. The initial two server approach turned out to be really inefficent and unnecessary for this project.
+- Pressing Enter when typing in the Add Mod textbox will add the mod to the profile. Pressing Enter when typing in the "Enter new version" textbox will refresh the profile.
 - Bugfixes, as well as a new suite of unit tests for the web app.
+
+Next update, I hope to add more quality of life features rather than backend changes. 🙂
 
 
 ## How to Download Mod Tracker Desktop

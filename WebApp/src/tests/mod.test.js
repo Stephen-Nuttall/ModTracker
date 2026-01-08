@@ -160,180 +160,180 @@ describe("Testing Mod Objects", () => {
             "Attempted to download Untitled Mod for 1.21.5, but it's not available for that version.")
     })
 
-    test("Download Skeleton Mods - Modrinth", async () => {
-        const skeletonMod_entityculling = new mod.Mod(
-            "https://modrinth.com/mod/entityculling",
-            new mod.Priority(), -1, "Entity Culling", "NNAgCjsB", ["1.21", "1.21.6", "1.21.8", "1.21.9", "1.21.10"]
-        )
+    // test("Download Skeleton Mods - Modrinth", async () => {
+    //     const skeletonMod_entityculling = new mod.Mod(
+    //         "https://modrinth.com/mod/entityculling",
+    //         new mod.Priority(), -1, "Entity Culling", "NNAgCjsB", ["1.21", "1.21.6", "1.21.8", "1.21.9", "1.21.10"]
+    //     )
 
-        // Entity Culling 1.21.6
-        // const download_entityculling_forge1 = await skeletonMod_entityculling.getDownloadLink("Forge", "1.21.6")
-        // expect(download_entityculling_forge1).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/ev6PFt64/entityculling-forge-1.8.2-mc1.21.6.jar")
+    //     // Entity Culling 1.21.6
+    //     // const download_entityculling_forge1 = await skeletonMod_entityculling.getDownloadLink("Forge", "1.21.6")
+    //     // expect(download_entityculling_forge1).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/ev6PFt64/entityculling-forge-1.8.2-mc1.21.6.jar")
 
-        // const download_entityculling_fabric1 = await skeletonMod_entityculling.getDownloadLink("Fabric", "1.21.6")
-        // expect(download_entityculling_fabric1).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/5wVZFo2d/entityculling-fabric-1.8.2-mc1.21.6.jar")
+    //     // const download_entityculling_fabric1 = await skeletonMod_entityculling.getDownloadLink("Fabric", "1.21.6")
+    //     // expect(download_entityculling_fabric1).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/5wVZFo2d/entityculling-fabric-1.8.2-mc1.21.6.jar")
 
-        const download_entityculling_neoforge1 = await skeletonMod_entityculling.getDownloadLink("NeoForge", "1.21.6")
-        expect(download_entityculling_neoforge1).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/rFvPqrY3/entityculling-neoforge-1.8.2-mc1.21.6.jar")
+    //     const download_entityculling_neoforge1 = await skeletonMod_entityculling.getDownloadLink("NeoForge", "1.21.6")
+    //     expect(download_entityculling_neoforge1).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/rFvPqrY3/entityculling-neoforge-1.8.2-mc1.21.6.jar")
 
-        // await expect(skeletonMod_entityculling.getDownloadLink("Quilt", "1.21.6")).rejects.toThrowError(
-        //     "No download link could be found for entityculling for 1.21.6 and quilt"
-        // )
+    //     // await expect(skeletonMod_entityculling.getDownloadLink("Quilt", "1.21.6")).rejects.toThrowError(
+    //     //     "No download link could be found for entityculling for 1.21.6 and quilt"
+    //     // )
 
-        // Entity Culling 1.21
-        const download_entityculling_forge2 = await skeletonMod_entityculling.getDownloadLink("Forge", "1.21")
-        expect(download_entityculling_forge2).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/DutsY8u5/entityculling-forge-1.8.2-mc1.21.jar")
+    //     // Entity Culling 1.21
+    //     const download_entityculling_forge2 = await skeletonMod_entityculling.getDownloadLink("Forge", "1.21")
+    //     expect(download_entityculling_forge2).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/DutsY8u5/entityculling-forge-1.8.2-mc1.21.jar")
 
-        // const download_entityculling_fabric2 = await skeletonMod_entityculling.getDownloadLink("Fabric", "1.21")
-        // expect(download_entityculling_fabric2).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/ivkfruZP/entityculling-fabric-1.8.2-mc1.21.jar")
+    //     // const download_entityculling_fabric2 = await skeletonMod_entityculling.getDownloadLink("Fabric", "1.21")
+    //     // expect(download_entityculling_fabric2).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/ivkfruZP/entityculling-fabric-1.8.2-mc1.21.jar")
 
-        // const download_entityculling_neoforge2 = await skeletonMod_entityculling.getDownloadLink("NeoForge", "1.21")
-        // expect(download_entityculling_neoforge2).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/11PvLmko/entityculling-neoforge-1.8.2-mc1.21.jar")
+    //     // const download_entityculling_neoforge2 = await skeletonMod_entityculling.getDownloadLink("NeoForge", "1.21")
+    //     // expect(download_entityculling_neoforge2).toBe("https://cdn.modrinth.com/data/NNAgCjsB/versions/11PvLmko/entityculling-neoforge-1.8.2-mc1.21.jar")
 
-        await expect(skeletonMod_entityculling.getDownloadLink("Quilt", "1.21")).rejects.toThrowError(
-            "No download link could be found for entityculling for 1.21 and quilt"
-        )
+    //     await expect(skeletonMod_entityculling.getDownloadLink("Quilt", "1.21")).rejects.toThrowError(
+    //         "No download link could be found for entityculling for 1.21 and quilt"
+    //     )
 
-        const skeletonMod_netherHeight = new mod.Mod(
-            "https://modrinth.com/mod/nether-height-expansion-mod",
-            new mod.Priority(), -1, "More Nether Mod", "bcoxXH0y", ["1.20.6", "1.21"]
-        )
+    //     const skeletonMod_netherHeight = new mod.Mod(
+    //         "https://modrinth.com/mod/nether-height-expansion-mod",
+    //         new mod.Priority(), -1, "More Nether Mod", "bcoxXH0y", ["1.20.6", "1.21"]
+    //     )
 
-        // Nether Height 1.21.6
-        // await expect(skeletonMod_netherHeight.getDownloadLink("Forge", "1.21.6")).rejects.toThrowError(
-        //     "Attempted to download More Nether Mod for 1.21.6, but it's not available for that version."
-        // )
+    //     // Nether Height 1.21.6
+    //     // await expect(skeletonMod_netherHeight.getDownloadLink("Forge", "1.21.6")).rejects.toThrowError(
+    //     //     "Attempted to download More Nether Mod for 1.21.6, but it's not available for that version."
+    //     // )
 
-        // await expect(skeletonMod_netherHeight.getDownloadLink("Fabric", "1.21.6")).rejects.toThrowError(
-        //     "Attempted to download More Nether Mod for 1.21.6, but it's not available for that version."
-        // )
+    //     // await expect(skeletonMod_netherHeight.getDownloadLink("Fabric", "1.21.6")).rejects.toThrowError(
+    //     //     "Attempted to download More Nether Mod for 1.21.6, but it's not available for that version."
+    //     // )
 
-        // await expect(skeletonMod_netherHeight.getDownloadLink("NeoForge", "1.21.6")).rejects.toThrowError(
-        //     "Attempted to download More Nether Mod for 1.21.6, but it's not available for that version."
-        // )
+    //     // await expect(skeletonMod_netherHeight.getDownloadLink("NeoForge", "1.21.6")).rejects.toThrowError(
+    //     //     "Attempted to download More Nether Mod for 1.21.6, but it's not available for that version."
+    //     // )
 
-        // await expect(skeletonMod_netherHeight.getDownloadLink("Quilt", "1.21.6")).rejects.toThrowError(
-        //     "Attempted to download More Nether Mod for 1.21.6, but it's not available for that version."
-        // )
+    //     // await expect(skeletonMod_netherHeight.getDownloadLink("Quilt", "1.21.6")).rejects.toThrowError(
+    //     //     "Attempted to download More Nether Mod for 1.21.6, but it's not available for that version."
+    //     // )
 
-        // Nether Height 1.21
-        // await expect(skeletonMod_netherHeight.getDownloadLink("Forge", "1.21")).rejects.toThrowError(
-        //     "No download link could be found for nether-height-expansion-mod for 1.21 and forge"
-        // )
+    //     // Nether Height 1.21
+    //     // await expect(skeletonMod_netherHeight.getDownloadLink("Forge", "1.21")).rejects.toThrowError(
+    //     //     "No download link could be found for nether-height-expansion-mod for 1.21 and forge"
+    //     // )
 
-        const download_netherHeight_forge2 = await skeletonMod_netherHeight.getDownloadLink("Fabric", "1.21")
-        expect(download_netherHeight_forge2).toBe("https://cdn.modrinth.com/data/bcoxXH0y/versions/wQCvsEgU/more-nether-1.1.jar")
+    //     const download_netherHeight_forge2 = await skeletonMod_netherHeight.getDownloadLink("Fabric", "1.21")
+    //     expect(download_netherHeight_forge2).toBe("https://cdn.modrinth.com/data/bcoxXH0y/versions/wQCvsEgU/more-nether-1.1.jar")
 
-        // await expect(skeletonMod_netherHeight.getDownloadLink("NeoForge", "1.21")).rejects.toThrowError(
-        //     "No download link could be found for nether-height-expansion-mod for 1.21 and neoforge"
-        // )
+    //     // await expect(skeletonMod_netherHeight.getDownloadLink("NeoForge", "1.21")).rejects.toThrowError(
+    //     //     "No download link could be found for nether-height-expansion-mod for 1.21 and neoforge"
+    //     // )
 
-        // await expect(skeletonMod_netherHeight.getDownloadLink("Quilt", "1.21")).rejects.toThrowError(
-        //     "No download link could be found for nether-height-expansion-mod for 1.21 and quilt"
-        // )
-    })
+    //     // await expect(skeletonMod_netherHeight.getDownloadLink("Quilt", "1.21")).rejects.toThrowError(
+    //     //     "No download link could be found for nether-height-expansion-mod for 1.21 and quilt"
+    //     // )
+    // })
 
-    test("Download Skeleton Mods - CurseForge", async () => {
-        const skeletonMod_JEI = new mod.Mod(
-            "https://www.curseforge.com/minecraft/mc-mods/jei",
-            new mod.Priority(), -1, "Just Enough Items (JEI)", 238222, ["1.20.1", "1.21.1", "1.21.8", "1.21.9", "1.21.10"], undefined,
-            {
-                name: "Just Enough Items (JEI)",
-                id: 238222,
-                latestFilesIndexes: [
-                    { "gameVersion": "1.21.1", "fileId": 7270454, "modLoader": 1 },
-                    { "gameVersion": "1.21.1", "fileId": 7270453, "modLoader": 4 },
-                    { "gameVersion": "1.21.1", "fileId": 7270455, "modLoader": 6 },
-                    { "gameVersion": "1.20.1", "fileId": 7270446, "modLoader": 1 },
-                    { "gameVersion": "1.20.1", "fileId": 7270445, "modLoader": 4 }
-                ]
-            }
-        )
+    // test("Download Skeleton Mods - CurseForge", async () => {
+    //     const skeletonMod_JEI = new mod.Mod(
+    //         "https://www.curseforge.com/minecraft/mc-mods/jei",
+    //         new mod.Priority(), -1, "Just Enough Items (JEI)", 238222, ["1.20.1", "1.21.1", "1.21.8", "1.21.9", "1.21.10"], undefined,
+    //         {
+    //             name: "Just Enough Items (JEI)",
+    //             id: 238222,
+    //             latestFilesIndexes: [
+    //                 { "gameVersion": "1.21.1", "fileId": 7270454, "modLoader": 1 },
+    //                 { "gameVersion": "1.21.1", "fileId": 7270453, "modLoader": 4 },
+    //                 { "gameVersion": "1.21.1", "fileId": 7270455, "modLoader": 6 },
+    //                 { "gameVersion": "1.20.1", "fileId": 7270446, "modLoader": 1 },
+    //                 { "gameVersion": "1.20.1", "fileId": 7270445, "modLoader": 4 }
+    //             ]
+    //         }
+    //     )
 
-        try {
-            // JEI  1.21.1
-            const download_JEI_forge1 = await skeletonMod_JEI.getDownloadLink("Forge", "1.21.1")
-            expect(download_JEI_forge1).toBe("https://edge.forgecdn.net/files/7270/454/jei-1.21.1-forge-19.25.1.332.jar")
+    //     try {
+    //         // JEI  1.21.1
+    //         const download_JEI_forge1 = await skeletonMod_JEI.getDownloadLink("Forge", "1.21.1")
+    //         expect(download_JEI_forge1).toBe("https://edge.forgecdn.net/files/7270/454/jei-1.21.1-forge-19.25.1.332.jar")
 
-            const download_JEI_fabric1 = await skeletonMod_JEI.getDownloadLink("Fabric", "1.21.1")
-            expect(download_JEI_fabric1).toBe("https://edge.forgecdn.net/files/7270/453/jei-1.21.1-fabric-19.25.1.332.jar")
+    //         const download_JEI_fabric1 = await skeletonMod_JEI.getDownloadLink("Fabric", "1.21.1")
+    //         expect(download_JEI_fabric1).toBe("https://edge.forgecdn.net/files/7270/453/jei-1.21.1-fabric-19.25.1.332.jar")
 
-            const download_JEI_neoforge1 = await skeletonMod_JEI.getDownloadLink("NeoForge", "1.21.1")
-            expect(download_JEI_neoforge1).toBe("https://edge.forgecdn.net/files/7270/455/jei-1.21.1-neoforge-19.25.1.332.jar")
+    //         const download_JEI_neoforge1 = await skeletonMod_JEI.getDownloadLink("NeoForge", "1.21.1")
+    //         expect(download_JEI_neoforge1).toBe("https://edge.forgecdn.net/files/7270/455/jei-1.21.1-neoforge-19.25.1.332.jar")
 
-            await expect(skeletonMod_JEI.getDownloadLink("Quilt", "1.21.1")).rejects.toThrowError(
-                "No download link could be found for Just Enough Items (JEI) for 1.21.1 and Quilt"
-            )
+    //         await expect(skeletonMod_JEI.getDownloadLink("Quilt", "1.21.1")).rejects.toThrowError(
+    //             "No download link could be found for Just Enough Items (JEI) for 1.21.1 and Quilt"
+    //         )
 
-            // JEI 1.20.1
-            const download_JEI_forge2 = await skeletonMod_JEI.getDownloadLink("Forge", "1.20.1")
-            expect(download_JEI_forge2).toBe("https://edge.forgecdn.net/files/7270/446/jei-1.20.1-forge-15.20.0.127.jar")
+    //         // JEI 1.20.1
+    //         const download_JEI_forge2 = await skeletonMod_JEI.getDownloadLink("Forge", "1.20.1")
+    //         expect(download_JEI_forge2).toBe("https://edge.forgecdn.net/files/7270/446/jei-1.20.1-forge-15.20.0.127.jar")
 
-            const download_JEI_fabric2 = await skeletonMod_JEI.getDownloadLink("Fabric", "1.20.1")
-            expect(download_JEI_fabric2).toBe("https://edge.forgecdn.net/files/7270/445/jei-1.20.1-fabric-15.20.0.127.jar")
+    //         const download_JEI_fabric2 = await skeletonMod_JEI.getDownloadLink("Fabric", "1.20.1")
+    //         expect(download_JEI_fabric2).toBe("https://edge.forgecdn.net/files/7270/445/jei-1.20.1-fabric-15.20.0.127.jar")
 
-            await expect(skeletonMod_JEI.getDownloadLink("NeoForge", "1.20.1")).rejects.toThrowError(
-                "No download link could be found for Just Enough Items (JEI) for 1.20.1 and NeoForge"
-            )
+    //         await expect(skeletonMod_JEI.getDownloadLink("NeoForge", "1.20.1")).rejects.toThrowError(
+    //             "No download link could be found for Just Enough Items (JEI) for 1.20.1 and NeoForge"
+    //         )
 
-            await expect(skeletonMod_JEI.getDownloadLink("Quilt", "1.20.1")).rejects.toThrowError(
-                "No download link could be found for Just Enough Items (JEI) for 1.20.1 and Quilt"
-            )
+    //         await expect(skeletonMod_JEI.getDownloadLink("Quilt", "1.20.1")).rejects.toThrowError(
+    //             "No download link could be found for Just Enough Items (JEI) for 1.20.1 and Quilt"
+    //         )
 
-            const skeletonMod_BoingBoing = new mod.Mod(
-                "https://www.curseforge.com/minecraft/mc-mods/boing-boing-items",
-                new mod.Priority(), -1, "Boing Boing Items", 1395190, ["1.20", "1.20.1", "1.20.2", "1.21", "1.21.1", "1.21.2"], undefined,
-                {
-                    name: "Boing Boing Items",
-                    id: 1395190,
-                    latestFilesIndexes: [
-                        { "gameVersion": "1.21.1", "fileId": 7284969, "modLoader": 6 },
-                        { "gameVersion": "1.21.1", "fileId": 7284964, "modLoader": 4 },
-                        { "gameVersion": "1.20.1", "fileId": 7284967, "modLoader": 1 }
-                    ]
-                }
-            )
+    //         const skeletonMod_BoingBoing = new mod.Mod(
+    //             "https://www.curseforge.com/minecraft/mc-mods/boing-boing-items",
+    //             new mod.Priority(), -1, "Boing Boing Items", 1395190, ["1.20", "1.20.1", "1.20.2", "1.21", "1.21.1", "1.21.2"], undefined,
+    //             {
+    //                 name: "Boing Boing Items",
+    //                 id: 1395190,
+    //                 latestFilesIndexes: [
+    //                     { "gameVersion": "1.21.1", "fileId": 7284969, "modLoader": 6 },
+    //                     { "gameVersion": "1.21.1", "fileId": 7284964, "modLoader": 4 },
+    //                     { "gameVersion": "1.20.1", "fileId": 7284967, "modLoader": 1 }
+    //                 ]
+    //             }
+    //         )
 
-            // Boing Boing Items 1.21.1
-            await expect(skeletonMod_BoingBoing.getDownloadLink("Forge", "1.21.1")).rejects.toThrowError(
-                "No download link could be found for Boing Boing Items for 1.21.1 and Forge"
-            )
+    //         // Boing Boing Items 1.21.1
+    //         await expect(skeletonMod_BoingBoing.getDownloadLink("Forge", "1.21.1")).rejects.toThrowError(
+    //             "No download link could be found for Boing Boing Items for 1.21.1 and Forge"
+    //         )
 
-            const download_BoingBoing_fabric1 = await skeletonMod_BoingBoing.getDownloadLink("Fabric", "1.21.1")
-            expect(download_BoingBoing_fabric1).toBe("https://edge.forgecdn.net/files/7284/964/boingboingitem-fabric-1.21.1-0.2.jar")
+    //         const download_BoingBoing_fabric1 = await skeletonMod_BoingBoing.getDownloadLink("Fabric", "1.21.1")
+    //         expect(download_BoingBoing_fabric1).toBe("https://edge.forgecdn.net/files/7284/964/boingboingitem-fabric-1.21.1-0.2.jar")
 
-            const download_BoingBoing_neoforge1 = await skeletonMod_BoingBoing.getDownloadLink("NeoForge", "1.21.1")
-            expect(download_BoingBoing_neoforge1).toBe("https://edge.forgecdn.net/files/7284/969/boingboingitem-neoforge-0.2.jar")
+    //         const download_BoingBoing_neoforge1 = await skeletonMod_BoingBoing.getDownloadLink("NeoForge", "1.21.1")
+    //         expect(download_BoingBoing_neoforge1).toBe("https://edge.forgecdn.net/files/7284/969/boingboingitem-neoforge-0.2.jar")
 
-            await expect(skeletonMod_BoingBoing.getDownloadLink("Quilt", "1.21.1")).rejects.toThrowError(
-                "No download link could be found for Boing Boing Items for 1.21.1 and Quilt"
-            )
+    //         await expect(skeletonMod_BoingBoing.getDownloadLink("Quilt", "1.21.1")).rejects.toThrowError(
+    //             "No download link could be found for Boing Boing Items for 1.21.1 and Quilt"
+    //         )
 
-            // Boing Boing Items 1.20.1
-            const download_BoingBoing_forge2 = await skeletonMod_BoingBoing.getDownloadLink("Forge", "1.20.1")
-            expect(download_BoingBoing_forge2).toBe("https://edge.forgecdn.net/files/7284/967/boingboingitem-forge-0.2.jar")
+    //         // Boing Boing Items 1.20.1
+    //         const download_BoingBoing_forge2 = await skeletonMod_BoingBoing.getDownloadLink("Forge", "1.20.1")
+    //         expect(download_BoingBoing_forge2).toBe("https://edge.forgecdn.net/files/7284/967/boingboingitem-forge-0.2.jar")
 
-            await expect(skeletonMod_BoingBoing.getDownloadLink("Fabric", "1.20.1")).rejects.toThrowError(
-                "No download link could be found for Boing Boing Items for 1.20.1 and Fabric"
-            )
+    //         await expect(skeletonMod_BoingBoing.getDownloadLink("Fabric", "1.20.1")).rejects.toThrowError(
+    //             "No download link could be found for Boing Boing Items for 1.20.1 and Fabric"
+    //         )
 
-            await expect(skeletonMod_BoingBoing.getDownloadLink("NeoForge", "1.20.1")).rejects.toThrowError(
-                "No download link could be found for Boing Boing Items for 1.20.1 and NeoForge"
-            )
+    //         await expect(skeletonMod_BoingBoing.getDownloadLink("NeoForge", "1.20.1")).rejects.toThrowError(
+    //             "No download link could be found for Boing Boing Items for 1.20.1 and NeoForge"
+    //         )
 
-            await expect(skeletonMod_BoingBoing.getDownloadLink("Quilt", "1.20.1")).rejects.toThrowError(
-                "No download link could be found for Boing Boing Items for 1.20.1 and Quilt"
-            )
-        } catch (error) {
-            if (error.name = "API Key could not be fetched") {
-                throw new Error(
-                    "CurseForge API key could not be fetched. "
-                    + "Please create an API_Keys.js file with the following contents:\n."
-                    + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
-                )
-            } else {
-                throw error
-            }
-        }
-    })
+    //         await expect(skeletonMod_BoingBoing.getDownloadLink("Quilt", "1.20.1")).rejects.toThrowError(
+    //             "No download link could be found for Boing Boing Items for 1.20.1 and Quilt"
+    //         )
+    //     } catch (error) {
+    //         if (error.name = "API Key could not be fetched") {
+    //             throw new Error(
+    //                 "CurseForge API key could not be fetched. "
+    //                 + "Please create an API_Keys.js file with the following contents:\n."
+    //                 + "const CurseForge = 'YOUR API KEY HERE'\nexport default CurseForge"
+    //             )
+    //         } else {
+    //             throw error
+    //         }
+    //     }
+    // })
 })

@@ -10,14 +10,13 @@ if (storedData) {
     try {
         const parsedData = JSON.parse(storedData)
         profileManager = loadFromJson.createProfileManager(parsedData)
+        profileManager.refreshProfiles()
         console.log("Saved data restored.")
     } catch (error) {
         if (error.name == "Blank manager data") {
             console.log("Stored data was empty or invalid. Creating blank save.")
-            profileManager = new profile.ProfileManager()
         } else {
             console.error("Error restoring saved data. Creating blank save.\n" + error)
-            profileManager = new profile.ProfileManager()
         }
     }
 } else {

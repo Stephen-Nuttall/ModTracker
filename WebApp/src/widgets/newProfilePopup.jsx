@@ -24,6 +24,7 @@ function NewProfilePopup({ isOpen = false, setIsOpen, setFuncOutput }) {
         }
         else {
             let newProfile = loadFromJson.createProfile(parsedData)
+            newProfile.refresh()
             profileManager.addProfile(newProfile, nameInput)
             setIsOpen(false)
         }
